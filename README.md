@@ -1,16 +1,92 @@
 # Harness Engineering 规范
 
-版本：v0.1  
+版本：v0.0.1  
 状态：试行（条款会在 v1.0 前持续收敛）  
 适用范围：使用 AI 参与需求、设计、编码、测试、交付和文档维护的软件工程团队
 
 ## TL;DR
 
-- **是什么**：一份将 Harness Engineering 思想落到团队 SDLC 的方法论 + 一组可直接使用的 Agent 提示词与文档模板。
+- **是什么**：一份将 Harness Engineering 思想落到团队 SDLC 的方法论 + 一组可直接使用的 Agent 提示词与文档模板 + 一套把它们一键铺到你仓库的脚本。
 - **为谁写**：在真实项目里和 AI 协作，并希望让交付保持可追溯、可评审、可维护的工程团队与个人开发者。
 - **解决什么**：把"AI 写得很快但难以验证 / 难以合并 / 难以维护"的现实问题，转化为一条由文档、评审、测试和提交记录组成的硬轨道。
 - **核心模型**：按 Agent **行动时序**划分的三层 Harness——约束层（行动前）/ 反馈层（行动中）/ 质量门禁层（行动后），配套 8 个职责单一的 Agent（H1–H6 + 横切两个）。
-- **不是什么**：不是工具，不是 SDK，不依赖特定 IDE 或厂商；与 `AGENTS.md` / `CLAUDE.md` / `copilot-instructions.md` 等运行时机制互补，而非替代。
+
+### 这是什么 / 不是什么
+
+| 这是                                                                                       | 这不是                                                               |
+| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| 一份**团队 AI 工程规约**：文档结构 + 评审节奏 + Agent 角色定义                             | AI Agent 框架 / SDK / 运行时（不替代 LangGraph、Agent Framework 等） |
+| 一套**多工具分发器**：同一份角色定义可同步成 Copilot chatmode / Claude Code subagent / ... | 一键万能解（chatmode 是"打开才用"，没有团队文化基础时就是死代码）    |
+| **可被采纳为 standard 的规范**：`.harness-engineering/` 目录直接提交进你的仓库   | prompt 库（提供的是结构与契约，不是预制 prompt 的集合）              |
+| 与 `AGENTS.md` / `copilot-instructions.md` / `CLAUDE.md` 等运行时机制**互补**              | 自动化质量门禁（CI / Hooks / Lint 仍需各项目自行接入）               |
+
+## 快速开始（一键集成）
+
+仓库根 `install.ps1` / `install.sh` 把规范文档 vendor 进你的项目并为指定的 AI 编码工具渲染配置：
+
+```powershell
+# Windows / 跨平台（PowerShell 7+）
+git clone https://github.com/shuaihuadu/harness-engineering.git
+cd harness-engineering
+./install.ps1 -TargetRepo D:\Path\To\YourRepo
+```
+
+```bash
+# Linux / macOS（依赖 jq）
+git clone https://github.com/shuaihuadu/harness-engineering.git
+cd harness-engineering
+./install.sh --target-repo /path/to/your/repo
+```
+
+默认会做四件事：
+
+1. **Vendor 规范文档**：把 `agents/` `docs/` `templates/` `README.md` 同步进 `<your-repo>/.harness-engineering/`（与安装清单同住，一个隐藏目录装下所有 harness 产物）
+2. **渲染 Copilot 配置**：`.github/copilot-instructions.md` + `.github/instructions/*`，链接指向上一步的 vendor 目录
+3. **不默认安装任何 chatmode**：自 v0.0.1 起，chatmode 必须显式指定（如 `-Chatmodes commit-auditor,design-reviewer` 或 `-Chatmodes all`），避免在用户未知情时往 `.github/chatmodes/` 落文件
+4. **写入安装清单**：`<your-repo>/.harness-engineering/manifest.json` 记录本次写入的所有文件（含 sha256）+ 本次填入的占位符（`replacements`），供 `uninstall` 使用，并在下次重装时自动预填
+
+### 占位符填入策略
+
+需要 7 个占位符（PROJECT_NAME / PROJECT_ONE_LINER / PRIMARY_LANGUAGE / TECH_STACK / TEST_COMMAND / LINT_COMMAND / HARNESS_REPO_REF），优先级：
+
+```
+CLI 参数  >  上次 manifest.replacements  >  自动探测  >  交互输入 / 空（→ <未配置>）
+```
+
+- **自动探测**：脚本会读取 `*.csproj` / `package.json` / `pyproject.toml` / `go.mod` / `Cargo.toml` / `global.json` 等推断项目名、主语言、技术栈、测试和 Lint 命令。检测到的值作为 prompt 默认（回车采纳）
+- **重装零输入**：上次安装的 `replacements` 写在 manifest 里，再次运行 `install` 时会自动作为最高优先级默认，覆盖探测结果
+- **可选字段允许留空**：除 `PROJECT_NAME` 和 `HARNESS_REPO_REF` 外，其余字段留空会被填为字面量 `<未配置>`，便于后续用 `grep '<未配置>'` 一次性补充
+- **零交互**：`-NonInteractive` 跳过所有 prompt（探测出什么用什么，仍缺则填 `<未配置>`）；`-Force` 隐含 `-NonInteractive` 并自动覆盖一切冲突
+
+需要卸载时：
+
+```powershell
+./uninstall.ps1 -TargetRepo D:\Path\To\YourRepo            # 安全卸载（用户改过的文件默认保留）
+./uninstall.ps1 -TargetRepo D:\Path\To\YourRepo -Force     # 一并清理用户改过的文件
+./uninstall.ps1 -TargetRepo D:\Path\To\YourRepo -DryRun    # 只预览
+```
+
+更多用法（多 target、占位符、`-Force` / `-DryRun` / `-NoVendor` 等）见 [`agents/_integrations/README.md`](agents/_integrations/README.md)。
+
+### 关于 vendor 模式
+
+默认行为是把 `agents/`、`docs/`、`templates/`、`README.md` **整份复制**到你的仓库 `.harness-engineering/` 下，这意味着：
+
+- ✅ 离线可用、链接在采用方仓库内可点
+- ✅ 规范副本与采用方仓库同步进入版本控制，可 diff、可回滚
+- ✅ 与 `manifest.json` 同住一个隐藏目录，不污染 `docs/` 树；整块卸载干净
+- ⚠️ 采用方仓库会多 ~300KB Markdown
+- ⚠️ 规范升级 = 每个采用方仓库重跑一次 `install`（manifest 会自动 diff，已存在且未改的文件会 skip）
+
+> 想换个目录名？交互模式下 vendor 路径会有 prompt（回车用默认 `.harness-engineering`）；非交互可显式传 `-VendorHarnessTo <path>` / `--vendor-harness-to <path>`。
+
+如果你希望不在采用方仓库落 vendor 副本（例如让链接指向 GitHub 远端），使用：
+
+```powershell
+./install.ps1 -TargetRepo X -NoVendor -HarnessRepoRef https://github.com/shuaihuadu/harness-engineering/blob/main
+```
+
+`-NoVendor` 模式下 `{{HARNESS_REPO_REF}}` 会被替换成你提供的 URL；缺点是 chatmode 里的链接需要联网才能跳转。两种模式适合不同场景，按需选择。
 
 ## 如何使用本仓库
 
@@ -65,11 +141,11 @@ Harness Engineering（中文社区暂无官方译名，本规范采用"驾驭工
 
 主流工具厂商对这三层的落地可作为对照：
 
-| 层次       | OpenAI Codex 体系                                                                                      | Anthropic Claude Code 体系                                    |
-| ---------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| 约束层     | `AGENTS.md`（多级，作为"目录"而非百科全书）、自定义 Lint、结构测试、分层架构不变式                     | `CLAUDE.md`（及子目录继承）、Skills、Subagents                |
-| 反馈层     | 测试 / 构建 / Chrome DevTools MCP / 本地可观测栈（LogQL、PromQL）、Ralph Wiggum 循环（Agent 自审自改） | Plan Mode、测试与截图验证、Subagents 隔离调查                 |
-| 质量门禁层 | 自定义 Lint 硬失败、结构测试、后台 doc-gardening Agent、提交者路径限制                                 | Hooks（确定性拦截）、Permission allowlist、Sandbox、Auto Mode |
+| 层次       | GitHub Copilot 体系                                                                                                                            | OpenAI Codex 体系                                                                                      | Anthropic Claude Code 体系                                    |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| 约束层     | `.github/copilot-instructions.md`、`.github/instructions/*.instructions.md`（带 `applyTo` 模式）、`AGENTS.md`、自定义 Chat Mode / Custom Agent | `AGENTS.md`（多级，作为"目录"而非百科全书）、自定义 Lint、结构测试、分层架构不变式                     | `CLAUDE.md`（及子目录继承）、Skills、Subagents                |
+| 反馈层     | Agent Mode（`#codebase` / `#fetch` / 终端 / Problems 回灌）、MCP 工具集成、Copilot Edits 多文件迭代                                            | 测试 / 构建 / Chrome DevTools MCP / 本地可观测栈（LogQL、PromQL）、Ralph Wiggum 循环（Agent 自审自改） | Plan Mode、测试与截图验证、Subagents 隔离调查                 |
+| 质量门禁层 | Copilot code review（PR 阶段）、Branch protection + Required reviewers、Secret scanning push protection、GitHub Actions CI                     | 自定义 Lint 硬失败、结构测试、后台 doc-gardening Agent、提交者路径限制                                 | Hooks（确定性拦截）、Permission allowlist、Sandbox、Auto Mode |
 
 本规范作为上述体系中 **"文档化 + SDLC"** 这一层的通用骨架，与底层工具不冲突。
 

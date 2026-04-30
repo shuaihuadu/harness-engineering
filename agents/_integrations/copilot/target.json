@@ -1,0 +1,32 @@
+{
+    "name": "copilot",
+    "display": "GitHub Copilot",
+    "renders": [
+        {
+            "kind": "single",
+            "source": "copilot-instructions.template.md",
+            "target": ".github/copilot-instructions.md"
+        },
+        {
+            "kind": "directory",
+            "source_dir": "instructions",
+            "target_dir": ".github/instructions",
+            "source_glob": "*.instructions.template.md",
+            "target_glob": "*.instructions.md",
+            "selectable": false,
+            "orphan_check": true,
+            "orphan_check_only_when_all": false
+        },
+        {
+            "kind": "directory",
+            "source_dir": "chatmodes",
+            "target_dir": ".github/chatmodes",
+            "source_glob": "*.chatmode.template.md",
+            "target_glob": "*.chatmode.md",
+            "selectable": true,
+            "default_select": [],
+            "orphan_check": true,
+            "orphan_check_only_when_all": true
+        }
+    ]
+}

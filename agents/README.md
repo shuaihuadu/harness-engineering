@@ -13,16 +13,16 @@
 
 ## 2. Agent 总索引
 
-| Agent                                                          | 阶段       | Harness 层 | 一句话职责                                                                        |
-| -------------------------------------------------------------- | ---------- | ---------- | --------------------------------------------------------------------------------- |
-| [RequirementsInterviewer](./requirements-interviewer/AGENT.md) | H1         | 反馈层     | 接收一句话需求，主动反问以暴露模糊点，产出可评审的 `requirements.md` 草稿         |
-| [RepoImpactMapper](./repo-impact-mapper/AGENT.md)              | H1↔H3 之间 | 约束层     | 在做计划前扫描真实代码，产出可审核的"仓库影响地图"，拦截"AI 凭空编 API"的失败模式 |
-| [DesignReviewer](./design-reviewer/AGENT.md)                   | H3         | 质量门禁层 | 机械化校验详细设计的完备性与一致性，挡住"设计没写清"流入 H4/H5                    |
-| [TestCaseAuthor](./test-case-author/AGENT.md)                  | H4         | 反馈层     | 从需求与设计反推 `TC-NNN`，确保每条 REQ 至少有可机械判断的覆盖                    |
-| [CodingExecutor](./coding-executor/AGENT.md)                   | H5         | 反馈层     | 严格按 `ai-task-brief.md` 完成单个工程单元，同步生成测试与提交元数据              |
-| [CommitAuditor](./commit-auditor/AGENT.md)                     | H5         | 质量门禁层 | 在 PR / 合并前机械化校验提交信息、改动范围、追溯字段                              |
-| [ReleaseNoteWriter](./release-note-writer/AGENT.md)            | H6         | 反馈层     | 从 commit-records 与追溯链生成 release notes 草稿，回写追溯矩阵                   |
-| [DocGardener](./doc-gardener/AGENT.md)                         | 横切       | 质量门禁层 | 定时巡检 `docs/` 与代码实际行为的偏离，开具修复 PR                                |
+| Agent                                                          | 阶段       | Harness 层          | 一句话职责                                                                        |
+| -------------------------------------------------------------- | ---------- | ------------------- | --------------------------------------------------------------------------------- |
+| [RequirementsInterviewer](./requirements-interviewer/AGENT.md) | H1         | 反馈层              | 接收一句话需求，主动反问以暴露模糊点，产出可评审的 `requirements.md` 草稿         |
+| [RepoImpactMapper](./repo-impact-mapper/AGENT.md)              | H1↔H3 之间 | 约束层              | 在做计划前扫描真实代码，产出可审核的"仓库影响地图"，拦截"AI 凭空编 API"的失败模式 |
+| [DesignReviewer](./design-reviewer/AGENT.md)                   | H3         | 质量门禁层          | 机械化校验详细设计的完备性与一致性，挡住"设计没写清"流入 H4/H5                    |
+| [TestCaseAuthor](./test-case-author/AGENT.md)                  | H4         | 反馈层              | 从需求与设计反推 `TC-NNN`，确保每条 REQ 至少有可机械判断的覆盖                    |
+| [CodingExecutor](./coding-executor/AGENT.md)                   | H5         | 反馈层              | 严格按 `ai-task-brief.md` 完成单个工程单元，同步生成测试与提交元数据              |
+| [CommitAuditor](./commit-auditor/AGENT.md)                     | H5/H6      | 质量门禁层          | 在 PR / 合并前机械化校验提交信息、改动范围、追溯字段                              |
+| [ReleaseNoteWriter](./release-note-writer/AGENT.md)            | H6         | 反馈层              | 从 commit-records 与追溯链生成 release notes 草稿，回写追溯矩阵                   |
+| [DocGardener](./doc-gardener/AGENT.md)                         | 跨阶段     | 质量门禁层 + 反馈层 | 定时巡检 `docs/` 与代码实际行为的偏离，开具修复 PR                                |
 
 后续候选（暂未交付，避免在缺乏真实样本时过早设计）：
 
@@ -35,7 +35,7 @@
 ```text
 H1: RequirementsInterviewer ──► RepoImpactMapper
                                         │
-H2: 人工 / ArchitectAdvisor（待补） ────┤
+H2: 人工 / ArchitectAdvisor（待补）  ────┤
                                         ▼
 H3:                              DesignReviewer
                                         │
@@ -43,7 +43,7 @@ H4:                              TestCaseAuthor
                                         │
 H5:                              CodingExecutor ──► CommitAuditor ──► CI 钩子 / 项目专属 Linter
                                                                                 │
-H6:                                                                              └──► ReleaseNoteWriter
+H6:                                                                             └──► ReleaseNoteWriter
 
 横切（定时 / Webhook 触发）：DocGardener
 ```

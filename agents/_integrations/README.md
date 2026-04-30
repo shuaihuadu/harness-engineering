@@ -6,23 +6,25 @@
 
 ## 1. 模板清单
 
-| 工具 | 模板 | 落地位置（使用方仓库） |
-| --- | --- | --- |
-| Claude Code | [`claude-code/agent.md.template`](./claude-code/agent.md.template) | `.claude/agents/<name>.md` |
-| GitHub Copilot Chat | [`copilot/chatmode.md.template`](./copilot/chatmode.md.template) | `.github/chatmodes/<name>.chatmode.md` |
-| OpenAI Codex / AGENTS.md | [`codex/agents.md.snippet`](./codex/agents.md.snippet) | 在仓库 `AGENTS.md` 末尾追加 |
-| 自研 Runtime | [`generic/runtime-config.yaml.template`](./generic/runtime-config.yaml.template) | 由 Runtime 项目自管理 |
+| 工具                     | 模板                                                                             | 落地位置（使用方仓库）                                                             |
+| ------------------------ | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Claude Code              | [`claude-code/agent.md.template`](./claude-code/agent.md.template)               | `.claude/agents/<name>.md`                                                         |
+| GitHub Copilot           | [`copilot/`](./copilot/README.md)（指令 + chatmode 套件）                        | `.github/copilot-instructions.md` / `.github/instructions/` / `.github/chatmodes/` |
+| OpenAI Codex / AGENTS.md | [`codex/agents.md.snippet`](./codex/agents.md.snippet)                           | 在仓库 `AGENTS.md` 末尾追加                                                        |
+| 自研 Runtime             | [`generic/runtime-config.yaml.template`](./generic/runtime-config.yaml.template) | 由 Runtime 项目自管理                                                              |
+
+> Copilot 一栏指向子目录而非单个文件——它包含一份顶层指令（`copilot-instructions.template.md`）、3 份切片指令（`instructions/`）、3 份专用 chatmode（`chatmodes/`），以及一份通用 chatmode 模板 `chatmode.md.template`（可派生其他 5 个 Agent）。详细文件清单与复制步骤见 [copilot/README.md](./copilot/README.md)。
 
 ## 2. 通用替换占位符
 
 所有模板中以下占位符在落地时替换：
 
-| 占位符 | 含义 |
-| --- | --- |
-| `{{AGENT_NAME}}` | Agent 名（如 `CodingExecutor`） |
-| `{{AGENT_DIR}}` | 相对仓库根的路径（如 `harness-engineering/agents/coding-executor`） |
-| `{{ONE_LINER}}` | 一句话职责（来自 `AGENT.md` §定位 第一句） |
-| `{{TOOL_LIST}}` | 工具白名单。值取自 [`_shared/tool-vocabulary.md`](../_shared/tool-vocabulary.md)，再按目标工具的真实接口名做一次映射 |
+| 占位符           | 含义                                                                                                                 |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `{{AGENT_NAME}}` | Agent 名（如 `CodingExecutor`）                                                                                      |
+| `{{AGENT_DIR}}`  | 相对仓库根的路径（如 `harness-engineering/agents/coding-executor`）                                                  |
+| `{{ONE_LINER}}`  | 一句话职责（来自 `AGENT.md` §定位 第一句）                                                                           |
+| `{{TOOL_LIST}}`  | 工具白名单。值取自 [`_shared/tool-vocabulary.md`](../_shared/tool-vocabulary.md)，再按目标工具的真实接口名做一次映射 |
 
 ## 3. 使用约定
 
