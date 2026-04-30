@@ -1,13 +1,13 @@
 # DocGardener
 
-> 跨阶段（H5 / H6 / 长期维护） | Harness 层：门禁层 + 反馈层
+> 跨阶段（H5 / H6 / 长期维护） | Harness 层：质量门禁层 + 反馈层
 > 共享契约：[`../_shared/glossary.md`](../_shared/glossary.md)、[`../_shared/io-contracts.md`](../_shared/io-contracts.md)
 
 ## 1. 定位
 
-周期性地比对 `docs/` 中的产物与代码 / 提交记录的真实状态，识别**已腐化**或**与代码不一致**的文档，开 PR 修复或在 issue 中提示。它对应规范 §15"熵管理与 GC"小节，是抵御文档腐烂的常驻反馈机制。
+周期性地比对 `docs/` 中的产物与代码 / 提交记录的真实状态，识别**已腐化**或**与代码不一致**的文档，开 PR 修复或在 issue 中提示。它对应规范 §10"熵管理与 GC"小节，是抵御文档腐烂的常驻反馈机制。
 
-> 设计依据：Harness Engineering 三层模型——长期项目里"约束层"会随时间漂移，需要门禁层之外的常驻反馈机制把漂移点暴露出来。
+> 设计依据：Harness Engineering 三层模型——长期项目里"约束层"会随时间漂移，需要质量门禁层之外的常驻反馈机制把漂移点暴露出来。
 
 ## 2. 触发时机
 
@@ -17,13 +17,13 @@
 
 ## 3. 输入契约
 
-| 输入 | 必需 | 说明 |
-| --- | --- | --- |
-| `docs/` 全量 | 是 | 包括 H1–H7 各阶段产物 |
-| `docs/06-implementation/commit-records.md` | 是 | 提交追溯表 |
-| `docs/06-implementation/exec-plans/tech-debt-tracker.md` | 是 | 已知技术债务 |
-| 仓库源码与最近的 git log | 是 | 用于验证文档描述的真实性 |
-| `AGENTS.md` | 是 | 模块边界 |
+| 输入                                                     | 必需 | 说明                     |
+| -------------------------------------------------------- | ---- | ------------------------ |
+| `docs/` 全量                                             | 是   | 包括 H1–H6 各阶段产物    |
+| `docs/06-implementation/commit-records.md`               | 是   | 提交追溯表               |
+| `docs/06-implementation/exec-plans/tech-debt-tracker.md` | 是   | 已知技术债务             |
+| 仓库源码与最近的 git log                                 | 是   | 用于验证文档描述的真实性 |
+| `AGENTS.md`                                              | 是   | 模块边界                 |
 
 ## 4. 输出契约
 
@@ -57,15 +57,15 @@
 
 能力 ID 取自 [`_shared/tool-vocabulary.md`](../_shared/tool-vocabulary.md)。
 
-| 能力 | 必需 | 用途 |
-| --- | --- | --- |
-| `read.file` | 是 | 读文档与源码 |
-| `read.list` | 是 | 遍历 `docs/` 子树 |
-| `read.search.text` | 是 | 校验文档中引用的路径 / 命令是否真实 |
-| `read.git.log` | 是 | 判断 draft 是否长期停滞 |
-| `read.git.blame` | 否 | 定位某行最后修改时间 |
-| `write.file` | 是 | 写 `doc-gc-report.md` |
-| `pr.create` | 否 | `high` 项可自动开修复 PR / issue（按部署环境而定） |
+| 能力               | 必需 | 用途                                               |
+| ------------------ | ---- | -------------------------------------------------- |
+| `read.file`        | 是   | 读文档与源码                                       |
+| `read.list`        | 是   | 遍历 `docs/` 子树                                  |
+| `read.search.text` | 是   | 校验文档中引用的路径 / 命令是否真实                |
+| `read.git.log`     | 是   | 判断 draft 是否长期停滞                            |
+| `read.git.blame`   | 否   | 定位某行最后修改时间                               |
+| `write.file`       | 是   | 写 `doc-gc-report.md`                              |
+| `pr.create`        | 否   | `high` 项可自动开修复 PR / issue（按部署环境而定） |
 
 **禁用**：`exec.*`、`write.patch` 对源码 / 规范文件的写动作——本 Agent 不动源码、不动 `harness-engineering/` 自身。
 

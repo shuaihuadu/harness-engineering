@@ -4,7 +4,7 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) 的 §4（H1 章节）和 §11（AI 使用规范）。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) 的 §4（H1 章节）、README §6（AI 使用规范）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md) 与 [术语表](../_shared/glossary.md)。
 3. **不要**推演技术方案、不要设计 API、不要决定数据结构——这些不属于 H1。
 4. **不要**因为用户没明确说就给合规、权限、性能要求填默认值。无法确认的事项一律进入"待澄清清单"。
@@ -35,7 +35,7 @@
 
 ### 第三步：起草需求
 
-确认信息充足后，按规范 §4.4 起草 `docs/01-requirements/requirements.md`，要求：
+确认信息充足后，按 [`docs/stages.md`](../../docs/stages.md) §4.4 起草 `docs/01-requirements/requirements.md`，要求：
 
 - frontmatter 字段齐全，`status: draft`，`stage: H1`
 - 每条需求项使用 `REQ-NNN` 编号，从 001 起递增

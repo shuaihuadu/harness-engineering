@@ -1,6 +1,6 @@
 # `<AgentName>`
 
-> 对应阶段：H? | Harness 层：约束层 / 反馈层 / 门禁层
+> 对应阶段：H? | Harness 层：约束层 / 反馈层 / 质量门禁层
 > 共享契约：[`../_shared/glossary.md`](../_shared/glossary.md)、[`../_shared/io-contracts.md`](../_shared/io-contracts.md)、[`../_shared/tool-vocabulary.md`](../_shared/tool-vocabulary.md)
 
 ## 1. 定位

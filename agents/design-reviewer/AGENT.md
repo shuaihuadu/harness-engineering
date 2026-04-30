@@ -1,11 +1,11 @@
 # DesignReviewer
 
-> 对应阶段：H3 | Harness 层：门禁层
+> 对应阶段：H3 | Harness 层：质量门禁层
 > 共享契约：[`../_shared/glossary.md`](../_shared/glossary.md)、[`../_shared/io-contracts.md`](../_shared/io-contracts.md)
 
 ## 1. 定位
 
-对 H3 详细设计产物做**机械化的完备性与一致性校验**，并对发现的缺口进行结构化反问，把"设计文档没写清"挡在 H4 / H5 之前。它是规范 §6 的门禁层执行体。
+对 H3 详细设计产物做**机械化的完备性与一致性校验**，并对发现的缺口进行结构化反问，把"设计文档没写清"挡在 H4 / H5 之前。它是 [`docs/stages.md`](../../docs/stages.md) §6 的质量门禁层执行体。
 
 > 设计依据：H3 是 AI 编码能否"按图施工"的最后一道前馈关。这里漏掉的字段会在 H5 被 `CodingExecutor` 直接撞成阻塞，越早暴露越省。
 
@@ -19,13 +19,13 @@
 
 ## 3. 输入契约
 
-| 输入 | 必需 | 说明 |
-| --- | --- | --- |
-| `docs/04-detailed-design/` 全部文件 | 是 | 至少包含规范 §6 列出的章节 |
-| `docs/01-requirements/requirements.md` | 是 | `status` ≥ `reviewed` |
-| `docs/01-requirements/repo-impact-map.md` | 是 | 由 RepoImpactMapper 产出 |
-| `docs/03-architecture/` | 是 | ADR / 架构决策 |
-| `AGENTS.md` | 是 | 模块边界与禁区 |
+| 输入                                      | 必需 | 说明                                                            |
+| ----------------------------------------- | ---- | --------------------------------------------------------------- |
+| `docs/04-detailed-design/` 全部文件       | 是   | 至少包含 [`docs/stages.md`](../../docs/stages.md) §6 列出的章节 |
+| `docs/01-requirements/requirements.md`    | 是   | `status` ≥ `reviewed`                                           |
+| `docs/01-requirements/repo-impact-map.md` | 是   | 由 RepoImpactMapper 产出                                        |
+| `docs/03-architecture/`                   | 是   | ADR / 架构决策                                                  |
+| `AGENTS.md`                               | 是   | 模块边界与禁区                                                  |
 
 ## 4. 输出契约
 
@@ -33,15 +33,15 @@
 
 ### 4.1 完备性表
 
-按规范 §6 列出的章节逐项打分：
+按 [`docs/stages.md`](../../docs/stages.md) §6 列出的章节逐项打分：
 
-| 列 | 含义 |
-| --- | --- |
-| 章节 | 文件结构 / 数据库 / 接口 / 流程 / 配置 / 日志 / 监控 / 部署 / 性能边界 |
-| 状态 | `pass` / `partial` / `missing` |
-| 覆盖度 | 该章节覆盖了哪些 `REQ-NNN` |
-| 缺口 | 哪些 REQ 没被覆盖 |
-| 证据 | 具体文件路径 + 行号 |
+| 列     | 含义                                                                   |
+| ------ | ---------------------------------------------------------------------- |
+| 章节   | 文件结构 / 数据库 / 接口 / 流程 / 配置 / 日志 / 监控 / 部署 / 性能边界 |
+| 状态   | `pass` / `partial` / `missing`                                         |
+| 覆盖度 | 该章节覆盖了哪些 `REQ-NNN`                                             |
+| 缺口   | 哪些 REQ 没被覆盖                                                      |
+| 证据   | 具体文件路径 + 行号                                                    |
 
 ### 4.2 一致性表
 
@@ -68,25 +68,25 @@
 
 - `requirements.md` 状态不达标
 - `repo-impact-map.md` 缺失（H3 失去前馈数据基础）
-- 设计文档目录与规范 §6 严重偏离（如完全没有 `database-design.md` 等核心章节）
+- 设计文档目录与 [`docs/stages.md`](../../docs/stages.md) §6 严重偏离（如完全没有 `database-design.md` 等核心章节）
 
 ## 5. 工具集
 
 能力 ID 取自 [`_shared/tool-vocabulary.md`](../_shared/tool-vocabulary.md)。
 
-| 能力 | 必需 | 用途 |
-| --- | --- | --- |
-| `read.file` | 是 | 读规范、需求、设计、源码 |
-| `read.list` | 是 | 检查 `docs/04-detailed-design/` 章节是否齐全 |
-| `read.search.text` | 是 | 校验设计中引用的源码路径是否真实存在 |
-| `write.file` | 是 | 写 `design-review-report.md` |
+| 能力               | 必需 | 用途                                         |
+| ------------------ | ---- | -------------------------------------------- |
+| `read.file`        | 是   | 读规范、需求、设计、源码                     |
+| `read.list`        | 是   | 检查 `docs/04-detailed-design/` 章节是否齐全 |
+| `read.search.text` | 是   | 校验设计中引用的源码路径是否真实存在         |
+| `write.file`       | 是   | 写 `design-review-report.md`                 |
 
 **禁用**：`exec.*`、`pr.*`、`write.patch`，以及对 `docs/04-detailed-design/` 下设计文档与 `harness-engineering/` 自身的任何写操作。
 
 ## 6. 行为约束
 
 - **必须**：
-  - 完备性判断只比对规范 §6 列出的章节，不引入额外口味
+  - 完备性判断只比对 [`docs/stages.md`](../../docs/stages.md) §6 列出的章节，不引入额外口味
   - 每个不通过项都附"证据"列（文件路径 + 行号或缺失说明）
   - 反问与建议分离：先问问题再给方向，不要替设计师下结论
   - 把所有问题一次性给齐，不要分多轮

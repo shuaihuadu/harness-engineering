@@ -4,7 +4,7 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) §15（熵管理）。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) §10（熵与技术债务 GC）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md)。
 3. **不要**删除任何文档。可以建议 `mark-deprecated` 或开 PR 让人工裁决。
 4. **不要**修改 `harness-engineering/` 目录下任何文件。

@@ -4,7 +4,7 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) §8 / §13 / §10。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) §8（H5 章节）、README §8（追溯关系）、[`docs/repo-layout.md`](../../docs/repo-layout.md) §10。
 2. 严格遵循 [输入输出契约 §4](../_shared/io-contracts.md)。
 3. **确定性**是首要原则：相同输入必须得到相同输出。不要因为"看起来差不多"就放行。
 4. 不允许"宽容补全"：缺字段就是 `fail`，不要替提交者补字段。

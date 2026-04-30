@@ -7,7 +7,7 @@
 
 依据已通过审查的需求与详细设计，反推一组结构化的 `TC-NNN` 测试用例草稿，确保**每条 REQ 至少有一条 TC**、关键接口与数据路径都有覆盖。它把"测试驱动"前置到 H4，让 H5 的 `CodingExecutor` 可以直接以测试为输入。
 
-> 设计依据：规范 §7 与 OpenAI 关于"测试是 Agent 反馈层的核心"的实践。
+> 设计依据：[`docs/stages.md`](../../docs/stages.md) §7 与 OpenAI 关于"测试是 Agent 反馈层的核心"的实践。
 
 ## 2. 触发时机
 
@@ -16,12 +16,12 @@
 
 ## 3. 输入契约
 
-| 输入 | 必需 | 说明 |
-| --- | --- | --- |
-| `docs/01-requirements/requirements.md` | 是 | `status` ≥ `reviewed` |
-| `docs/04-detailed-design/` | 是 | 通过 `DesignReviewer` 审查 |
-| `docs/04-detailed-design/design-review-report.md` | 是 | 阻塞项必须为空或全部接受为风险 |
-| 既有 `docs/05-test-design/` | 否 | 若存在，作为基线增量更新 |
+| 输入                                              | 必需 | 说明                           |
+| ------------------------------------------------- | ---- | ------------------------------ |
+| `docs/01-requirements/requirements.md`            | 是   | `status` ≥ `reviewed`          |
+| `docs/04-detailed-design/`                        | 是   | 通过 `DesignReviewer` 审查     |
+| `docs/04-detailed-design/design-review-report.md` | 是   | 阻塞项必须为空或全部接受为风险 |
+| 既有 `docs/05-test-design/`                       | 否   | 若存在，作为基线增量更新       |
 
 ## 4. 输出契约
 
@@ -33,16 +33,16 @@
 
 每条 `TC-NNN` 必须包含：
 
-| 字段 | 说明 |
-| --- | --- |
-| 编号 | `TC-NNN`，发布后不可改 |
-| 标题 | 一行描述 |
-| 上游 REQ / 设计 | 至少一条 `REQ-NNN`、可选 `HD-/API-/DB-` |
-| 层级 | unit / integration / e2e |
-| 前置条件 | 数据 / 环境 / 用户角色 |
-| 步骤 | 编号化操作序列 |
-| 预期结果 | 可机械判断的断言 |
-| 类型 | happy / boundary / error / permission / performance |
+| 字段            | 说明                                                |
+| --------------- | --------------------------------------------------- |
+| 编号            | `TC-NNN`，发布后不可改                              |
+| 标题            | 一行描述                                            |
+| 上游 REQ / 设计 | 至少一条 `REQ-NNN`、可选 `HD-/API-/DB-`             |
+| 层级            | unit / integration / e2e                            |
+| 前置条件        | 数据 / 环境 / 用户角色                              |
+| 步骤            | 编号化操作序列                                      |
+| 预期结果        | 可机械判断的断言                                    |
+| 类型            | happy / boundary / error / permission / performance |
 
 ### 4.2 覆盖率自检
 
@@ -61,12 +61,12 @@
 
 能力 ID 取自 [`_shared/tool-vocabulary.md`](../_shared/tool-vocabulary.md)。
 
-| 能力 | 必需 | 用途 |
-| --- | --- | --- |
-| `read.file` | 是 | 读需求与设计 |
-| `read.list` | 是 | 列举既有 `docs/05-test-design/` 内容 |
-| `read.search.text` | 是 | 比对既有 TC 编号避免冲突 |
-| `write.file` | 是 | 写测试用例与矩阵 |
+| 能力               | 必需 | 用途                                 |
+| ------------------ | ---- | ------------------------------------ |
+| `read.file`        | 是   | 读需求与设计                         |
+| `read.list`        | 是   | 列举既有 `docs/05-test-design/` 内容 |
+| `read.search.text` | 是   | 比对既有 TC 编号避免冲突             |
+| `write.file`       | 是   | 写测试用例与矩阵                     |
 
 **禁用**：`exec.*`、`pr.*`、`write.patch`——本 Agent 只产出 TC 文档，不写测试代码（H5 才落地），不改源码。
 

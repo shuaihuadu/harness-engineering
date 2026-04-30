@@ -7,7 +7,7 @@
 
 从 `commit-records.md`、`tech-debt-tracker.md` 与 `traceability-matrix.md` 抽取已合入的变更，生成 `release-notes.md` 草稿，并回写追溯矩阵。它是 H6 的"信息归集器"，负责把分散在多个 PR 里的事实凝练成一份对外可读的发布说明。
 
-> 设计依据：规范 §9（H6 运行验证与文档回写）+ §13（追溯链）。
+> 设计依据：[`docs/stages.md`](../../docs/stages.md) §9（H6 运行验证与文档回写）+ README §8（追溯链）。
 
 ## 2. 触发时机
 
@@ -17,14 +17,14 @@
 
 ## 3. 输入契约
 
-| 输入 | 必需 | 说明 |
-| --- | --- | --- |
-| `docs/06-implementation/commit-records.md` | 是 | 包含本次发布范围内的所有提交 |
-| `docs/06-implementation/exec-plans/tech-debt-tracker.md` | 是 | 已知技术债务 |
-| `docs/06-implementation/exec-plans/active/` | 是 | 进行中的执行计划 |
-| `docs/06-implementation/exec-plans/completed/` | 是 | 本周期已完成的计划 |
-| `docs/07-release/traceability-matrix.md` | 否 | 若存在，作为基线增量更新 |
-| 发布范围（git tag / commit 区间） | 是 | 由人工指定 |
+| 输入                                                     | 必需 | 说明                         |
+| -------------------------------------------------------- | ---- | ---------------------------- |
+| `docs/06-implementation/commit-records.md`               | 是   | 包含本次发布范围内的所有提交 |
+| `docs/06-implementation/exec-plans/tech-debt-tracker.md` | 是   | 已知技术债务                 |
+| `docs/06-implementation/exec-plans/active/`              | 是   | 进行中的执行计划             |
+| `docs/06-implementation/exec-plans/completed/`           | 是   | 本周期已完成的计划           |
+| `docs/07-release/traceability-matrix.md`                 | 否   | 若存在，作为基线增量更新     |
+| 发布范围（git tag / commit 区间）                        | 是   | 由人工指定                   |
 
 ## 4. 输出契约
 
@@ -61,13 +61,13 @@ REQ-NNN → HD/API/DB-NNN → TC-NNN → TASK-YYYY-MM-DD-NNN → commit hash
 
 能力 ID 取自 [`_shared/tool-vocabulary.md`](../_shared/tool-vocabulary.md)。
 
-| 能力 | 必需 | 用途 |
-| --- | --- | --- |
-| `read.git.log` | 是 | 抽取发布范围内的 commit |
-| `read.git.diff` | 否 | 在解释破坏性变更时核对 diff |
-| `read.file` | 是 | 读追溯文档与 PR 描述 |
-| `read.search.text` | 是 | 解析编号引用 |
-| `write.file` | 是 | 写 release notes 与矩阵 |
+| 能力               | 必需 | 用途                        |
+| ------------------ | ---- | --------------------------- |
+| `read.git.log`     | 是   | 抽取发布范围内的 commit     |
+| `read.git.diff`    | 否   | 在解释破坏性变更时核对 diff |
+| `read.file`        | 是   | 读追溯文档与 PR 描述        |
+| `read.search.text` | 是   | 解析编号引用                |
+| `write.file`       | 是   | 写 release notes 与矩阵     |
 
 **禁用**：`exec.*`、`pr.create`、`write.patch`——本 Agent 不发布制品、不推送 tag、不改源码、不直接开 PR。
 

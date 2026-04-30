@@ -21,7 +21,7 @@
 | --- | --- |
 | `{{AGENT_NAME}}` | Agent 名（如 `CodingExecutor`） |
 | `{{AGENT_DIR}}` | 相对仓库根的路径（如 `harness-engineering/agents/coding-executor`） |
-| `{{ONE_LINER}}` | 一句话职责（来自 `AGENTS.md` §定位 第一句） |
+| `{{ONE_LINER}}` | 一句话职责（来自 `AGENT.md` §定位 第一句） |
 | `{{TOOL_LIST}}` | 工具白名单。值取自 [`_shared/tool-vocabulary.md`](../_shared/tool-vocabulary.md)，再按目标工具的真实接口名做一次映射 |
 
 ## 3. 使用约定

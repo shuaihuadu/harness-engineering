@@ -19,12 +19,12 @@
 
 ## 3. 输入契约
 
-| 输入 | 必需 | 说明 |
-| --- | --- | --- |
-| 用户原始描述 | 是 | 一句话或一段文字，可包含截图、参考链接 |
-| 已有规范 | 是 | [`../../README.md`](../../README.md) §4 H1 章节 |
-| 已有需求文件 | 否 | 若 `docs/01-requirements/requirements.md` 已存在，作为修订基线 |
-| 业务现状参考 | 否 | 用户提供的现有系统约束、合规要求、竞品资料 |
+| 输入         | 必需 | 说明                                                           |
+| ------------ | ---- | -------------------------------------------------------------- |
+| 用户原始描述 | 是   | 一句话或一段文字，可包含截图、参考链接                         |
+| 已有规范     | 是   | [`../../docs/stages.md`](../../docs/stages.md) §4 H1 章节      |
+| 已有需求文件 | 否   | 若 `docs/01-requirements/requirements.md` 已存在，作为修订基线 |
+| 业务现状参考 | 否   | 用户提供的现有系统约束、合规要求、竞品资料                     |
 
 **禁止读取**：`src/`、`tests/`、`docs/04-detailed-design/` 及之后阶段的产物（H1 不应被实现细节污染）。
 
@@ -32,7 +32,7 @@
 
 ### 4.1 主要产物
 
-`docs/01-requirements/requirements.md`，frontmatter 按 [`io-contracts.md` §2](../_shared/io-contracts.md) 填写，正文必须覆盖 README §4.4 列出的全部章节：
+`docs/01-requirements/requirements.md`，frontmatter 按 [`io-contracts.md` §2](../_shared/io-contracts.md) 填写，正文必须覆盖 [`docs/stages.md`](../../docs/stages.md) §4.4 列出的全部章节：
 
 - 项目背景 / 目标用户 / 用户角色 / 核心场景 / 功能范围
 - 非功能需求 / 权限边界 / 数据边界 / 异常场景
@@ -57,12 +57,12 @@
 
 能力 ID 取自 [`_shared/tool-vocabulary.md`](../_shared/tool-vocabulary.md)。
 
-| 能力 | 必需 | 用途 |
-| --- | --- | --- |
-| `read.file` | 是 | 读规范、已有需求文档、用户提供的参考材料 |
-| `write.file` | 是 | 写出 `requirements.md` 与 `open-questions.md` |
-| `ask.user` | 是 | 向用户主动提问 |
-| `read.web` | 否 | 仅在用户显式提供链接时使用 |
+| 能力         | 必需 | 用途                                          |
+| ------------ | ---- | --------------------------------------------- |
+| `read.file`  | 是   | 读规范、已有需求文档、用户提供的参考材料      |
+| `write.file` | 是   | 写出 `requirements.md` 与 `open-questions.md` |
+| `ask.user`   | 是   | 向用户主动提问                                |
+| `read.web`   | 否   | 仅在用户显式提供链接时使用                    |
 
 **禁用**：`read.search.text`、`read.search.semantic`、`exec.*`、`pr.*`、`write.patch`——H1 不接触实现，也不应直接动 PR。
 
@@ -84,7 +84,7 @@
 
 本 Agent 一次执行视为合格，需同时满足：
 
-- `requirements.md` 通过规范 §4.6 的人工评审门禁
+- `requirements.md` 通过 [`docs/stages.md`](../../docs/stages.md) §4.6 的人工评审门禁
 - `open-questions.md` 中所有 `blocking` 项均已被解答或显式接受为风险
 - frontmatter 字段齐全且 `status` 进入 `reviewed`
 

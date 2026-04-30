@@ -1,11 +1,11 @@
 # CommitAuditor
 
-> 对应阶段：H5 / H6 衔接 | Harness 层：门禁层
+> 对应阶段：H5 / H6 衔接 | Harness 层：质量门禁层
 > 共享契约：[`../_shared/glossary.md`](../_shared/glossary.md)、[`../_shared/io-contracts.md`](../_shared/io-contracts.md)
 
 ## 1. 定位
 
-对每一个 PR / commit，机械化地校验**提交元数据 + 改动范围 + 追溯字段**是否符合规范。它是 Harness Engineering 三层模型中的**门禁层**：不达标即拒绝，不参与"合不合理"的主观讨论。
+对每一个 PR / commit，机械化地校验**提交元数据 + 改动范围 + 追溯字段**是否符合规范。它是 Harness Engineering 三层模型中的**质量门禁层**：不达标即拒绝，不参与"合不合理"的主观讨论。
 
 > 设计依据：Anthropic Claude Code 的 Hooks 思想——确定性的、可重放的检查比 LLM 主观判断更适合放在合并门禁。
 
@@ -18,13 +18,13 @@
 
 ## 3. 输入契约
 
-| 输入 | 必需 | 说明 |
-| --- | --- | --- |
-| PR 元数据 | 是 | 标题、描述、提交信息 |
-| 改动文件 diff | 是 | 由 Git 提供 |
-| 关联的 `ai-task-brief.md` | 是 | 通过 `Task:` 字段定位 |
-| `docs/06-implementation/commit-records.md` | 是 | 用于交叉验证追溯链 |
-| 设计 / 测试编号清单 | 是 | 来自 `docs/04-detailed-design/`、`docs/05-test-design/` |
+| 输入                                       | 必需 | 说明                                                    |
+| ------------------------------------------ | ---- | ------------------------------------------------------- |
+| PR 元数据                                  | 是   | 标题、描述、提交信息                                    |
+| 改动文件 diff                              | 是   | 由 Git 提供                                             |
+| 关联的 `ai-task-brief.md`                  | 是   | 通过 `Task:` 字段定位                                   |
+| `docs/06-implementation/commit-records.md` | 是   | 用于交叉验证追溯链                                      |
+| 设计 / 测试编号清单                        | 是   | 来自 `docs/04-detailed-design/`、`docs/05-test-design/` |
 
 ## 4. 输出契约
 
@@ -68,13 +68,13 @@ suggested_fixes:
 
 能力 ID 取自 [`_shared/tool-vocabulary.md`](../_shared/tool-vocabulary.md)。
 
-| 能力 | 必需 | 用途 |
-| --- | --- | --- |
-| `pr.read` | 是 | 读 PR 元数据、提交信息、改动 diff |
-| `read.git.diff` | 是 | 与 PR diff 交叉验证 |
-| `read.file` | 是 | 校验设计 / 测试 / 任务编号对应文档存在 |
-| `read.search.text` | 是 | 解析编号引用 |
-| `pr.comment` | 是 | 回写审查结论 |
+| 能力               | 必需 | 用途                                   |
+| ------------------ | ---- | -------------------------------------- |
+| `pr.read`          | 是   | 读 PR 元数据、提交信息、改动 diff      |
+| `read.git.diff`    | 是   | 与 PR diff 交叉验证                    |
+| `read.file`        | 是   | 校验设计 / 测试 / 任务编号对应文档存在 |
+| `read.search.text` | 是   | 解析编号引用                           |
+| `pr.comment`       | 是   | 回写审查结论                           |
 
 **禁用**：`write.*`、`exec.*`、`pr.create`——本 Agent 只读 + 评论，不写文件、不跑测试、不改代码。
 
