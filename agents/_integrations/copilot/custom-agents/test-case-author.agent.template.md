@@ -1,20 +1,20 @@
 ---
-description: '从需求与设计反推 TC-NNN 测试用例，确保每条 REQ 至少有可机械判断的覆盖'
+description: '需求与详细设计已 reviewed、需要起草或更新 H4 测试用例（docs/05-test-design/）时使用：从需求与设计反推 TC-NNN 测试矩阵与分组用例草稿，确保每条 REQ 至少有可机械判断的覆盖'
 tools: ['codebase', 'search', 'usages', 'fetch']
 ---
 
-# TestCaseAuthor（GitHub Copilot Chat 包装）
+# TestCaseAuthor（GitHub Copilot Chat Custom Agent）
 
-本 chatmode 是 [Harness Engineering 配套 Agent · TestCaseAuthor]({{HARNESS_REPO_REF_FROM_GITHUB}}/agents/test-case-author/AGENT.md) 在 GitHub Copilot Chat 中的包装。
+本文件是 [Harness Engineering 配套 Agent · TestCaseAuthor]({{HARNESS_REPO_REF_FROM_GITHUB}}/agents/test-case-author/AGENT.md) 在 GitHub Copilot Chat 中的 Custom Agent 包装。
 
 - **角色定义**：见 `{{HARNESS_REPO_REF_FROM_GITHUB}}/agents/test-case-author/AGENT.md`
 - **工作流**：见 `{{HARNESS_REPO_REF_FROM_GITHUB}}/agents/test-case-author/prompt.md`
-- **TC 字段集**：见 `AGENT.md` §4.1
-- **阶段定义**：见 `{{HARNESS_REPO_REF_FROM_GITHUB}}/docs/stages.md` §7
+- **TC 字段集**：见 `AGENT.md` 第 4.1 节
+- **阶段定义**：见 `{{HARNESS_REPO_REF_FROM_GITHUB}}/docs/stages.md` 第 7 节
 
 ## 触发约定
 
-- H1 / H3 文档均 `reviewed` 后切换到本 chatmode 起草测试用例
+- H1 / H3 文档均 `reviewed` 后切换到本 Custom Agent 起草测试用例
 - H3 设计有重大变更时增量更新
 
 ## 你（AI）必须遵守
@@ -54,5 +54,5 @@ tools: ['codebase', 'search', 'usages', 'fetch']
 ## 落地清单
 
 - [ ] 已替换 `{{HARNESS_REPO_REF}}` 为采用方实际路径
-- [ ] 已确认 `tools` 字段与 `AGENT.md` §5 工具集一致（不允许 `exec.*`）
+- [ ] 已确认 `tools` 字段与 `AGENT.md` 第 5 节工具集一致（不允许 `exec.*`）
 - [ ] 已在 `.github/copilot-instructions.md` 的"何时切换"表中登记 H4 用例起草场景

@@ -92,7 +92,7 @@ invoke_render_directory() {
         fi
 
         if [[ -z "$picked" ]]; then
-            echo "   skip   $source_dir：未选择任何项（target.json 默认空集，且未指定 --chatmodes）"
+            echo "   skip   $source_dir：未选择任何项（target.json 默认空集，且未指定 --copilot-agents）"
             return 0
         fi
 

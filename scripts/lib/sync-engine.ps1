@@ -155,7 +155,7 @@ function Sync-RenderedFile {
 
     # 按目标文件深度动态计算 HARNESS_REPO_REF_FROM_GITHUB：
     # 链接 target 写在 .github/copilot-instructions.md 时需 ../，
-    # 写在 .github/chatmodes/foo.md 时需 ../../，URL 则保持原样。
+    # 写在 .github/agents/foo.agent.md 时需 ../../，URL 则保持原样。
     $perFileReplacements = @{}
     foreach ($k in $Context.Replacements.Keys) { $perFileReplacements[$k] = $Context.Replacements[$k] }
     if ($Context.Replacements.Contains('HARNESS_REPO_REF')) {

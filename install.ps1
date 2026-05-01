@@ -34,9 +34,9 @@
 .PARAMETER NoVendor
     不 vendor 规范文档。需配合 -HarnessRepoRef 指定外部 URL。
 
-.PARAMETER Chatmodes
-    Copilot 专属：选择安装哪些 chatmode（如 'commit-auditor,design-reviewer'）；'all' 全装。
-    省略时使用 target.json 里的 default_select；当前默认为空集（不安装任何 chatmode）。
+.PARAMETER CopilotAgents
+    Copilot 专属：选择安装哪些 Custom Agent（如 'commit-auditor,design-reviewer'）；'all' 全装。
+    省略时使用 target.json 里的 default_select；当前默认为空集（不安装任何 Custom Agent）。
 
 .PARAMETER NonInteractive
     零交互。缺位占位符使用探测结果，仍缺则填 `<未配置>`。附带 summary 不询问。
@@ -81,7 +81,7 @@ param(
     [string]$VendorHarnessTo = '.harness-engineering',
     [switch]$NoVendor,
 
-    [string[]]$Chatmodes,
+    [string[]]$CopilotAgents,
 
     [switch]$NonInteractive,
     [switch]$Force,
@@ -257,13 +257,13 @@ if ([string]::IsNullOrWhiteSpace($HarnessRepoRef)) {
 }
 
 $Replacements = [ordered]@{
-    'PROJECT_NAME'      = $ProjectName
-    'PROJECT_ONE_LINER' = $ProjectOneLiner
-    'PRIMARY_LANGUAGE'  = $PrimaryLanguage
-    'TECH_STACK'        = $TechStack
-    'TEST_COMMAND'      = $TestCommand
-    'LINT_COMMAND'      = $LintCommand
-    'HARNESS_REPO_REF'  = $HarnessRepoRef
+    'PROJECT_NAME'                 = $ProjectName
+    'PROJECT_ONE_LINER'            = $ProjectOneLiner
+    'PRIMARY_LANGUAGE'             = $PrimaryLanguage
+    'TECH_STACK'                   = $TechStack
+    'TEST_COMMAND'                 = $TestCommand
+    'LINT_COMMAND'                 = $LintCommand
+    'HARNESS_REPO_REF'             = $HarnessRepoRef
     # 派生占位符：从 .github/ 子目录链接回 vendor 时需多一级 ../；URL 则保持原样
     'HARNESS_REPO_REF_FROM_GITHUB' = $(if ($HarnessRepoRef -match '^(https?://|/)') { $HarnessRepoRef } else { "../$HarnessRepoRef" })
 }
@@ -309,8 +309,8 @@ $Context = @{
 
 # Selections：target 名 → 用户挑的 stem 列表（含 'all'）
 $Selections = @{}
-if ($Chatmodes) {
-    $Selections['copilot/chatmodes'] = $Chatmodes
+if ($CopilotAgents) {
+    $Selections['copilot/custom-agents'] = $CopilotAgents
 }
 
 # ----------------------------------------------------------------------------

@@ -24,7 +24,7 @@ HARNESS_REPO_REF=""
 VENDOR_HARNESS_TO=".harness-engineering"
 VENDOR_HARNESS_TO_EXPLICIT=0
 NO_VENDOR=0
-CHATMODES=""
+COPILOT_AGENTS=""
 NON_INTERACTIVE=0
 FORCE=0
 NO_DELETE=0
@@ -46,7 +46,7 @@ while [[ $# -gt 0 ]]; do
         --harness-repo-ref)   HARNESS_REPO_REF="$2";   shift 2 ;;
         --vendor-harness-to)  VENDOR_HARNESS_TO="$2"; VENDOR_HARNESS_TO_EXPLICIT=1; shift 2 ;;
         --no-vendor)          NO_VENDOR=1;             shift ;;
-        --chatmodes)          CHATMODES="$2";          shift 2 ;;
+        --copilot-agents)     COPILOT_AGENTS="$2";     shift 2 ;;
         --non-interactive)    NON_INTERACTIVE=1;       shift ;;
         --force)              FORCE=1;                 shift ;;
         --no-delete)          NO_DELETE=1;             shift ;;
@@ -228,7 +228,7 @@ else
 fi
 
 declare -A SELECTIONS
-[[ -n "$CHATMODES" ]] && SELECTIONS["copilot/chatmodes"]="$CHATMODES"
+[[ -n "$COPILOT_AGENTS" ]] && SELECTIONS["copilot/custom-agents"]="$COPILOT_AGENTS"
 
 # 总结 + 确认
 echo

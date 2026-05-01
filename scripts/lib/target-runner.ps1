@@ -140,7 +140,7 @@ function Invoke-RenderDirectory {
         }
 
         if (@($picked).Count -eq 0) {
-            Write-Host "   skip   $($Spec.source_dir)：未选择任何项（target.json 默认空集，且未指定 -Chatmodes/选择参数）" -ForegroundColor DarkGray
+            Write-Host "   skip   $($Spec.source_dir)：未选择任何项（target.json 默认空集，且未指定 -CopilotAgents/选择参数）" -ForegroundColor DarkGray
             return
         }
 

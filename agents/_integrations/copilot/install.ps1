@@ -24,7 +24,7 @@ param(
     [string]$VendorHarnessTo = '.harness-engineering',
     [switch]$NoVendor,
 
-    [string[]]$Chatmodes,
+    [string[]]$CopilotAgents,
 
     [switch]$Force,
     [switch]$NoDelete,
@@ -50,7 +50,7 @@ if ($TechStack) { $forwarded.TechStack = $TechStack }
 if ($TestCommand) { $forwarded.TestCommand = $TestCommand }
 if ($LintCommand) { $forwarded.LintCommand = $LintCommand }
 if ($HarnessRepoRef) { $forwarded.HarnessRepoRef = $HarnessRepoRef }
-if ($Chatmodes) { $forwarded.Chatmodes = $Chatmodes }
+if ($CopilotAgents) { $forwarded.CopilotAgents = $CopilotAgents }
 if ($NoVendor) { $forwarded.NoVendor = $true }
 if ($Force) { $forwarded.Force = $true }
 if ($NoDelete) { $forwarded.NoDelete = $true }
