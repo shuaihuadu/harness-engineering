@@ -31,7 +31,7 @@ H5 是 Harness Engineering 流程里 AI 真正动手写代码的阶段。AI 写�
 
 ### 3.1 先读模板
 
-读取 [`templates/ai-task-brief.md`](../../../templates/ai-task-brief.md) 与 [`agents/_shared/io-contracts.md`](../../_shared/io-contracts.md) §3。模板与契约是事实来源，不要凭记忆复述字段名。
+读取 [`templates/ai-task-brief.md`](../../../templates/ai-task-brief.md) 与 [`agents/_shared/io-contracts.md`](../../_shared/io-contracts.md) 第 3 节。模板与契约是事实来源，不要凭记忆复述字段名。
 
 ### 3.2 字段抽取与缺口识别
 
@@ -67,7 +67,7 @@ H5 是 Harness Engineering 流程里 AI 真正动手写代码的阶段。AI 写�
 
 所有字段就绪后，按 [`templates/ai-task-brief.md`](../../../templates/ai-task-brief.md) 的小节顺序生成完整 Markdown，不要重排小节。注意：
 
-- frontmatter（如该项目使用）必须满足 [`agents/_shared/io-contracts.md`](../../_shared/io-contracts.md) §2。
+- frontmatter（如该项目使用）必须满足 [`agents/_shared/io-contracts.md`](../../_shared/io-contracts.md) 第 2 节。
 - `任务编号` 用 `TASK-YYYY-MM-DD-NNN` 格式，年月日补零。
 - `允许修改的文件` / `禁止修改的文件` 用 ```text 围栏包裹，每行一条路径。
 
@@ -107,6 +107,6 @@ H5 是 Harness Engineering 流程里 AI 真正动手写代码的阶段。AI 写�
 
 ## 6. 与其它 Skill / Agent 的边界
 
-- 想**校验**已有任务卡是否合格：把卡片内容喂给本 Skill，会按 §3.2 输出缺口清单。
+- 想**校验**已有任务卡是否合格：把卡片内容嗂给本 Skill，会按 3.2 节输出缺口清单。
 - 想**审计提交**是否回填了 `Task:` 字段：用 `commit-message-formatter` 或 `commit-auditor`。
 - 想**反推追溯链**：用 `traceability-linker`。

@@ -71,7 +71,7 @@ H1–H6 的每一阶段都有一份**机械化清单**（[`templates/phase-gate-
 - 评估人：<Agent / 用户>
 
 ## 通过项（✓ N/Total）
-- 数据库表、字段、索引、约束已明确 → docs/04-detailed-design/DB-001.md §2
+- 数据库表、字段、索引、约束已明确 → docs/04-detailed-design/DB-001.md 第 2 节
 - API 请求、响应、错误码已明确 → docs/04-detailed-design/API-007.md
 - ...
 
@@ -82,7 +82,7 @@ H1–H6 的每一阶段都有一份**机械化清单**（[`templates/phase-gate-
   - 下一步：补一份评审纪要（参考 `templates/review-record.md`）。
 
 ## 待证项（! K）
-- 性能边界已明确：在 HD-007 §6 看到"接口延迟 ≤ 200ms"，但未给出测量方法/采样窗口。
+- 性能边界已明确：在 HD-007 第 6 节看到"接口延迟 ≤ 200ms"，但未给出测量方法/采样窗口。
   - 下一步：补充指标定义或显式声明"以默认 SLO 为准"。
 
 ## 放行结论
@@ -114,8 +114,8 @@ H1–H6 的每一阶段都有一份**机械化清单**（[`templates/phase-gate-
 ```markdown
 # 阶段门禁报告：H1
 ## 通过项（9/12）
-- 需求背景清楚 → docs/01-requirements/REQ-001.md §1
-- 用户角色明确 → docs/01-requirements/REQ-001.md §2
+- 需求背景清楚 → docs/01-requirements/REQ-001.md 第 1 节
+- 用户角色明确 → docs/01-requirements/REQ-001.md 第 2 节
 - ...
 
 ## 缺失项（2）

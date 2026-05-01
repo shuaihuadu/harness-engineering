@@ -40,7 +40,7 @@ REQ-NNN ──► HD-NNN / API-NNN / DB-NNN ──► TC-NNN ──► TASK-YYYY
 
 ### 3.1 锚定起点
 
-确认输入对应到哪一个节点（REQ / HD / API / DB / TC / TASK / Commit）。如果是文件，读取 frontmatter 的 `id` 与 `upstream` / `downstream`（见 `agents/_shared/io-contracts.md` §2）。
+确认输入对应到哪一个节点（REQ / HD / API / DB / TC / TASK / Commit）。如果是文件，读取 frontmatter 的 `id` 与 `upstream` / `downstream`（见 `agents/_shared/io-contracts.md` 第 2 节）。
 
 ### 3.2 沿链双向展开
 
@@ -96,8 +96,8 @@ REQ-NNN ──► HD-NNN / API-NNN / DB-NNN ──► TC-NNN ──► TASK-YYYY
 ## 4. 失败模式与回退
 
 - **多个 REQ 同名编号**：项目历史上撞号了。立即停下，要求用户先在 `docs/01-requirements/` 里去重，不要自己挑一个用。
-- **commit 没有 `Task:` 字段**：标记为"违反 §io-contracts.md §4 的提交规范"，建议补 `--amend` 或新提交一条 fixup（前提是未推送），并提示用户走 `commit-auditor` 流程。
-- **frontmatter 缺失或不合法**：不要"宽容解析"——直接报告该文档不符合 §io-contracts.md §2，请先修复 frontmatter 再重试本 Skill。
+- **commit 没有 `Task:` 字段**：标记为"违反 io-contracts.md 第 4 节的提交规范"，建议补 `--amend` 或新提交一条 fixup（前提是未推送），并提示用户走 `commit-auditor` 流程。
+- **frontmatter 缺失或不合法**：不要"宽容解析"——直接报告该文档不符合 io-contracts.md 第 2 节，请先修复 frontmatter 再重试本 Skill。
 - **跨仓库追溯**：本 Skill 默认只看当前仓库。涉及外部依赖时只在断链清单里标记"需跨仓库验证"，不要尝试自动跳出仓库。
 
 ## 5. 示例
@@ -134,7 +134,7 @@ Task: TASK-2026-04-30-001
 
 输入：`TC-022`
 
-执行 §3.2 上溯发现 frontmatter 没有 `upstream`，正文也未写覆盖需求。
+执行 3.2 节上溯发现 frontmatter 没有 `upstream`，正文也未写覆盖需求。
 
 输出：
 

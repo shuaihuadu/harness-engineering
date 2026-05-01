@@ -23,26 +23,28 @@
 
 ## 3. 何时切换到专用 chatmode
 
-| 场景               | 使用模式                              |
-| ------------------ | ------------------------------------- |
-| 起草 / 修订需求    | `RequirementsInterviewer`（如已部署） |
-| 评审 H3 详细设计   | `DesignReviewer`                      |
-| 反推测试用例       | `TestCaseAuthor`                      |
-| 准备提交 / 评审 PR | `CommitAuditor`                       |
-| 撰写 release notes | `ReleaseNoteWriter`（如已部署）       |
-| 其他编码           | 默认 chatmode（即本指令）             |
+当前项目已装的 chatmode（在 VS Code Copilot Chat 顶部下拉菜单中选择）：
+
+| 场景               | 使用模式             |
+| ------------------ | -------------------- |
+| 评审 H3 详细设计   | `DesignReviewer`     |
+| 反推测试用例       | `TestCaseAuthor`     |
+| 准备提交 / 评审 PR | `CommitAuditor`      |
+| 其他编码           | 默认 chatmode（即本指令） |
 
 > 默认 chatmode 下不要尝试代行上述 Agent 的工作。Agent 的判定逻辑写在各自的 `chatmode.md` 里，单独运行才能保证机械化。
+>
+> Harness Engineering 还定义了 `RequirementsInterviewer`、`RepoImpactMapper`、`CodingExecutor`、`ReleaseNoteWriter`、`DocGardener` 等 Agent 规格，但本项目还未将它们包装为 chatmode。需要时可参考 [`{{HARNESS_REPO_REF_FROM_GITHUB}}/agents/`]({{HARNESS_REPO_REF_FROM_GITHUB}}/agents/) 补充并重装。
 
 ## 4. 关键文档入口
 
 - 阶段细则：`{{HARNESS_REPO_REF_FROM_GITHUB}}/docs/stages.md`（H1–H6）
 - 目录规范：`{{HARNESS_REPO_REF_FROM_GITHUB}}/docs/repo-layout.md`
-- 反模式：`{{HARNESS_REPO_REF_FROM_GITHUB}}/README.md` §6.4
+- 反模式：`{{HARNESS_REPO_REF_FROM_GITHUB}}/README.md` 第 6.4 节
 - 项目 ADR：`docs/03-architecture/adr/`
 
 > `{{HARNESS_REPO_REF}}` 默认指向已 vendor 的本地副本（`.harness-engineering/`）；如使用 `-NoVendor` 则指向远端 URL。
 
 ## 5. 反模式（出现即拒绝）
 
-照搬 [Harness Engineering 规范 §6.4]({{HARNESS_REPO_REF_FROM_GITHUB}}/README.md) 的五条："杂烩会话 / 反复纠错 / 过量规则文件 / 先信后验缺口 / 无界探索"。当用户请求触发任一条时，先指出反模式，再给替代做法。
+照搬 [Harness Engineering 规范 6.4 节]({{HARNESS_REPO_REF_FROM_GITHUB}}/README.md) 的五条："杂烩会话 / 反复纠错 / 过量规则文件 / 先信后验缺口 / 无界探索"。当用户请求触发任一条时，先指出反模式，再给替代做法。

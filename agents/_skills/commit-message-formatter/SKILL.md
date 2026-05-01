@@ -1,6 +1,6 @@
 ---
 name: commit-message-formatter
-description: 按 Harness Engineering 提交规范（io-contracts §4 的六字段模板：Design / Tests / Verify / Docs / Risk / Task）生成或校验 Git 提交信息。当用户说"帮我写一条提交信息"、"这条 commit message 合规吗"、"准备提交但缺字段"、或者在 PR/commit 评审里出现追溯字段缺失时，主动调用本 Skill。它强制反问而非编造编号，并且不会在结果里夹带"AI 生成"等元注释。
+description: 按 Harness Engineering 提交规范（io-contracts 第 4 节的六字段模板：Design / Tests / Verify / Docs / Risk / Task）生成或校验 Git 提交信息。当用户说"帮我写一条提交信息"、"这条 commit message 合规吗"、"准备提交但缺字段"、或者在 PR/commit 评审里出现追溯字段缺失时，主动调用本 Skill。它强制反问而非编造编号，并且不会在结果里夹带"AI 生成"等元注释。
 when_to_use: |
   - 用户写完代码准备提交，请求生成 commit message
   - 用户给出一条已写好的 commit message，问"是否合规"
@@ -33,7 +33,7 @@ Harness Engineering 的提交规范要求每条 commit 都把"这次改动对应
 
 ## 3. 模板（事实来源）
 
-参考 [`agents/_shared/io-contracts.md`](../../_shared/io-contracts.md) §4 与 [`agents/commit-auditor/AGENT.md`](../../commit-auditor/AGENT.md)。**生成时严格按下面的字面顺序与字段名**：
+参考 [`agents/_shared/io-contracts.md`](../../_shared/io-contracts.md) 第 4 节与 [`agents/commit-auditor/AGENT.md`](../../commit-auditor/AGENT.md)。**生成时严格按下面的字面顺序与字段名**：
 
 ```text
 <type>(<scope>): <summary>
@@ -76,7 +76,7 @@ Task: TASK-YYYY-MM-DD-NNN
 - `Docs`：根据改动是否触及 `docs/` 自动判断，但仍允许用户覆盖。
 - `Risk`：默认 `none`，除非用户提到了已知风险。
 
-发现缺口时进入 §4.3。
+发现缺口时进入 4.3 节。
 
 ### 4.3 反问模板
 
@@ -95,7 +95,7 @@ Task: TASK-YYYY-MM-DD-NNN
 
 ### 4.4 生成最终输出
 
-按 §3 模板字面拼接。注意：
+按 3 节模板字面拼接。注意：
 
 - `summary` 用祈使句，首字母小写，不带句号，长度建议 ≤ 72 字符。
 - 标题与正文之间留一空行。

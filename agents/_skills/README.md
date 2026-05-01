@@ -17,7 +17,7 @@ title: Harness Engineering 通用 Skills
 | -------------------------------------------------------------- | ------------------------------------------------------- | --------------------------------------------------- |
 | [traceability-linker](./traceability-linker/SKILL.md)          | 校验并补全 `REQ ↔ HD ↔ TC ↔ Task ↔ Commit` 追溯链       | DesignReviewer / CommitAuditor / RepoImpactMapper   |
 | [ai-task-brief-writer](./ai-task-brief-writer/SKILL.md)        | 把口头需求/Issue 转成符合 `templates/ai-task-brief.md` 的 H5 任务卡 | 默认会话 / CodingExecutor 启动前        |
-| [commit-message-formatter](./commit-message-formatter/SKILL.md) | 按 §io-contracts.md §4 的六字段模板生成或校验提交信息   | 任意阶段                                            |
+| [commit-message-formatter](./commit-message-formatter/SKILL.md) | 按 io-contracts.md 第 4 节的六字段模板生成或校验提交信息   | 任意阶段                                            |
 | [phase-gate-runner](./phase-gate-runner/SKILL.md)              | 按 `templates/phase-gate-checklist.md` 机械核对阶段门禁 | 阶段切换时                                          |
 
 ## 2. Skill 的结构约定
@@ -61,4 +61,4 @@ when_not_to_use: |
 2. 是否是**操作流程**（how-to），而不是规则（rule）或角色（role）？规则归 `instructions/`，角色归 `agents/<name>/`。
 3. 是否业务无关？涉及具体技术栈的 SOP 应该放回消费仓库，而不是污染规范骨架。
 
-三条都点头再考虑动手。规模克制是 Harness Engineering 的反过量原则之一（见 README §6.4）。
+三条都点头再考虑动手。规模克制是 Harness Engineering 的反过量原则之一（见 README 第 6.4 节）。
