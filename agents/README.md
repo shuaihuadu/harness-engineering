@@ -57,7 +57,20 @@ H6:                                                                             
 - [`_shared/tool-vocabulary.md`](./_shared/tool-vocabulary.md)：Agent 工具能力共享词表，由各 `AGENT.md` §工具集 引用。
 - [`_shared/AGENT.md.template`](./_shared/AGENT.md.template) / [`_shared/prompt.md.template`](./_shared/prompt.md.template)：新增 Agent 时使用的干净骨架。
 
-## 5. 接入具体工具
+## 5. 通用 Skills（跨 Agent 的可复用 SOP）
+
+[`_skills/`](./_skills/README.md) 下提供若干**操作型 Skill**：被多个 Agent 反复用到的元动作（追溯、写任务卡、写提交信息、阶段门禁核对）。它们与 Agent 是不同的事物——Agent 是一个角色，Skill 是一段可重入的流程。
+
+| Skill                                                                              | 解决的问题                                              |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| [traceability-linker](./_skills/traceability-linker/SKILL.md)                      | 校验并补全 `REQ ↔ HD/API/DB ↔ TC ↔ TASK ↔ Commit` 追溯链 |
+| [ai-task-brief-writer](./_skills/ai-task-brief-writer/SKILL.md)                    | 把口头需求/Issue 转成合规 H5 任务卡                     |
+| [commit-message-formatter](./_skills/commit-message-formatter/SKILL.md)            | 按六字段模板生成或校验提交信息                          |
+| [phase-gate-runner](./_skills/phase-gate-runner/SKILL.md)                          | 按阶段门禁清单逐条核对                                  |
+
+新增 Skill 的判断标准与目录约定见 [`_skills/README.md`](./_skills/README.md)。
+
+## 6. 接入具体工具
 
 每个 Agent 只交付两份纯 Markdown 文件：
 
@@ -77,12 +90,12 @@ H6:                                                                             
 
 可直接复用的模板见 [`_integrations/`](./_integrations/README.md)，覆盖 Claude Code、GitHub Copilot Chat、OpenAI Codex、自研 Runtime 四类落地方式。
 
-## 6. 版本与演进
+## 7. 版本与演进
 
 - 当前版本：v0.1（与规范 v0.1 同步）
 - 状态：试行
 
-### 6.1 修改门槛
+### 7.1 修改门槛
 
 `prompt.md` / `AGENT.md` 的修改属于规范级变更，按以下门槛执行：
 
@@ -90,7 +103,7 @@ H6:                                                                             
 - **行为微调**（措辞改变 Agent 行为但不改契约）：必须附 1 个真实项目的反例，并在 PR 描述中给出修改前后 Agent 的输出对比
 - **契约变更**（修改 `AGENT.md` 输入输出、工具集、阻塞返回条件）：必须先在本目录 §7 登记修订建议，由维护者批量回写
 
-### 6.2 反例采集
+### 7.2 反例采集
 
 每个 Agent 在落地后保留以下输入用于演进：
 
@@ -100,7 +113,7 @@ H6:                                                                             
 
 数量门槛：单个 Agent 累计 ≥ 3 个反例后，才允许提出"行为微调"级别的 PR。
 
-### 6.3 何时新增 Agent
+### 7.3 何时新增 Agent
 
 提出新 Agent 前必须先回答：
 
@@ -110,7 +123,7 @@ H6:                                                                             
 
 通过以上三问后，再按 [`_shared/AGENT.md.template`](./_shared/AGENT.md.template) 与 [`_shared/prompt.md.template`](./_shared/prompt.md.template) 起草。
 
-### 6.4 退役
+### 7.4 退役
 
 允许把 Agent 标记为 `deprecated`：
 
@@ -120,7 +133,7 @@ H6:                                                                             
 
 退役至少保留两个版本周期再考虑物理删除。
 
-## 7. 对规范的修订建议（占位）
+## 8. 对规范的修订建议（占位）
 
 落地 Agent 过程中如果发现规范本身需要调整，集中记录到本节，由维护者批量回写到 [`../README.md`](../README.md)。每条建议格式：
 
