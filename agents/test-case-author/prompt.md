@@ -4,7 +4,7 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) §7（H4 章节）。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) 第 7 节（H4 章节）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md)。
 3. **不要**引入需求里没有的功能，哪怕"明显应该有"。该写需求就回去写需求。
 4. **不要**写测试代码，只产出文档化的 TC。
@@ -18,7 +18,7 @@
 - 读取 `design-review-report.md`，确认无 `blocking` 项
 - 若已有 `docs/05-test-design/`，加载现有 TC 编号集合，避免冲突
 
-任一不满足按 [io-contracts.md §5](../_shared/io-contracts.md) 阻塞返回。
+任一不满足按 [io-contracts.md 第 5 节](../_shared/io-contracts.md) 阻塞返回。
 
 ### 第二步：建立索引
 
@@ -60,7 +60,7 @@
 - `test-matrix.md`：以 Markdown 表呈现 REQ × TC，缺口必须为空
 - `test-cases/<group>.md`：分组（建议按模块或 REQ 主题）
 
-每条 TC 必填字段见 [`AGENT.md` §4.1](AGENT.md)。
+每条 TC 必填字段见 [`AGENT.md` 第 4.1 节](AGENT.md)。
 
 ### 第六步：覆盖率自检
 
@@ -89,7 +89,7 @@
 
 ## 阻塞返回
 
-按 [io-contracts.md §5](../_shared/io-contracts.md) 返回的场景：
+按 [io-contracts.md 第 5 节](../_shared/io-contracts.md) 返回的场景：
 
 - 上游审查仍有 `blocking` 项
 - 存在无法被可执行测试验证的 REQ

@@ -4,7 +4,7 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) §<相关章节>。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) <相关章节>。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md) 与 [术语表](../_shared/glossary.md)。
 3. **不要** `<列出最容易被诱惑的越界行为>`。
 4. **不要** `<列出第二条越界行为>`。
@@ -16,7 +16,7 @@
 ### 第一步：前置检查
 
 - <验证哪些前置条件？哪些状态？>
-- 任一不满足按 [io-contracts.md §5](../_shared/io-contracts.md) 阻塞返回，**不要**自行补全。
+- 任一不满足按 [io-contracts.md 第 5 节](../_shared/io-contracts.md) 阻塞返回，**不要**自行补全。
 
 ### 第二步：<具体动作>
 
@@ -38,7 +38,7 @@
 
 ## 阻塞返回
 
-按 [io-contracts.md §5](../_shared/io-contracts.md) 返回结构化错误的场景：
+按 [io-contracts.md 第 5 节](../_shared/io-contracts.md) 返回结构化错误的场景：
 
 - <场景 1>
 - <场景 2>

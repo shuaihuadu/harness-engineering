@@ -13,12 +13,14 @@
 
 ### 这是什么 / 不是什么
 
-| 这是                                                                                       | 这不是                                                               |
-| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
-| 一份**团队 AI 工程规约**：文档结构 + 评审节奏 + Agent 角色定义                             | AI Agent 框架 / SDK / 运行时（不替代 LangGraph、Agent Framework 等） |
-| 一套**多工具分发器**：同一份角色定义可同步成 Copilot chatmode / Claude Code subagent / ... | 一键万能解（chatmode 是"打开才用"，没有团队文化基础时就是死代码）    |
-| **可被采纳为 standard 的规范**：`.harness-engineering/` 目录直接提交进你的仓库   | prompt 库（提供的是结构与契约，不是预制 prompt 的集合）              |
-| 与 `AGENTS.md` / `copilot-instructions.md` / `CLAUDE.md` 等运行时机制**互补**              | 自动化质量门禁（CI / Hooks / Lint 仍需各项目自行接入）               |
+| 这是                                                                                           | 这不是                                                                |
+| ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| 一份**团队 AI 工程规约**：文档结构 + 评审节奏 + Agent 角色定义                                 | AI Agent 框架 / SDK / 运行时（不替代 LangGraph、Agent Framework 等）  |
+| 一套**多工具分发器**：同一份角色定义可同步成 Copilot Custom Agent / Claude Code subagent / ... | 一键万能解（Custom Agent 是"打开才用"，没有团队文化基础时就是死代码） |
+| **可被采纳为 standard 的规范**：`.harness-engineering/` 目录直接提交进你的仓库                 | prompt 库（提供的是结构与契约，不是预制 prompt 的集合）               |
+| 与 `AGENTS.md` / `copilot-instructions.md` / `CLAUDE.md` 等运行时机制**互补**                  | 自动化质量门禁（CI / Hooks / Lint 仍需各项目自行接入）                |
+
+> **设计取向**：业务规则集中在 [`agents/`](agents/README.md) 一份维护，Copilot、Codex、Claude Code 等工具仅在 [`agents/_integrations/`](agents/_integrations/README.md) 下各自占据一个入口子目录，对同一份公共核心做格式包装。完整设计思路见 [`agents/_integrations/README.md` 第 0 节](agents/_integrations/README.md#0-设计思路)。
 
 ## 快速开始（一键集成）
 
@@ -42,7 +44,7 @@ cd harness-engineering
 
 1. **Vendor 规范文档**：把 `agents/` `docs/` `templates/` `README.md` 同步进 `<your-repo>/.harness-engineering/`（与安装清单同住，一个隐藏目录装下所有 harness 产物）
 2. **渲染 Copilot 配置**：`.github/copilot-instructions.md` + `.github/instructions/*`，链接指向上一步的 vendor 目录
-3. **不默认安装任何 chatmode**：自 v0.0.1 起，chatmode 必须显式指定（如 `-Chatmodes commit-auditor,design-reviewer` 或 `-Chatmodes all`），避免在用户未知情时往 `.github/chatmodes/` 落文件
+3. **不默认安装任何 Custom Agent**：自 v0.0.1 起，Custom Agent 必须显式指定（如 `-CopilotAgents commit-auditor,design-reviewer` 或 `-CopilotAgents all`），避免在用户未知情时往 `.github/agents/` 落文件
 4. **写入安装清单**：`<your-repo>/.harness-engineering/manifest.json` 记录本次写入的所有文件（含 sha256）+ 本次填入的占位符（`replacements`），供 `uninstall` 使用，并在下次重装时自动预填
 
 ### 占位符填入策略
@@ -86,13 +88,13 @@ CLI 参数  >  上次 manifest.replacements  >  自动探测  >  交互输入 / 
 ./install.ps1 -TargetRepo X -NoVendor -HarnessRepoRef https://github.com/shuaihuadu/harness-engineering/blob/main
 ```
 
-`-NoVendor` 模式下 `{{HARNESS_REPO_REF}}` 会被替换成你提供的 URL；缺点是 chatmode 里的链接需要联网才能跳转。两种模式适合不同场景，按需选择。
+`-NoVendor` 模式下 `{{HARNESS_REPO_REF}}` 会被替换成你提供的 URL；缺点是 Custom Agent 里的链接需要联网才能跳转。两种模式适合不同场景，按需选择。
 
 ## 如何使用本仓库
 
 本仓库是**规范型仓库**（specification repo），主体内容即 README 本身。常见使用方式有三种，可单独或组合使用：
 
-1. **作为方法论参考**：通读 README，按 §1–§3 把三层 Harness 与 H1–H6 流程映射到自己团队当前的 SDLC，识别缺口。
+1. **作为方法论参考**：通读 README，按第 1–3 节把三层 Harness 与 H1–H6 流程映射到自己团队当前的 SDLC，识别缺口。
 2. **作为 Agent 提示词模板**：直接复用 [`agents/`](agents/) 下 8 个 Agent 的 `AGENT.md` + `prompt.md`，按需替换项目专属术语后接入到 Copilot Chat / Claude Code / Cursor / 自建工作流。
 3. **作为评审 / 门禁清单**：把 [`templates/phase-gate-checklist.md`](templates/phase-gate-checklist.md) 与 [`templates/review-record.md`](templates/review-record.md) 接入团队的 PR 模板与阶段评审，让规范从纸面落到流程。
 
@@ -143,7 +145,7 @@ Harness Engineering（中文社区暂无官方译名，本规范采用"驾驭工
 
 | 层次       | GitHub Copilot 体系                                                                                                                            | OpenAI Codex 体系                                                                                      | Anthropic Claude Code 体系                                    |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| 约束层     | `.github/copilot-instructions.md`、`.github/instructions/*.instructions.md`（带 `applyTo` 模式）、`AGENTS.md`、自定义 Chat Mode / Custom Agent | `AGENTS.md`（多级，作为"目录"而非百科全书）、自定义 Lint、结构测试、分层架构不变式                     | `CLAUDE.md`（及子目录继承）、Skills、Subagents                |
+| 约束层     | `.github/copilot-instructions.md`、`.github/instructions/*.instructions.md`（带 `applyTo` 模式）、`AGENTS.md`、`.github/agents/*.agent.md`（Custom Agent） | `AGENTS.md`（多级，作为"目录"而非百科全书）、自定义 Lint、结构测试、分层架构不变式                     | `CLAUDE.md`（及子目录继承）、Skills、Subagents                |
 | 反馈层     | Agent Mode（`#codebase` / `#fetch` / 终端 / Problems 回灌）、MCP 工具集成、Copilot Edits 多文件迭代                                            | 测试 / 构建 / Chrome DevTools MCP / 本地可观测栈（LogQL、PromQL）、Ralph Wiggum 循环（Agent 自审自改） | Plan Mode、测试与截图验证、Subagents 隔离调查                 |
 | 质量门禁层 | Copilot code review（PR 阶段）、Branch protection + Required reviewers、Secret scanning push protection、GitHub Actions CI                     | 自定义 Lint 硬失败、结构测试、后台 doc-gardening Agent、提交者路径限制                                 | Hooks（确定性拦截）、Permission allowlist、Sandbox、Auto Mode |
 
@@ -243,20 +245,20 @@ H6 运行验证与文档回写
 
 ## 4. 阶段细则（H1–H6）
 
-H1–H6 各阶段的输入、输出物、必填章节与评审门禁，详见独立文件 [`docs/stages.md`](docs/stages.md)。原 README §4–§9 的章节编号在该文件中保持不变（§4–§9），便于其他 Agent 与文档继续按 `§4.4`、`§6.5`、`§9.6` 等编号交叉引用。
+H1–H6 各阶段的输入、输出物、必填章节与评审门禁，详见独立文件 [`docs/stages.md`](docs/stages.md)。原 README 第 4–9 节的章节编号在该文件中保持不变（第 4–9 节），便于其他 Agent 与文档继续按 `第 4.4 节`、`第 6.5 节`、`第 9.6 节` 等编号交叉引用。
 
 | 阶段 | 主题                | 跳转                                                      |
 | ---- | ------------------- | --------------------------------------------------------- |
-| H1   | 需求、UI 与交互原型 | [stages.md §4](docs/stages.md#4-h1需求ui-与交互原型阶段)  |
-| H2   | 技术架构选型        | [stages.md §5](docs/stages.md#5-h2技术架构选型阶段)       |
-| H3   | 详细设计            | [stages.md §6](docs/stages.md#6-h3详细设计阶段)           |
-| H4   | 测试用例设计        | [stages.md §7](docs/stages.md#7-h4测试用例设计阶段)       |
-| H5   | AI 编码与自验证     | [stages.md §8](docs/stages.md#8-h5ai-编码与自验证阶段)    |
-| H6   | 运行验证与文档回写  | [stages.md §9](docs/stages.md#9-h6运行验证与文档回写阶段) |
+| H1   | 需求、UI 与交互原型 | [stages.md 第 4 节](docs/stages.md#4-h1需求ui-与交互原型阶段)  |
+| H2   | 技术架构选型        | [stages.md 第 5 节](docs/stages.md#5-h2技术架构选型阶段)       |
+| H3   | 详细设计            | [stages.md 第 6 节](docs/stages.md#6-h3详细设计阶段)           |
+| H4   | 测试用例设计        | [stages.md 第 7 节](docs/stages.md#7-h4测试用例设计阶段)       |
+| H5   | AI 编码与自验证     | [stages.md 第 8 节](docs/stages.md#8-h5ai-编码与自验证阶段)    |
+| H6   | 运行验证与文档回写  | [stages.md 第 9 节](docs/stages.md#9-h6运行验证与文档回写阶段) |
 
 ## 5. 目录规范与 Agent 套件
 
-项目目录推荐结构、`AGENTS.md` 的使用约定、以及随规范附带的 8 个 Agent 套件说明，详见独立文件 [`docs/repo-layout.md`](docs/repo-layout.md)。原 README §10 的章节编号在该文件中保持不变（§10.1、§10.2）。
+项目目录推荐结构、`AGENTS.md` 的使用约定、以及随规范附带的 8 个 Agent 套件说明，详见独立文件 [`docs/repo-layout.md`](docs/repo-layout.md)。原 README 第 10 节的章节编号在该文件中保持不变（第 10.1 节、第 10.2 节）。
 
 ## 6. AI 使用规范
 
@@ -360,7 +362,7 @@ AI 输出必须满足：
 - 与上游文档一致
 - 可支撑下一阶段工作
 
-项目级完成标准见 [`docs/stages.md`](docs/stages.md) §9.6。
+项目级完成标准见 [`docs/stages.md`](docs/stages.md) 第 9.6 节。
 
 ## 10. 熵与技术债务 GC
 

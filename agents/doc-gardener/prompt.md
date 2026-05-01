@@ -4,7 +4,7 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) §10（熵与技术债务 GC）。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 第 10 节（熵与技术债务 GC）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md)。
 3. **不要**删除任何文档。可以建议 `mark-deprecated` 或开 PR 让人工裁决。
 4. **不要**修改 `harness-engineering/` 目录下任何文件。
@@ -58,7 +58,7 @@
 
 ### 第六步：产出报告
 
-写 `docs/07-release/doc-gc-report.md`（覆盖更新），按 [`AGENT.md` §4.1](AGENT.md) 的章节组织。每条记录使用统一格式：
+写 `docs/07-release/doc-gc-report.md`（覆盖更新），按 [`AGENT.md` 第 4.1 节](AGENT.md) 的章节组织。每条记录使用统一格式：
 
 ```markdown
 - **文件**：`<path>` 第 <N> 行

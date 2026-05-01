@@ -15,7 +15,7 @@
 
 ```yaml
 ---
-id: REQ-001                    # 编号，见 glossary.md §4
+id: REQ-001                    # 编号，见 glossary.md 第 4 节
 stage: H1                      # 所属阶段
 status: draft                  # draft / reviewed / approved / deprecated
 authors:

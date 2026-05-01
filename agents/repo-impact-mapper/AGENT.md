@@ -39,7 +39,7 @@
 | 受影响接口 / 数据结构 | 列出已存在的，不发明新的 |
 | 受影响测试 | 现有的 / 需要新增的（粗粒度） |
 | 风险 | 兼容性 / 性能 / 数据迁移等已知风险 |
-| 置信度 | high / medium / low（见 §6） |
+| 置信度 | high / medium / low（见第 6 节） |
 
 ### 4.2 模块依赖摘要
 
@@ -55,7 +55,7 @@
 
 ### 4.4 阻塞返回
 
-若 `requirements.md` 状态不达标、或核心模块路径在 `AGENTS.md` 中被列为禁区且 REQ 与之冲突，按 [`io-contracts.md` §5](../_shared/io-contracts.md) 返回结构化错误。
+若 `requirements.md` 状态不达标、或核心模块路径在 `AGENTS.md` 中被列为禁区且 REQ 与之冲突，按 [`io-contracts.md` 第 5 节](../_shared/io-contracts.md) 返回结构化错误。
 
 ## 5. 工具集
 

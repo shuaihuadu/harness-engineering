@@ -7,7 +7,7 @@
 
 从 `commit-records.md`、`tech-debt-tracker.md` 与 `traceability-matrix.md` 抽取已合入的变更，生成 `release-notes.md` 草稿，并回写追溯矩阵。它是 H6 的"信息归集器"，负责把分散在多个 PR 里的事实凝练成一份对外可读的发布说明。
 
-> 设计依据：[`docs/stages.md`](../../docs/stages.md) §9（H6 运行验证与文档回写）+ README §8（追溯链）。
+> 设计依据：[`docs/stages.md`](../../docs/stages.md) 第 9 节（H6 运行验证与文档回写）+ README 第 8 节（追溯链）。
 
 ## 2. 触发时机
 

@@ -13,7 +13,7 @@
 
 ### 第一步：前置检查
 
-读取 `docs/01-requirements/requirements.md`，确认 frontmatter 中 `status` 为 `reviewed` 或 `approved`。若未达标，按 [io-contracts.md §5](../_shared/io-contracts.md) 返回阻塞，附上具体不满足的字段。
+读取 `docs/01-requirements/requirements.md`，确认 frontmatter 中 `status` 为 `reviewed` 或 `approved`。若未达标，按 [io-contracts.md 第 5 节](../_shared/io-contracts.md) 返回阻塞，附上具体不满足的字段。
 
 ### 第二步：粗扫仓库
 
@@ -48,7 +48,7 @@
 
 ### 第五步：产出文档
 
-按照 [`AGENT.md` §4](AGENT.md) 的章节结构写 `docs/01-requirements/repo-impact-map.md`：
+按照 [`AGENT.md` 第 4 节](AGENT.md) 的章节结构写 `docs/01-requirements/repo-impact-map.md`：
 
 - 影响面表（4.1）
 - 模块依赖摘要（4.2）
@@ -66,7 +66,7 @@ frontmatter 必填，`upstream` 列出本次涉及的所有 REQ 编号。
 
 ## 阻塞返回
 
-按 [io-contracts.md §5](../_shared/io-contracts.md) 返回结构化错误的场景：
+按 [io-contracts.md 第 5 节](../_shared/io-contracts.md) 返回结构化错误的场景：
 
 - `requirements.md` 状态不达标
 - 关键 REQ 与 `AGENTS.md` 禁区冲突

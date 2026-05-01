@@ -5,13 +5,13 @@ parent: ../README.md
 
 # 各阶段细则（H1–H6）
 
-本文件是 Harness Engineering 规范的阶段细则部分，从 [`../README.md`](../README.md) 抽出。原 §4–§9 的章节编号在本文件中**保持不变**，便于其他 Agent 与文档继续按 `§4.4`、`§6.5`、`§9.6` 等编号引用。
+本文件是 Harness Engineering 规范的阶段细则部分，从 [`../README.md`](../README.md) 抽出。原第 4–9 节的章节编号在本文件中**保持不变**，便于其他 Agent 与文档继续按 `第 4.4 节`、`第 6.5 节`、`第 9.6 节` 等编号引用。
 
 阅读路径建议：
 
-- 先看 [`../README.md`](../README.md) §1–§3 了解三层 Harness 与 H1–H6 总流程
+- 先看 [`../README.md`](../README.md) 第 1–3 节了解三层 Harness 与 H1–H6 总流程
 - 再回到本文件按需查阅具体阶段
-- 评审与质量门禁的横切要求见 [`../README.md`](../README.md) §6–§11
+- 评审与质量门禁的横切要求见 [`../README.md`](../README.md) 第 6–11 节
 
 ## 4. H1：需求、UI 与交互原型阶段
 

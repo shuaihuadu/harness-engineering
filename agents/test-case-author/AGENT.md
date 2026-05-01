@@ -7,7 +7,7 @@
 
 依据已通过审查的需求与详细设计，反推一组结构化的 `TC-NNN` 测试用例草稿，确保**每条 REQ 至少有一条 TC**、关键接口与数据路径都有覆盖。它把"测试驱动"前置到 H4，让 H5 的 `CodingExecutor` 可以直接以测试为输入。
 
-> 设计依据：[`docs/stages.md`](../../docs/stages.md) §7 与 OpenAI 关于"测试是 Agent 反馈层的核心"的实践。
+> 设计依据：[`docs/stages.md`](../../docs/stages.md) 第 7 节与 OpenAI 关于"测试是 Agent 反馈层的核心"的实践。
 
 ## 2. 触发时机
 

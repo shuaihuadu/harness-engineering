@@ -21,20 +21,20 @@
 - `docs/` 是事实来源（source of truth）：先改文档再改代码，不要让代码先于设计落地。
 - 不在 `docs/04-detailed-design/` 之外的位置放设计内容；不在 `AGENTS.md` 里复述能用 Lint / Hooks / CI 强制的规则。
 
-## 3. 何时切换到专用 chatmode
+## 3. 何时切换到专用 Custom Agent
 
-当前项目已装的 chatmode（在 VS Code Copilot Chat 顶部下拉菜单中选择）：
+当前项目已装的 Custom Agent（在 VS Code Copilot Chat 顶部下拉菜单中选择）：
 
-| 场景               | 使用模式             |
-| ------------------ | -------------------- |
-| 评审 H3 详细设计   | `DesignReviewer`     |
-| 反推测试用例       | `TestCaseAuthor`     |
-| 准备提交 / 评审 PR | `CommitAuditor`      |
-| 其他编码           | 默认 chatmode（即本指令） |
+| 场景               | 使用 Agent             |
+| ------------------ | ---------------------- |
+| 评审 H3 详细设计   | `DesignReviewer`       |
+| 反推测试用例       | `TestCaseAuthor`       |
+| 准备提交 / 评审 PR | `CommitAuditor`        |
+| 其他编码           | 默认 Agent（即本指令） |
 
-> 默认 chatmode 下不要尝试代行上述 Agent 的工作。Agent 的判定逻辑写在各自的 `chatmode.md` 里，单独运行才能保证机械化。
+> 默认 Agent 下不要尝试代行上述专用 Agent 的工作。专用 Agent 的判定逻辑写在各自的 `*.agent.md` 里，单独运行才能保证机械化。
 >
-> Harness Engineering 还定义了 `RequirementsInterviewer`、`RepoImpactMapper`、`CodingExecutor`、`ReleaseNoteWriter`、`DocGardener` 等 Agent 规格，但本项目还未将它们包装为 chatmode。需要时可参考 [`{{HARNESS_REPO_REF_FROM_GITHUB}}/agents/`]({{HARNESS_REPO_REF_FROM_GITHUB}}/agents/) 补充并重装。
+> Harness Engineering 还定义了 `RequirementsInterviewer`、`RepoImpactMapper`、`CodingExecutor`、`ReleaseNoteWriter`、`DocGardener` 等 Agent 规格，但本项目还未将它们包装为 Custom Agent。需要时可参考 [`{{HARNESS_REPO_REF_FROM_GITHUB}}/agents/`]({{HARNESS_REPO_REF_FROM_GITHUB}}/agents/) 补充并重装。
 
 ## 4. 关键文档入口
 

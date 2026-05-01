@@ -18,7 +18,7 @@
 
 | 输入 | 必需 | 说明 |
 | --- | --- | --- |
-| `ai-task-brief.md`（任务说明） | 是 | 内容须符合 [`io-contracts.md` §3](../_shared/io-contracts.md) |
+| `ai-task-brief.md`（任务说明） | 是 | 内容须符合 [`io-contracts.md` 第 3 节](../_shared/io-contracts.md) |
 | 上游设计文档 | 是 | 任务说明里"上游文档"列出的所有路径 |
 | 上游测试用例 | 是 | 任务说明里"测试引用"列出的 `TC-NNN` 对应文档 |
 | 仓库源码 | 是 | 真实代码 |
@@ -34,7 +34,7 @@
 
 ### 4.2 提交信息
 
-按 [`io-contracts.md` §4](../_shared/io-contracts.md) 格式生成提交信息草稿，写入 PR 描述或 commit message，不得遗漏 `Design`/`Tests`/`Verify`/`Task` 字段。
+按 [`io-contracts.md` 第 4 节](../_shared/io-contracts.md) 格式生成提交信息草稿，写入 PR 描述或 commit message，不得遗漏 `Design`/`Tests`/`Verify`/`Task` 字段。
 
 ### 4.3 自验证报告
 
@@ -47,7 +47,7 @@
 
 ### 4.4 阻塞返回
 
-下列情况按 [`io-contracts.md` §5](../_shared/io-contracts.md) 阻塞，**禁止**自行降级或扩大改动范围：
+下列情况按 [`io-contracts.md` 第 5 节](../_shared/io-contracts.md) 阻塞，**禁止**自行降级或扩大改动范围：
 
 - 任务说明不完整（缺设计 / 测试引用 / 验收命令）
 - 上游设计文档缺失或与任务说明矛盾
@@ -70,7 +70,7 @@
 | `exec.shell` | 否 | 仅在 `Verify` 命令需要时使用，且范围最小化 |
 | `read.web` | 否 | 默认禁用，确需查文档时由人工解锁 |
 
-**禁用**：`pr.create`——本 Agent 不直接开 PR，提交动作交给人工或 IDE 内置流程；`ask.user` 默认禁用，遇阻塞时按 [io-contracts §5](../_shared/io-contracts.md) 结构化返回，而不是反复追问。
+**禁用**：`pr.create`——本 Agent 不直接开 PR，提交动作交给人工或 IDE 内置流程；`ask.user` 默认禁用，遇阻塞时按 [io-contracts 第 5 节](../_shared/io-contracts.md) 结构化返回，而不是反复追问。
 
 ## 6. 行为约束
 

@@ -4,8 +4,8 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) §8（H5 章节）、README §8（追溯关系）、[`docs/repo-layout.md`](../../docs/repo-layout.md) §10。
-2. 严格遵循 [输入输出契约 §4](../_shared/io-contracts.md)。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) 第 8 节（H5 章节）、README 第 8 节（追溯关系）、[`docs/repo-layout.md`](../../docs/repo-layout.md) 第 10 节。
+2. 严格遵循 [输入输出契约第 4 节](../_shared/io-contracts.md)。
 3. **确定性**是首要原则：相同输入必须得到相同输出。不要因为"看起来差不多"就放行。
 4. 不允许"宽容补全"：缺字段就是 `fail`，不要替提交者补字段。
 
@@ -39,7 +39,7 @@
 
 ### 第五步：输出结论
 
-按 [`AGENT.md` §4.1](AGENT.md) 的 YAML 结构输出。每个 `fail` 项必须配一条 `suggested_fixes`。
+按 [`AGENT.md` 第 4.1 节](AGENT.md) 的 YAML 结构输出。每个 `fail` 项必须配一条 `suggested_fixes`。
 
 - 全部通过：在 PR 中发简短确认评论，引用 `Task:` 编号
 - 任一失败：在 PR 中发详细评论，列出所有失败检查、原因、修复建议（一次性给全，不要分多轮）

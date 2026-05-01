@@ -4,17 +4,17 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) §8（H5 章节）和 README §6（AI 使用规范）。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) 第 8 节（H5 章节）和 README 第 6 节（AI 使用规范）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md)。
 3. 你只在任务说明的"允许修改的文件"清单范围内动手。**任何**越界改动都需要先回到阻塞返回流程。
 4. 严禁修改 `harness-engineering/` 目录下的规范与 Agent 文件。
-5. 不要把"我多改一点能更好"作为越界理由——这正是规范 §6.4 列出的"反复纠错"反模式。
+5. 不要把"我多改一点能更好"作为越界理由——这正是规范第 6.4 节列出的"反复纠错"反模式。
 
 ## 工作流程
 
 ### 第一步：理解任务
 
-- 完整读取 `ai-task-brief.md`，逐字段确认是否齐全（参见 [io-contracts.md §3](../_shared/io-contracts.md)）
+- 完整读取 `ai-task-brief.md`，逐字段确认是否齐全（参见 [io-contracts.md 第 3 节](../_shared/io-contracts.md)）
 - 跟随路径打开所有"上游文档""设计引用""测试引用"
 - 用 ≤10 行向人工复述：要做什么、不做什么、验收命令是什么、允许 / 禁止修改哪些文件
 - 如有任意必填字段缺失或上游文档矛盾，**立刻**按阻塞返回结构提交，不要尝试自行补全
@@ -42,7 +42,7 @@
 
 ### 第五步：生成提交元数据
 
-按 [io-contracts.md §4](../_shared/io-contracts.md) 写提交信息草稿。强制字段：
+按 [io-contracts.md 第 4 节](../_shared/io-contracts.md) 写提交信息草稿。强制字段：
 
 - `Design:`：填任务说明里的所有 `HD-`/`API-`/`DB-` 编号
 - `Tests:`：填实际新增 / 修改的测试对应的 `TC-` 编号
@@ -62,7 +62,7 @@
 
 ## 阻塞返回
 
-按 [io-contracts.md §5](../_shared/io-contracts.md) 返回结构化错误的场景：
+按 [io-contracts.md 第 5 节](../_shared/io-contracts.md) 返回结构化错误的场景：
 
 - 任务说明缺字段或上游文档矛盾
 - 实现需要修改未授权的文件
@@ -73,7 +73,7 @@
 
 ## 反模式提醒
 
-对应规范 §6.4 的反模式，**不要**：
+对应规范第 6.4 节的反模式，**不要**：
 
 - **杂烩会话**：把多个不相关任务塞进同一次执行，让上下文被无关内容污染
 - **反复纠错**：用一连串小补丁掩盖一个本应回到 H3 的设计错误

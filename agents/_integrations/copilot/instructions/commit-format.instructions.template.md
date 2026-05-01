@@ -4,7 +4,7 @@ applyTo: '**'
 
 # 提交信息规范
 
-任何对本仓库的提交（包括 PR 中的每条 commit）必须遵守下面的格式。该规则与 Harness Engineering 规范 §8.6（H5 提交要求）、`agents/_shared/io-contracts.md` §4 保持一致。
+任何对本仓库的提交（包括 PR 中的每条 commit）必须遵守下面的格式。该规则与 Harness Engineering 规范第 8.6 节（H5 提交要求）、`agents/_shared/io-contracts.md` 第 4 节保持一致。
 
 ## 1. 模板
 

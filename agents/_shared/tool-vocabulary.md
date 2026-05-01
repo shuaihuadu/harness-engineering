@@ -1,6 +1,6 @@
 # 工具能力词表
 
-各 Agent 的 `AGENT.md` §工具集 必须从本词表中选用条目。这样落到具体工具时，[`_integrations/`](../_integrations/README.md) 的 `{{TOOL_LIST}}` 占位符可以做一次性映射，避免命名漂移。
+各 Agent 的 `AGENT.md` 的工具集必须从本词表中选用条目。这样落到具体工具时，[`_integrations/`](../_integrations/README.md) 的 `{{TOOL_LIST}}` 占位符可以做一次性映射，避免命名漂移。
 
 > 词表只规定**能力维度**，不绑定具体厂商接口。同一条目在不同 IDE 里可能对应不同实现。
 
@@ -29,11 +29,11 @@
 ## 2. 选用规则
 
 - **最小授权**：每个 Agent 只声明完成职责所需的最少能力。多余的不写。
-- **禁用项显式声明**：在 `AGENT.md` §工具集 末尾用"禁止"列表写出**必须**禁用的能力（如 `RequirementsInterviewer` 应显式禁 `exec.*`）。
+- **禁用项显式声明**：在 `AGENT.md` 工具集末尾用"禁止"列表写出**必须**禁用的能力（如 `RequirementsInterviewer` 应显式禁 `exec.*`）。
 - **风险能力默认禁用**：`exec.shell`、`pr.create`、`read.web` 默认禁用，仅在 `AGENT.md` 里有明确职责需要时才启用。
 
 ## 3. 增改流程
 
 - 新能力必须能映射到至少一种主流工具的真实接口
-- 新增条目走 [`docs/stages.md`](../../docs/stages.md) §6.1 的"契约变更"门槛，需先在 §7 登记
+- 新增条目走 [`docs/stages.md`](../../docs/stages.md) 第 6.1 节的"契约变更"门槛，需先在第 7 节登记
 - 不允许把项目特有的工具名（如 `inkwell-cli`）加进来——本词表是规范级共享词表

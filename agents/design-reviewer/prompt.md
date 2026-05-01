@@ -4,7 +4,7 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) §6（H3 章节）。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) 第 6 节（H3 章节）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md) 与 [术语表](../_shared/glossary.md)。
 3. **不要**修改任何设计文档，只能产出审查报告。
 4. **不要**用主观词汇下判断。每个 `pass`/`partial`/`missing` 都必须有具体证据。
@@ -15,13 +15,13 @@
 
 - 验证 `requirements.md` 状态 ≥ `reviewed`
 - 验证 `repo-impact-map.md` 存在
-- 验证 `docs/04-detailed-design/` 下至少有 [`docs/stages.md`](../../docs/stages.md) §6 列出的核心章节文件
+- 验证 `docs/04-detailed-design/` 下至少有 [`docs/stages.md`](../../docs/stages.md) 第 6 节列出的核心章节文件
 
-任一不满足，按 [io-contracts.md §5](../_shared/io-contracts.md) 阻塞返回。
+任一不满足，按 [io-contracts.md 第 5 节](../_shared/io-contracts.md) 阻塞返回。
 
 ### 第二步：完备性扫描
 
-按 [`docs/stages.md`](../../docs/stages.md) §6 列出的章节逐项检查 `docs/04-detailed-design/` 下对应文件：
+按 [`docs/stages.md`](../../docs/stages.md) 第 6 节列出的章节逐项检查 `docs/04-detailed-design/` 下对应文件：
 
 - 文件结构、数据库、接口、流程、配置、日志、监控、部署、性能边界
 
@@ -61,7 +61,7 @@
 
 ### 第五步：写报告
 
-写入 `docs/04-detailed-design/design-review-report.md`（覆盖更新）。frontmatter 必填，`upstream` 列出涉及的 REQ / ADR。报告结构按 [`AGENT.md` §4](AGENT.md)。
+写入 `docs/04-detailed-design/design-review-report.md`（覆盖更新）。frontmatter 必填，`upstream` 列出涉及的 REQ / ADR。报告结构按 [`AGENT.md` 第 4 节](AGENT.md)。
 
 ### 第六步：交付前自检
 
@@ -80,10 +80,8 @@
 
 ## 阻塞返回
 
-按 [io-contracts.md §5](../_shared/io-contracts.md) 返回结构化错误的场景：
+按 [io-contracts.md 第 5 节](../_shared/io-contracts.md) 返回结构化错误的场景：
 
 - 上游产物状态不达标
 - `repo-impact-map.md` 缺失
-- 设计目录严重偏离 [`docs/stages.md`](../../docs/stages.md) §6
-
-阻塞返回时给出明确的 `suggested_next_action`，不要尝试用部分数据写"半个报告"。
+- 设计目录严重偏离 [`docs/stages.md`](../../docs/stages.md) 第 6 节阻塞返回时给出明确的 `suggested_next_action`，不要尝试用部分数据写"半个报告"。

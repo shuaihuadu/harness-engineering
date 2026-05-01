@@ -5,7 +5,7 @@ parent: ../README.md
 
 # 目录规范
 
-本文件是 Harness Engineering 规范的目录与套件章节，从 [`../README.md`](../README.md) 抽出。原 §10 的章节编号在本文件中**保持不变**，便于其他文档继续按 `§10.1`、`§10.2` 引用。
+本文件是 Harness Engineering 规范的目录与套件章节，从 [`../README.md`](../README.md) 抽出。原第 10 节的章节编号在本文件中**保持不变**，便于其他文档继续按 `第 10.1 节`、`第 10.2 节` 引用。
 
 ## 10. 目录规范
 
@@ -70,7 +70,7 @@ templates/
   phase-gate-checklist.md
   review-record.md
 
-agents/                    # 配套 Agent 套件（与业务无关，详见 §10.2）
+agents/                    # 配套 Agent 套件（与业务无关，详见第 10.2 节）
   README.md
   _shared/                 # 共享术语与 I/O 契约
   _integrations/           # 落到具体工具的轻量包装模板

@@ -17,7 +17,7 @@ applyTo: '**/*.md'
 
 - 一级章节按 `## 1. xxx` / `## 2. xxx` 形式编号，**不跳号**
 - 子章节 `### 1.1 xxx`，深度对齐父章节
-- 跨文档引用必须给出**完整路径 + 章节号**，例如：`详见 docs/stages.md §6.4`
+- 跨文档引用必须给出**完整路径 + 章节号**，例如：`详见 docs/stages.md 第 6.4 节`
 
 ## 3. 正文风格
 
@@ -35,7 +35,7 @@ applyTo: '**/*.md'
 
 ## 5. frontmatter
 
-需求 / 设计 / 测试用例 / 评审记录等结构化文档必须带 frontmatter，字段集见 `agents/_shared/io-contracts.md` §2。
+需求 / 设计 / 测试用例 / 评审记录等结构化文档必须带 frontmatter，字段集见 `agents/_shared/io-contracts.md` 第 2 节。
 
 ```yaml
 ---
@@ -50,5 +50,5 @@ last_reviewed: YYYY-MM-DD
 
 ## 6. AI 协作时的输出
 
-- 当请求"补全这份设计文档"时，按本规则与 [`docs/stages.md` §6]({{HARNESS_REPO_REF_FROM_GITHUB}}/docs/stages.md) 的章节列表逐项补齐，不引入额外口味。
+- 当请求"补全这份设计文档"时，按本规则与 [`docs/stages.md` 第 6 节]({{HARNESS_REPO_REF_FROM_GITHUB}}/docs/stages.md) 的章节列表逐项补齐，不引入额外口味。
 - 当用户要求"把代码同步到文档"时，先生成 diff 预览，让用户确认后再写盘。

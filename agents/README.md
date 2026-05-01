@@ -8,7 +8,7 @@
 
 - **业务无关**：Agent 只读规范定义的产物（`docs/01-requirements/` ... `docs/07-release/`、`AGENTS.md`、`templates/`），不假设任何业务领域。
 - **模型中立**：所有 prompt 不依赖某个模型的特殊能力（thinking 标签、专有工具格式），任何具备工具调用能力的 LLM 都可装载。
-- **工具中立**：以纯 Markdown 描述 Agent 规格，需要落到具体工具时再做轻量适配（详见 §5）。
+- **工具中立**：以纯 Markdown 描述 Agent 规格，需要落到具体工具时再做轻量适配（详见第 5 节）。
 - **小步交付**：先打通 H1 / H3 / H4 / H5 / H6 与横切共 8 个核心岗位，验证后再扩展 H2 等其余阶段。
 
 ## 2. Agent 总索引
@@ -48,25 +48,35 @@ H6:                                                                             
 横切（定时 / Webhook 触发）：DocGardener
 ```
 
+### 3.1 交接约定
+
+上图箭头不是函数调用，是**文档落地交接**。所有 Agent 遵守同一条规则：
+
+- Agent 之间**不直接调用**对方。每个 Agent 只读自己上游产出的文档、写自己负责的产物，下游何时启动由人工或调度器决定。
+- 单个 Agent 发现需要其它 Agent 介入时，按 [`_shared/io-contracts.md`](./_shared/io-contracts.md) 的「阻塞返回」结构输出 `status: blocked` + 具体缺口，**不要**自行扩张职责把下游的活也干了。
+- 共享文档落点固定：`docs/01-requirements/` / `docs/04-detailed-design/` / `docs/05-test-design/` / `docs/06-implementation/exec-plans/` / `docs/07-release/`。每个 Agent 的 `AGENT.md` 已显式声明它读哪些路径、写哪些路径。
+
+这条约定让流水线图在工具维度可解释——人工调度器、CI 钩子、Copilot 下拉菜单切换 Agent，三种触发方式底下走的是同一条契约。
+
 ## 4. 共享契约
 
 所有 Agent 共用以下两份契约文件，避免每个 `AGENT.md` 重复定义：
 
 - [`_shared/glossary.md`](./_shared/glossary.md)：阶段编号、产物路径、追溯字段等术语统一定义。
 - [`_shared/io-contracts.md`](./_shared/io-contracts.md)：输入输出文件命名、frontmatter 字段、提交信息格式、错误返回结构。
-- [`_shared/tool-vocabulary.md`](./_shared/tool-vocabulary.md)：Agent 工具能力共享词表，由各 `AGENT.md` §工具集 引用。
+- [`_shared/tool-vocabulary.md`](./_shared/tool-vocabulary.md)：Agent 工具能力共享词表，由各 `AGENT.md` 的工具集引用。
 - [`_shared/AGENT.md.template`](./_shared/AGENT.md.template) / [`_shared/prompt.md.template`](./_shared/prompt.md.template)：新增 Agent 时使用的干净骨架。
 
 ## 5. 通用 Skills（跨 Agent 的可复用 SOP）
 
 [`_skills/`](./_skills/README.md) 下提供若干**操作型 Skill**：被多个 Agent 反复用到的元动作（追溯、写任务卡、写提交信息、阶段门禁核对）。它们与 Agent 是不同的事物——Agent 是一个角色，Skill 是一段可重入的流程。
 
-| Skill                                                                              | 解决的问题                                              |
-| ---------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| [traceability-linker](./_skills/traceability-linker/SKILL.md)                      | 校验并补全 `REQ ↔ HD/API/DB ↔ TC ↔ TASK ↔ Commit` 追溯链 |
-| [ai-task-brief-writer](./_skills/ai-task-brief-writer/SKILL.md)                    | 把口头需求/Issue 转成合规 H5 任务卡                     |
-| [commit-message-formatter](./_skills/commit-message-formatter/SKILL.md)            | 按六字段模板生成或校验提交信息                          |
-| [phase-gate-runner](./_skills/phase-gate-runner/SKILL.md)                          | 按阶段门禁清单逐条核对                                  |
+| Skill                                                                   | 解决的问题                                               |
+| ----------------------------------------------------------------------- | -------------------------------------------------------- |
+| [traceability-linker](./_skills/traceability-linker/SKILL.md)           | 校验并补全 `REQ ↔ HD/API/DB ↔ TC ↔ TASK ↔ Commit` 追溯链 |
+| [ai-task-brief-writer](./_skills/ai-task-brief-writer/SKILL.md)         | 把口头需求/Issue 转成合规 H5 任务卡                      |
+| [commit-message-formatter](./_skills/commit-message-formatter/SKILL.md) | 按六字段模板生成或校验提交信息                           |
+| [phase-gate-runner](./_skills/phase-gate-runner/SKILL.md)               | 按阶段门禁清单逐条核对                                   |
 
 新增 Skill 的判断标准与目录约定见 [`_skills/README.md`](./_skills/README.md)。
 
@@ -77,12 +87,14 @@ H6:                                                                             
 - `AGENT.md`：Agent 规格（定位、触发、输入输出、行为约束、验收标准）。
 - `prompt.md`：模型中立的中文系统提示。
 
+> 这两份文件是公共核心：业务规则只在这里维护一次。Copilot、Codex、Claude Code 等工具在 [`_integrations/`](./_integrations/README.md) 下各占一个子目录，仅做识别 / 调用 / 权限三类入口适配，不复制业务、不为单一工具改写规则。完整设计思路见 [`_integrations/README.md` 第 0 节](./_integrations/README.md#0-设计思路)。
+
 落到具体工具时只需做一层轻量包装：
 
 | 工具                          | 包装方式                                                                                                           |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Claude Code                   | 在 `.claude/agents/<name>.md` 加 frontmatter（`name`、`description`、`tools`、`model`），正文 `@` 引用 `prompt.md` |
-| GitHub Copilot Chat           | 在 `.github/chatmodes/<name>.chatmode.md` 配置工具集，正文引用 `prompt.md`                                         |
+| GitHub Copilot Chat           | 在 `.github/agents/<name>.agent.md` 配置工具集（VS Code 1.118+ Custom Agents），正文引用 `prompt.md`               |
 | OpenAI Codex / AGENTS.md 体系 | 在 `AGENTS.md` 子目录指向对应 `AGENT.md`，由 Runtime 注入 `prompt.md`                                              |
 | 自研 Agent Runtime            | 直接读取 `AGENT.md` 的输入输出契约 + `prompt.md` 作为 system prompt                                                |
 
@@ -101,7 +113,7 @@ H6:                                                                             
 
 - **轻微修订**（错别字、格式、链接、不改行为）：直接 PR，1 名维护者评审即可
 - **行为微调**（措辞改变 Agent 行为但不改契约）：必须附 1 个真实项目的反例，并在 PR 描述中给出修改前后 Agent 的输出对比
-- **契约变更**（修改 `AGENT.md` 输入输出、工具集、阻塞返回条件）：必须先在本目录 §7 登记修订建议，由维护者批量回写
+- **契约变更**（修改 `AGENT.md` 输入输出、工具集、阻塞返回条件）：必须先在本目录第 7 节登记修订建议，由维护者批量回写
 
 ### 7.2 反例采集
 
@@ -128,7 +140,7 @@ H6:                                                                             
 允许把 Agent 标记为 `deprecated`：
 
 - `AGENT.md` 顶部加 `> **状态**：deprecated（自 vX.Y 起）`
-- 在本目录 §2 索引表中标灰（不删除条目）
+- 在本目录第 2 节索引表中标灰（不删除条目）
 - 给出迁移建议（指向继任 Agent 或人工流程）
 
 退役至少保留两个版本周期再考虑物理删除。
@@ -139,7 +151,7 @@ H6:                                                                             
 
 ```markdown
 - **触发 Agent**：<哪个 Agent 在落地中发现>
-- **规范章节**：<README.md 的 §X.Y>
+- **规范章节**：<README.md 的 X.Y>
 - **问题**：<具体描述>
 - **建议**：<修改方向>
 - **证据**：<反例 / 链接>
