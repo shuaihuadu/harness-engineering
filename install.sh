@@ -139,21 +139,21 @@ resolve_placeholder() {
         return 0
     fi
 
-    local hint; if [[ -n "$default" ]]; then hint=" [$default]"; else hint=" [回车跳过]"; fi
+    local hint; if [[ -n "$default" ]]; then hint=" [$default]"; else hint=" [回车跳过 / press Enter to skip]"; fi
     local value; read -r -p "$prompt$hint: " value
     [[ -z "$value" ]] && value="$default"
     printf -v "$var_name" '%s' "$value"
 }
 
 echo
-echo "==> Harness Engineering v$HARNESS_VERSION · 集成同步"
-echo "    目标仓库：$TARGET_REPO"
-echo "    安装目标：$TARGETS"
-echo "    交互模式：$([[ $NON_INTERACTIVE -eq 1 ]] && echo 否 || echo 是)"
+echo "==> Harness Engineering v$HARNESS_VERSION · 集成同步 / Integration sync"
+echo "    目标仓库 / Target repo : $TARGET_REPO"
+echo "    安装目标 / Targets     : $TARGETS"
+echo "    交互模式 / Interactive : $([[ $NON_INTERACTIVE -eq 1 ]] && echo '否 / no' || echo '是 / yes')"
 
 if [[ -n "$DETECTED_PROJECT_NAME$DETECTED_PRIMARY_LANGUAGE$DETECTED_TECH_STACK$DETECTED_TEST_COMMAND$DETECTED_LINT_COMMAND" ]]; then
     echo
-    echo '    自动探测：'
+    echo '    自动探测 / Auto-detected:'
     [[ -n "$DETECTED_PROJECT_NAME"     ]] && echo "      ProjectName     = $DETECTED_PROJECT_NAME"
     [[ -n "$DETECTED_PRIMARY_LANGUAGE" ]] && echo "      PrimaryLanguage = $DETECTED_PRIMARY_LANGUAGE"
     [[ -n "$DETECTED_TECH_STACK"       ]] && echo "      TechStack       = $DETECTED_TECH_STACK"
@@ -162,16 +162,16 @@ if [[ -n "$DETECTED_PROJECT_NAME$DETECTED_PRIMARY_LANGUAGE$DETECTED_TECH_STACK$D
 fi
 if [[ ${#PRIOR[@]} -gt 0 ]]; then
     echo
-    echo "    检测到上次 manifest（$PRIOR_VERSION），将作为默认值预填"
+    echo "    检测到上次 manifest（v$PRIOR_VERSION），将作为默认值预填 / Detected previous manifest, prefilling defaults"
 fi
 echo
 
-resolve_placeholder PROJECT_NAME      'PROJECT_NAME'      "$DETECTED_PROJECT_NAME"     '项目名称（PROJECT_NAME）'
-resolve_placeholder PROJECT_ONE_LINER 'PROJECT_ONE_LINER' ''                           '一句话定位（PROJECT_ONE_LINER，可留空）'
-resolve_placeholder PRIMARY_LANGUAGE  'PRIMARY_LANGUAGE'  "$DETECTED_PRIMARY_LANGUAGE" '主语言（PRIMARY_LANGUAGE）'
-resolve_placeholder TECH_STACK        'TECH_STACK'        "$DETECTED_TECH_STACK"       '技术栈（TECH_STACK）'
-resolve_placeholder TEST_COMMAND      'TEST_COMMAND'      "$DETECTED_TEST_COMMAND"     '测试命令（TEST_COMMAND）'
-resolve_placeholder LINT_COMMAND      'LINT_COMMAND'      "$DETECTED_LINT_COMMAND"     '代码风格检查命令（LINT_COMMAND）'
+resolve_placeholder PROJECT_NAME      'PROJECT_NAME'      "$DETECTED_PROJECT_NAME"     '项目名称 / Project name (PROJECT_NAME)'
+resolve_placeholder PROJECT_ONE_LINER 'PROJECT_ONE_LINER' ''                           '一句话定位 / One-liner pitch (PROJECT_ONE_LINER, optional)'
+resolve_placeholder PRIMARY_LANGUAGE  'PRIMARY_LANGUAGE'  "$DETECTED_PRIMARY_LANGUAGE" '主语言 / Primary language (PRIMARY_LANGUAGE)'
+resolve_placeholder TECH_STACK        'TECH_STACK'        "$DETECTED_TECH_STACK"       '技术栈 / Tech stack (TECH_STACK)'
+resolve_placeholder TEST_COMMAND      'TEST_COMMAND'      "$DETECTED_TEST_COMMAND"     '测试命令 / Test command (TEST_COMMAND)'
+resolve_placeholder LINT_COMMAND      'LINT_COMMAND'      "$DETECTED_LINT_COMMAND"     '代码风格检查命令 / Lint command (LINT_COMMAND)'
 
 # Vendor 目录：CLI 显式传入 > 上次 manifest.vendor_dir > 默认 .harness-engineering
 if [[ $NO_VENDOR -eq 0 && $VENDOR_HARNESS_TO_EXPLICIT -eq 0 ]]; then
@@ -181,7 +181,7 @@ if [[ $NO_VENDOR -eq 0 && $VENDOR_HARNESS_TO_EXPLICIT -eq 0 ]]; then
         [[ -n "$prior_vendor" ]] && vendor_default="$prior_vendor"
     fi
     if [[ $NON_INTERACTIVE -eq 0 ]]; then
-        read -r -p "Vendor 目录（相对 TargetRepo） [$vendor_default]: " vendor_input
+        read -r -p "Vendor 目录 / Vendor directory (relative to TargetRepo) [$vendor_default]: " vendor_input
         if [[ -z "$vendor_input" ]]; then
             VENDOR_HARNESS_TO="$vendor_default"
         else
@@ -194,7 +194,7 @@ fi
 
 if [[ $NO_VENDOR -eq 1 ]]; then
     default_ref="${PRIOR[HARNESS_REPO_REF]:-https://github.com/shuaihuadu/harness-engineering}"
-    resolve_placeholder HARNESS_REPO_REF 'HARNESS_REPO_REF' "$default_ref" '规范引用（HARNESS_REPO_REF，路径或 URL）'
+    resolve_placeholder HARNESS_REPO_REF 'HARNESS_REPO_REF' "$default_ref" '规范引用 / Harness repo ref (HARNESS_REPO_REF, path or URL)'
     [[ -z "$HARNESS_REPO_REF" ]] && HARNESS_REPO_REF="$default_ref"
     VENDOR_HARNESS_TO=""
 else
@@ -232,7 +232,7 @@ declare -A SELECTIONS
 
 # 总结 + 确认
 echo
-echo '==> 即将使用以下占位符渲染：'
+echo '==> 即将使用以下占位符渲染 / Rendering with placeholders:'
 UNCONFIGURED_COUNT=0
 for key in PROJECT_NAME PROJECT_ONE_LINER PRIMARY_LANGUAGE TECH_STACK TEST_COMMAND LINT_COMMAND HARNESS_REPO_REF; do
     val="${REPLACEMENTS[$key]}"
@@ -241,15 +241,15 @@ for key in PROJECT_NAME PROJECT_ONE_LINER PRIMARY_LANGUAGE TECH_STACK TEST_COMMA
 done
 if [[ $UNCONFIGURED_COUNT -gt 0 ]]; then
     echo
-    echo "    [!] 有 $UNCONFIGURED_COUNT 项未配置，将渲染为 $UNCONFIGURED；安装后请用："
+    echo "    [!] 有 $UNCONFIGURED_COUNT 项未配置，将渲染为 $UNCONFIGURED / $UNCONFIGURED_COUNT placeholder(s) unset:"
     echo "        grep -RFn '$UNCONFIGURED' '$TARGET_REPO/.github'"
 fi
 
 if [[ $NON_INTERACTIVE -eq 0 ]]; then
     echo
-    read -r -p '继续？[Y/n]: ' confirm
+    read -r -p '继续？ / Proceed? [Y/n]: ' confirm
     case "${confirm,,}" in
-        n|no) echo '已取消。'; exit 1 ;;
+        n|no) echo '已取消 / Cancelled.'; exit 1 ;;
     esac
 fi
 
@@ -259,11 +259,11 @@ fi
 if [[ -n "$VENDOR_HARNESS_TO" ]]; then
     vendor_abs="$TARGET_REPO/$VENDOR_HARNESS_TO"
     echo
-    echo "==> Vendor 规范文档 -> $vendor_abs"
+    echo "==> Vendor 规范文档 / Vendor harness docs -> $vendor_abs"
     sync_vendored_tree "$REPO_ROOT" "$vendor_abs" agents docs templates README.md
 else
     echo
-    echo "==> 跳过 vendor（指定了 --no-vendor）"
+    echo "==> 跳过 vendor / Skipping vendor (--no-vendor)"
 fi
 
 # ----------------------------------------------------------------------------
@@ -327,7 +327,7 @@ if [[ $DRY_RUN -eq 0 ]]; then
         >"$manifest_path"
 
     echo
-    echo "==> 已写入 manifest：$manifest_path"
+    echo "==> 已写入 manifest / Manifest written: $manifest_path"
 fi
 [[ -n "$MANIFEST_TMP" && -f "$MANIFEST_TMP" ]] && rm -f "$MANIFEST_TMP"
 
@@ -336,11 +336,11 @@ fi
 # ----------------------------------------------------------------------------
 echo
 if [[ $DRY_RUN -eq 1 ]]; then
-    echo "DryRun 完成。未写入任何文件。"
+    echo "DryRun 完成，未写入任何文件 / DryRun done, nothing written."
 else
-    echo "完成。下一步建议："
+    echo "完成。下一步建议 / Done. Suggested next steps:"
     echo "  1. cd $TARGET_REPO"
     [[ -n "$VENDOR_HARNESS_TO" ]] && echo "  2. git status $VENDOR_HARNESS_TO"
-    echo "  3. git diff 检查修改是否符合预期"
-    echo "  4. 检查渲染输出无残留占位符：grep -rn '{{' '$TARGET_REPO/.github' 2>/dev/null"
+    echo "  3. git diff 检查修改是否符合预期 / inspect changes"
+    echo "  4. 检查残留占位符 / scan for unrendered placeholders: grep -rn '{{' '$TARGET_REPO/.github' 2>/dev/null"
 fi

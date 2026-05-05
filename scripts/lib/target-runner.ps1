@@ -92,6 +92,74 @@ function Invoke-Target {
     }
 }
 
+function Read-SelectableMenu {
+    <#
+    .SYNOPSIS
+        交互式菜单：从 SourceDir 中列出可选模板让用户挑选。
+        Interactive menu: list selectable templates and let user pick.
+
+    .DESCRIPTION
+        - 列出目录中所有匹配 SourceGlob 的模板，去掉 .template 后缀作为 stem 展示
+        - 默认值由 DefaultSelect 决定：空数组 → 默认 none；含 'all' → 默认 all；否则按 stem 列预选
+        - 用户输入支持：编号（1,3）/ stem 名（commit-auditor,design-reviewer）/ 'all' / 'none' / 空回车采纳默认
+        - 返回值：'all' / 空数组 / 选中的 stem 数组
+    #>
+    param(
+        [Parameter(Mandatory)] [string]   $SourceDir,
+        [Parameter(Mandatory)] [string]   $SourceGlob,
+        [AllowEmptyCollection()] [string[]] $DefaultSelect = @(),
+        [Parameter(Mandatory)] [string]   $GroupName
+    )
+
+    $items = Get-ChildItem -Path $SourceDir -Filter $SourceGlob | Sort-Object Name
+    if (@($items).Count -eq 0) { return @() }
+
+    # 计算默认提示
+    $defaultLabel = if ($DefaultSelect -contains 'all') { 'all' }
+    elseif (@($DefaultSelect).Count -eq 0) { 'none' }
+    else { ($DefaultSelect -join ',') }
+
+    Write-Host ''
+    Write-Host "   ?  $GroupName 可选项 / available items:" -ForegroundColor Cyan
+    $i = 0
+    $stems = @()
+    foreach ($f in $items) {
+        $i++
+        # 渲染器把第一段 `.` 之前作为 stem（与 Where-Object { -like "$stem.*" } 的语义一致）
+        # the renderer treats the first dot-segment as the stem
+        $stem = ($f.Name -replace '\.template', '') -split '\.' | Select-Object -First 1
+        $stems += $stem
+        Write-Host ("        [{0}] {1}" -f $i, $stem)
+    }
+    Write-Host '      输入编号（1,3）/ stem 名 / all / none，回车采纳默认' -ForegroundColor DarkGray
+    Write-Host '      Enter numbers (e.g. 1,3) / stem names / all / none; press Enter for default' -ForegroundColor DarkGray
+    $answer = Read-Host "      选择 / Choose [$defaultLabel]"
+
+    if ([string]::IsNullOrWhiteSpace($answer)) {
+        # 采纳默认
+        return $DefaultSelect
+    }
+    $answer = $answer.Trim().ToLowerInvariant()
+    if ($answer -eq 'all') { return @('all') }
+    if ($answer -in @('none', 'no', 'n', '0', '-', 'skip')) { return @() }
+
+    # 解析编号 / stem 混合
+    $parts = $answer -split '[,\s]+' | Where-Object { $_ }
+    $picked = New-Object System.Collections.Generic.List[string]
+    foreach ($p in $parts) {
+        if ($p -match '^\d+$') {
+            $idx = [int]$p
+            if ($idx -ge 1 -and $idx -le $stems.Count) { [void]$picked.Add($stems[$idx - 1]) }
+            else { Write-Warning "无效编号 / invalid index: $p" }
+        }
+        else {
+            if ($stems -contains $p) { [void]$picked.Add($p) }
+            else { Write-Warning "未找到模板 / unknown stem: $p" }
+        }
+    }
+    return @($picked | Select-Object -Unique)
+}
+
 function Invoke-RenderSingle {
     param([hashtable]$Context, [object]$Spec, [string]$TargetDir, [string]$TargetRepoRoot)
 
@@ -121,7 +189,8 @@ function Invoke-RenderDirectory {
     $selectedStems = @()
 
     if ($selectable) {
-        # 优先级：用户为该目录指定的选择 > target 下默认 > target.json 的 default_select > 全部
+        # 优先级：用户为该目录指定的选择 > target 下默认 > 交互菜单（仅交互模式） > target.json 的 default_select
+        # priority: per-directory selection > per-target selection > interactive menu (only when interactive) > default_select
         $key = "$TargetName/$($Spec.source_dir)"
         $picked = $null
         $hasUserChoice = $false
@@ -129,18 +198,31 @@ function Invoke-RenderDirectory {
         elseif ($Selections.ContainsKey($TargetName)) { $picked = $Selections[$TargetName]; $hasUserChoice = $true }
 
         if (-not $hasUserChoice) {
-            # 用户未传选择 → 完全交给 target.json 的 default_select 决定
-            # default_select 缺失 ⇒ 装全部；default_select=[] ⇒ 一个都不装
-            if ($Spec.PSObject.Properties.Name -contains 'default_select') {
-                $picked = @($Spec.default_select)
+            $isInteractive = -not $Context.NonInteractive
+            if ($isInteractive) {
+                # 交互菜单：列出所有可选模板让用户挑（默认值取自 default_select）
+                # interactive menu: list all available templates and let the user pick
+                $defaultSelect = @()
+                if ($Spec.PSObject.Properties.Name -contains 'default_select') {
+                    $defaultSelect = @($Spec.default_select)
+                }
+                $picked = Read-SelectableMenu -SourceDir $srcDir -SourceGlob $srcGlob -DefaultSelect $defaultSelect -GroupName $Spec.source_dir
+                $hasUserChoice = $true
             }
             else {
-                $picked = @('all')
+                # 非交互：完全交给 default_select
+                # default_select 缺失 ⇒ 装全部；default_select=[] ⇒ 一个都不装
+                if ($Spec.PSObject.Properties.Name -contains 'default_select') {
+                    $picked = @($Spec.default_select)
+                }
+                else {
+                    $picked = @('all')
+                }
             }
         }
 
         if (@($picked).Count -eq 0) {
-            Write-Host "   skip   $($Spec.source_dir)：未选择任何项（target.json 默认空集，且未指定 -CopilotAgents/选择参数）" -ForegroundColor DarkGray
+            Write-Host "   skip   $($Spec.source_dir)：未选择任何项 / nothing selected" -ForegroundColor DarkGray
             return
         }
 

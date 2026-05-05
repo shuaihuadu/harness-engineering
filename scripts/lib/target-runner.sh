@@ -49,6 +49,98 @@ invoke_render_single() {
     sync_rendered_file "$target_dir/$source" "$target_repo/$target"
 }
 
+# 交互菜单：列出 source_dir 中的可选模板让用户挑
+# Interactive menu: list templates from source_dir for user to pick
+# args: $1=src_dir $2=source_glob $3=default_select_csv $4=group_name
+# stdout: 返回 csv（'all' / '' / 'stem1,stem2'）—— 注意所有提示输出走 stderr
+read_selectable_menu() {
+    local src_dir="$1" source_glob="$2" default_csv="$3" group="$4"
+
+    # 收集所有 stem
+    local stems=()
+    for f in "$src_dir"/$source_glob; do
+        [[ -f "$f" ]] || continue
+        local n; n=$(basename "$f")
+        local stem="${n/.template/}"; stem="${stem%.*}"
+        # 再去掉一层（例如 commit-auditor.agent → commit-auditor）：保留首段
+        stem="${stem%%.*}"
+        stems+=("$stem")
+    done
+
+    if [[ ${#stems[@]} -eq 0 ]]; then
+        echo ""
+        return 0
+    fi
+
+    # 默认标签
+    local default_label
+    if [[ ",$default_csv," == *",all,"* ]]; then
+        default_label="all"
+    elif [[ -z "$default_csv" ]]; then
+        default_label="none"
+    else
+        default_label="$default_csv"
+    fi
+
+    {
+        echo
+        echo "   ?  $group 可选项 / available items:"
+        local i=0
+        for stem in "${stems[@]}"; do
+            i=$((i + 1))
+            printf "        [%d] %s\n" "$i" "$stem"
+        done
+        echo "      输入编号（1,3）/ stem 名 / all / none，回车采纳默认"
+        echo "      Enter numbers (e.g. 1,3) / stem names / all / none; press Enter for default"
+    } >&2
+
+    local answer
+    read -r -p "      选择 / Choose [$default_label]: " answer </dev/tty
+
+    if [[ -z "$answer" ]]; then
+        echo "$default_csv"
+        return 0
+    fi
+    local lc; lc="$(echo "$answer" | tr '[:upper:]' '[:lower:]' | xargs)"
+    if [[ "$lc" == "all" ]]; then echo "all"; return 0; fi
+    if [[ "$lc" == "none" || "$lc" == "no" || "$lc" == "n" || "$lc" == "0" || "$lc" == "-" || "$lc" == "skip" ]]; then
+        echo ""
+        return 0
+    fi
+
+    # 解析数字 / stem 混合
+    IFS=$', \t' read -ra parts <<<"$lc"
+    local picked=()
+    for p in "${parts[@]}"; do
+        [[ -z "$p" ]] && continue
+        if [[ "$p" =~ ^[0-9]+$ ]]; then
+            local idx="$p"
+            if (( idx >= 1 && idx <= ${#stems[@]} )); then
+                picked+=("${stems[$((idx - 1))]}")
+            else
+                echo "无效编号 / invalid index: $p" >&2
+            fi
+        else
+            local found=0
+            for s in "${stems[@]}"; do
+                if [[ "$s" == "$p" ]]; then picked+=("$p"); found=1; break; fi
+            done
+            [[ $found -eq 0 ]] && echo "未找到模板 / unknown stem: $p" >&2
+        fi
+    done
+
+    # 去重
+    local seen=()
+    local unique=()
+    for x in "${picked[@]}"; do
+        local dup=0
+        for y in "${seen[@]}"; do [[ "$y" == "$x" ]] && dup=1 && break; done
+        [[ $dup -eq 0 ]] && { seen+=("$x"); unique+=("$x"); }
+    done
+    (IFS=,; echo "${unique[*]}")
+}
+
+
 invoke_render_directory() {
     local render="$1" target_dir="$2" target_repo="$3" target_name="$4"
 
@@ -81,18 +173,24 @@ invoke_render_directory() {
         fi
 
         if [[ $has_user_choice -eq 0 ]]; then
-            # 用户未传选择 → 由 target.json 的 default_select 决定
-            # 字段缺失 ⇒ 全装；空数组 ⇒ 一个都不装
+            local default_select_csv=""
             local has_field; has_field=$(jq 'has("default_select")' <<<"$render")
             if [[ "$has_field" == "true" ]]; then
-                picked=$(jq -r '.default_select | join(",")' <<<"$render")
+                default_select_csv=$(jq -r '.default_select | join(",")' <<<"$render")
             else
-                picked="all"
+                default_select_csv="all"
+            fi
+
+            if [[ ${NON_INTERACTIVE:-0} -eq 0 ]]; then
+                # 交互菜单 / interactive menu
+                picked=$(read_selectable_menu "$src_dir" "$source_glob" "$default_select_csv" "$source_dir")
+            else
+                picked="$default_select_csv"
             fi
         fi
 
         if [[ -z "$picked" ]]; then
-            echo "   skip   $source_dir：未选择任何项（target.json 默认空集，且未指定 --copilot-agents）"
+            echo "   skip   $source_dir：未选择任何项 / nothing selected"
             return 0
         fi
 

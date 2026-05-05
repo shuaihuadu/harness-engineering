@@ -179,7 +179,7 @@ function Resolve-Placeholder {
         return $default  # 可能是 $null
     }
 
-    $hint = if ($default) { " [$default]" } else { ' [回车跳过]' }
+    $hint = if ($default) { " [$default]" } else { ' [回车跳过 / press Enter to skip]' }
     $value = Read-Host "$Prompt$hint"
     if ([string]::IsNullOrWhiteSpace($value)) { return $default }
     return $value
@@ -189,10 +189,10 @@ $Unconfigured = '<未配置>'
 $interactive = -not $NonInteractive
 
 Write-Host ''
-Write-Host "==> Harness Engineering v$HarnessVersion · 集成同步" -ForegroundColor Cyan
-Write-Host "    目标仓库：$TargetRepo"
-Write-Host "    安装目标：$($Targets -join ', ')"
-Write-Host "    交互模式：$(if ($NonInteractive) { '否' } else { '是' })"
+Write-Host "==> Harness Engineering v$HarnessVersion · 集成同步 / Integration sync" -ForegroundColor Cyan
+Write-Host "    目标仓库 / Target repo : $TargetRepo"
+Write-Host "    安装目标 / Targets     : $($Targets -join ', ')"
+Write-Host "    交互模式 / Interactive : $(if ($NonInteractive) { '否 / no' } else { '是 / yes' })"
 
 # 探测摘要（仅用于提示用户）
 $detectedSummary = @()
@@ -201,21 +201,21 @@ foreach ($k in @('ProjectName', 'PrimaryLanguage', 'TechStack', 'TestCommand', '
 }
 if ($detectedSummary) {
     Write-Host ''
-    Write-Host '    自动探测：' -ForegroundColor DarkCyan
+    Write-Host '    自动探测 / Auto-detected:' -ForegroundColor DarkCyan
     foreach ($s in $detectedSummary) { Write-Host "      $s" -ForegroundColor DarkCyan }
 }
 if ($priorReplacements.Count -gt 0) {
     Write-Host ''
-    Write-Host "    检测到上次 manifest（$($priorManifest.harness_version)），将作为默认值预填" -ForegroundColor DarkCyan
+    Write-Host "    检测到上次 manifest（v$($priorManifest.harness_version)），将作为默认值预填 / Detected previous manifest, prefilling defaults" -ForegroundColor DarkCyan
 }
 Write-Host ''
 
-$ProjectName = Resolve-Placeholder -Cli $ProjectName     -ManifestKey 'PROJECT_NAME'      -Detected $detected.ProjectName     -Prompt '项目名称（PROJECT_NAME）'                       -Interactive $interactive
-$ProjectOneLiner = Resolve-Placeholder -Cli $ProjectOneLiner -ManifestKey 'PROJECT_ONE_LINER' -Detected ''                        -Prompt '一句话定位（PROJECT_ONE_LINER，可留空）'        -Interactive $interactive
-$PrimaryLanguage = Resolve-Placeholder -Cli $PrimaryLanguage -ManifestKey 'PRIMARY_LANGUAGE'  -Detected $detected.PrimaryLanguage -Prompt '主语言（PRIMARY_LANGUAGE，如 C# / TypeScript）'  -Interactive $interactive
-$TechStack = Resolve-Placeholder -Cli $TechStack       -ManifestKey 'TECH_STACK'        -Detected $detected.TechStack       -Prompt '技术栈（TECH_STACK，如 .NET 10 + ASP.NET Core）' -Interactive $interactive
-$TestCommand = Resolve-Placeholder -Cli $TestCommand     -ManifestKey 'TEST_COMMAND'      -Detected $detected.TestCommand     -Prompt '测试命令（TEST_COMMAND）'                       -Interactive $interactive
-$LintCommand = Resolve-Placeholder -Cli $LintCommand     -ManifestKey 'LINT_COMMAND'      -Detected $detected.LintCommand     -Prompt '代码风格检查命令（LINT_COMMAND）'               -Interactive $interactive
+$ProjectName = Resolve-Placeholder -Cli $ProjectName     -ManifestKey 'PROJECT_NAME'      -Detected $detected.ProjectName     -Prompt '项目名称 / Project name (PROJECT_NAME)'                                 -Interactive $interactive
+$ProjectOneLiner = Resolve-Placeholder -Cli $ProjectOneLiner -ManifestKey 'PROJECT_ONE_LINER' -Detected ''                        -Prompt '一句话定位 / One-liner pitch (PROJECT_ONE_LINER, optional)'             -Interactive $interactive
+$PrimaryLanguage = Resolve-Placeholder -Cli $PrimaryLanguage -ManifestKey 'PRIMARY_LANGUAGE'  -Detected $detected.PrimaryLanguage -Prompt '主语言 / Primary language (PRIMARY_LANGUAGE, e.g. C# / TypeScript)'   -Interactive $interactive
+$TechStack = Resolve-Placeholder -Cli $TechStack       -ManifestKey 'TECH_STACK'        -Detected $detected.TechStack       -Prompt '技术栈 / Tech stack (TECH_STACK, e.g. .NET 10 + ASP.NET Core)'         -Interactive $interactive
+$TestCommand = Resolve-Placeholder -Cli $TestCommand     -ManifestKey 'TEST_COMMAND'      -Detected $detected.TestCommand     -Prompt '测试命令 / Test command (TEST_COMMAND)'                                 -Interactive $interactive
+$LintCommand = Resolve-Placeholder -Cli $LintCommand     -ManifestKey 'LINT_COMMAND'      -Detected $detected.LintCommand     -Prompt '代码风格检查命令 / Lint command (LINT_COMMAND)'                          -Interactive $interactive
 
 # Vendor 目录：CLI 显式传入 > 上次 manifest.vendor_dir > 参数默认值（.harness-engineering）；
 # 未显式传入且交互模式 → 弹 prompt，回车采纳默认。
@@ -228,7 +228,7 @@ if (-not $NoVendor) {
         }
         if ($interactive) {
             $hint = " [$vendorDefault]"
-            $value = Read-Host "Vendor 目录（相对 TargetRepo）$hint"
+            $value = Read-Host "Vendor 目录 / Vendor directory (relative to TargetRepo)$hint"
             if ([string]::IsNullOrWhiteSpace($value)) { $VendorHarnessTo = $vendorDefault } else { $VendorHarnessTo = $value.Trim() }
         }
         else {
@@ -239,7 +239,7 @@ if (-not $NoVendor) {
 
 if ($NoVendor) {
     $defaultRef = if ($priorReplacements.ContainsKey('HARNESS_REPO_REF')) { [string]$priorReplacements['HARNESS_REPO_REF'] } else { 'https://github.com/shuaihuadu/harness-engineering' }
-    $HarnessRepoRef = Resolve-Placeholder -Cli $HarnessRepoRef -ManifestKey 'HARNESS_REPO_REF' -Detected $defaultRef -Prompt '规范引用（HARNESS_REPO_REF，路径或 URL）' -Interactive $interactive
+    $HarnessRepoRef = Resolve-Placeholder -Cli $HarnessRepoRef -ManifestKey 'HARNESS_REPO_REF' -Detected $defaultRef -Prompt '规范引用 / Harness repo ref (HARNESS_REPO_REF, path or URL)' -Interactive $interactive
     if (-not $HarnessRepoRef) { $HarnessRepoRef = $defaultRef }
     $VendorHarnessTo = $null
 }
@@ -270,7 +270,7 @@ $Replacements = [ordered]@{
 
 # 4) 总结 + 确认
 Write-Host ''
-Write-Host '==> 即将使用以下占位符渲染：' -ForegroundColor Cyan
+Write-Host '==> 即将使用以下占位符渲染 / Rendering with placeholders:' -ForegroundColor Cyan
 foreach ($k in $Replacements.Keys) {
     $val = $Replacements[$k]
     $color = if ($val -eq $Unconfigured) { 'Yellow' } else { 'Gray' }
@@ -279,15 +279,15 @@ foreach ($k in $Replacements.Keys) {
 $unconfiguredCount = @($Replacements.Values | Where-Object { $_ -eq $Unconfigured }).Count
 if ($unconfiguredCount -gt 0) {
     Write-Host ''
-    Write-Host "    [!] 有 $unconfiguredCount 项未配置，将渲染为 `<未配置>`；安装后请用以下命令逐一补充：" -ForegroundColor Yellow
+    Write-Host "    [!] 有 $unconfiguredCount 项未配置，将渲染为 `<未配置>` / $unconfiguredCount placeholder(s) unset, will render as `<未配置>`. To find them later:" -ForegroundColor Yellow
     Write-Host "        Get-ChildItem '$TargetRepo/.github' -Recurse -File | Select-String '<未配置>'" -ForegroundColor Yellow
 }
 
 if ($interactive) {
     Write-Host ''
-    $confirm = Read-Host '继续？[Y/n]'
+    $confirm = Read-Host '继续？/ Proceed? [Y/n]'
     if ($confirm -and $confirm.Trim().ToLowerInvariant() -in @('n', 'no')) {
-        Write-Host '已取消。' -ForegroundColor DarkYellow
+        Write-Host '已取消 / Cancelled.' -ForegroundColor DarkYellow
         exit 1
     }
 }
@@ -319,13 +319,13 @@ if ($CopilotAgents) {
 if ($VendorHarnessTo) {
     $vendorAbs = Join-Path $TargetRepo $VendorHarnessTo
     Write-Host ''
-    Write-Host "==> Vendor 规范文档 -> $vendorAbs" -ForegroundColor Cyan
+    Write-Host "==> Vendor 规范文档 / Vendor harness docs -> $vendorAbs" -ForegroundColor Cyan
     Sync-VendoredTree -Context $Context -SourceRoot $RepoRoot -TargetRoot $vendorAbs `
         -Items @('agents', 'docs', 'templates', 'README.md')
 }
 else {
     Write-Host ''
-    Write-Host '==> 跳过 vendor（指定了 -NoVendor）' -ForegroundColor DarkYellow
+    Write-Host '==> 跳过 vendor / Skipping vendor (-NoVendor)' -ForegroundColor DarkYellow
 }
 
 # ----------------------------------------------------------------------------
@@ -383,7 +383,7 @@ if (-not $DryRun) {
     $manifestJson = $manifestObj | ConvertTo-Json -Depth 6
     [System.IO.File]::WriteAllText($manifestPath, $manifestJson, [System.Text.UTF8Encoding]::new($false))
     Write-Host ''
-    Write-Host "==> 已写入 manifest：$manifestPath" -ForegroundColor Cyan
+    Write-Host "==> 已写入 manifest / Manifest written: $manifestPath" -ForegroundColor Cyan
 }
 
 # ----------------------------------------------------------------------------
@@ -391,13 +391,13 @@ if (-not $DryRun) {
 # ----------------------------------------------------------------------------
 Write-Host ''
 if ($DryRun) {
-    Write-Host 'DryRun 完成。未写入任何文件。' -ForegroundColor Cyan
+    Write-Host 'DryRun 完成，未写入任何文件 / DryRun done, nothing written.' -ForegroundColor Cyan
 }
 else {
-    Write-Host '完成。下一步建议：' -ForegroundColor Cyan
+    Write-Host '完成。下一步建议 / Done. Suggested next steps:' -ForegroundColor Cyan
     Write-Host "  1. cd $TargetRepo"
     if ($VendorHarnessTo) { Write-Host "  2. git status $VendorHarnessTo" }
-    Write-Host '  3. git diff 检查修改是否符合预期'
-    Write-Host "  4. 检查渲染输出无残留占位符：Get-ChildItem (Join-Path '$TargetRepo' '.github') -Recurse -File | Select-String '\{\{'"
+    Write-Host '  3. git diff 检查修改是否符合预期 / inspect changes'
+    Write-Host "  4. 检查残留占位符 / scan for unrendered placeholders: Get-ChildItem (Join-Path '$TargetRepo' '.github') -Recurse -File | Select-String '\{\{'"
 }
 Write-Host ''
