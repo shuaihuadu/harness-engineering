@@ -88,7 +88,7 @@ agents/                    # 配套 Agent 套件（与业务无关，详见第 1
 - 顶层 `AGENTS.md` 控制在 100 行以内，只写项目身份、关键约束、常用命令、文档入口
 - 领域知识、详细架构、测试策略由 `AGENTS.md` **指向** `docs/` 下的权威文档，不重复书写
 - 子目录（如 `src/core/AGENTS.md`、`src/app/webapp/AGENTS.md`）可增量补充**仅在子范围适用**的约束，由工具自动按路径层级拼接
-- 如果一条规则可以用 Lint / Hooks / CI 强制执行，就不要只在 `AGENTS.md` 里说它——文档是 advisory，工具才是 deterministic
+- 如果一条规则可以用 Lint / Hooks / CI 强制执行，就不要只在 `AGENTS.md` 里说它——文档只能"建议"，工具才能"强制"
 
 判断一条规则到底该不该写进 `AGENTS.md` 的常用问法：**"如果删了这一行，Agent 还会照做吗？"** 如果是，删。
 
