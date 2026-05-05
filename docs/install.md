@@ -5,7 +5,7 @@ parent: ../README.md
 
 # 安装与卸载
 
-本文件是 Harness Engineering 规范的安装手册，从 [`../README.md`](../README.md) 抽出。
+本文件是 Harness Engineering 规范的安装手册，记录一键集成脚本、占位符策略、Vendor / NoVendor 两种部署模式以及卸载流程的完整选项。
 
 仓库根 `install.ps1` / `install.sh` 把规范文档 vendor 进你的项目，并为指定的 AI 编码工具渲染配置。
 

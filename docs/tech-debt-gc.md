@@ -5,7 +5,7 @@ parent: ../README.md
 
 # 熵与技术债务 GC
 
-本文件是 Harness Engineering 规范的技术债务治理章节，从 [`../README.md`](../README.md) 抽出。原 README §10.1–§10.3 的内容在本文件中作为独立章节展开。
+本文件是 Harness Engineering 规范的技术债务治理章节，记录黄金原则、定期 GC 任务、使用原则三个部分。
 
 > 在 H6 交付后，AI 代码仓库会随时间产生"状态熵"，需要持续清理。该章实践经验来自 OpenAI Codex 团队在 *Harness engineering* 一文中提出的方案。
 
