@@ -22,7 +22,7 @@
 
 > **设计取向**：业务规则集中在 [`agents/`](agents/README.md) 一份维护，Copilot、Codex、Claude Code 等工具仅在 [`agents/_integrations/`](agents/_integrations/README.md) 下各自占据一个入口子目录，对同一份公共核心做格式包装。完整设计思路见 [`agents/_integrations/README.md` 第 0 节](agents/_integrations/README.md#0-设计思路)。
 
-## 快速开始（一键集成）
+## 快速开始
 
 仓库根 `install.ps1` / `install.sh` 把规范文档 vendor 进你的项目并为指定的 AI 编码工具渲染配置：
 
@@ -35,60 +35,17 @@ cd harness-engineering
 
 ```bash
 # Linux / macOS（依赖 jq）
-git clone https://github.com/shuaihuadu/harness-engineering.git
-cd harness-engineering
 ./install.sh --target-repo /path/to/your/repo
 ```
 
 默认会做四件事：
 
-1. **Vendor 规范文档**：把 `agents/` `docs/` `templates/` `README.md` 同步进 `<your-repo>/.harness-engineering/`（与安装清单同住，一个隐藏目录装下所有 harness 产物）
-2. **渲染 Copilot 配置**：`.github/copilot-instructions.md` + `.github/instructions/*`，链接指向上一步的 vendor 目录
-3. **不默认安装任何 Custom Agent**：自 v0.0.1 起，Custom Agent 必须显式指定（如 `-CopilotAgents commit-auditor,design-reviewer` 或 `-CopilotAgents all`），避免在用户未知情时往 `.github/agents/` 落文件
-4. **写入安装清单**：`<your-repo>/.harness-engineering/manifest.json` 记录本次写入的所有文件（含 sha256）+ 本次填入的占位符（`replacements`），供 `uninstall` 使用，并在下次重装时自动预填
+1. **Vendor 规范文档**到 `<your-repo>/.harness-engineering/`
+2. **渲染 Copilot 配置**到 `.github/copilot-instructions.md` + `.github/instructions/*`
+3. **不默认安装 Custom Agent**：必须显式 `-CopilotAgents commit-auditor,...` 或 `-CopilotAgents all`
+4. **写入安装清单**到 `<your-repo>/.harness-engineering/manifest.json`，供 `uninstall` 使用并在重装时自动预填
 
-### 占位符填入策略
-
-需要 7 个占位符（PROJECT_NAME / PROJECT_ONE_LINER / PRIMARY_LANGUAGE / TECH_STACK / TEST_COMMAND / LINT_COMMAND / HARNESS_REPO_REF），优先级：
-
-```
-CLI 参数  >  上次 manifest.replacements  >  自动探测  >  交互输入 / 空（→ <未配置>）
-```
-
-- **自动探测**：脚本会读取 `*.csproj` / `package.json` / `pyproject.toml` / `go.mod` / `Cargo.toml` / `global.json` 等推断项目名、主语言、技术栈、测试和 Lint 命令。检测到的值作为 prompt 默认（回车采纳）
-- **重装零输入**：上次安装的 `replacements` 写在 manifest 里，再次运行 `install` 时会自动作为最高优先级默认，覆盖探测结果
-- **可选字段允许留空**：除 `PROJECT_NAME` 和 `HARNESS_REPO_REF` 外，其余字段留空会被填为字面量 `<未配置>`，便于后续用 `grep '<未配置>'` 一次性补充
-- **零交互**：`-NonInteractive` 跳过所有 prompt（探测出什么用什么，仍缺则填 `<未配置>`）；`-Force` 隐含 `-NonInteractive` 并自动覆盖一切冲突
-
-需要卸载时：
-
-```powershell
-./uninstall.ps1 -TargetRepo D:\Path\To\YourRepo            # 安全卸载（用户改过的文件默认保留）
-./uninstall.ps1 -TargetRepo D:\Path\To\YourRepo -Force     # 一并清理用户改过的文件
-./uninstall.ps1 -TargetRepo D:\Path\To\YourRepo -DryRun    # 只预览
-```
-
-更多用法（多 target、占位符、`-Force` / `-DryRun` / `-NoVendor` 等）见 [`agents/_integrations/README.md`](agents/_integrations/README.md)。
-
-### 关于 vendor 模式
-
-默认行为是把 `agents/`、`docs/`、`templates/`、`README.md` **整份复制**到你的仓库 `.harness-engineering/` 下，这意味着：
-
-- ✅ 离线可用、链接在采用方仓库内可点
-- ✅ 规范副本与采用方仓库同步进入版本控制，可 diff、可回滚
-- ✅ 与 `manifest.json` 同住一个隐藏目录，不污染 `docs/` 树；整块卸载干净
-- ⚠️ 采用方仓库会多 ~300KB Markdown
-- ⚠️ 规范升级 = 每个采用方仓库重跑一次 `install`（manifest 会自动 diff，已存在且未改的文件会 skip）
-
-> 想换个目录名？交互模式下 vendor 路径会有 prompt（回车用默认 `.harness-engineering`）；非交互可显式传 `-VendorHarnessTo <path>` / `--vendor-harness-to <path>`。
-
-如果你希望不在采用方仓库落 vendor 副本（例如让链接指向 GitHub 远端），使用：
-
-```powershell
-./install.ps1 -TargetRepo X -NoVendor -HarnessRepoRef https://github.com/shuaihuadu/harness-engineering/blob/main
-```
-
-`-NoVendor` 模式下 `{{HARNESS_REPO_REF}}` 会被替换成你提供的 URL；缺点是 Custom Agent 里的链接需要联网才能跳转。两种模式适合不同场景，按需选择。
+完整选项（占位符策略、Vendor / NoVendor 模式、卸载方式、多 target）见 [`docs/install.md`](docs/install.md)。
 
 ## 如何使用本仓库
 
@@ -105,9 +62,17 @@ CLI 参数  >  上次 manifest.replacements  >  自动探测  >  交互输入 / 
 ```
 harness-engineering/
 ├── README.md                       # 规范主体（你正在阅读的文件）
+├── install.{ps1,sh}                # 一键集成脚本（详见 docs/install.md）
+├── uninstall.{ps1,sh}              # 卸载脚本
+├── docs/                           # 抽出的细则与手册
+│   ├── stages.md                   # H1–H6 阶段细则
+│   ├── repo-layout.md              # 目录规范与项目级索引（dev-map）
+│   ├── install.md                  # 安装、占位符、Vendor / NoVendor 模式
+│   └── tech-debt-gc.md             # 黄金原则、定期 GC、使用原则
 ├── agents/                         # 8 个 Agent 的角色规格与提示词
-│   ├── README.md                   # Agent 协作拓扑与 H1–H6 编号说明
+│   ├── README.md                   # Agent 协作拓扑、交接约定与调度纪律
 │   ├── _shared/                    # 跨 Agent 共享：术语表、I/O 契约、工具词表、模板
+│   ├── _skills/                    # 跨 Agent 复用的操作型 Skill
 │   ├── _integrations/              # 与 Copilot / Claude Code / Cursor / AGENTS.md 的对接说明
 │   ├── requirements-interviewer/   # H1 需求访谈
 │   ├── repo-impact-mapper/         # H1 代码库影响分析
@@ -325,7 +290,20 @@ Rule 是软约束：再清晰的自然语言，在长上下文与复杂需求下
 | 不能机械判定（设计取舍、架构原则） | **Rule（`AGENTS.md` / `instructions/`）**   | 写进 prompt + Skill；评审时人工把关           |
 | 个人偏好（语种、shell、排版习惯）  | **个人 Memory / 工具私有配置**              | 不进入团队规范，不依赖跨人对齐                |
 
-判断口径：**如果一条规则在第二次被绕过时还只能靠"再加一句话"治理，它就该下沉一层载体。** 关于"团队真相必须落仓库、个人偏好不进规范"的边界，见第 10 节末尾。
+判断口径：**如果一条规则在第二次被绕过时还只能靠"再加一句话"治理，它就该下沉一层载体。**
+
+### 6.6 团队真相落仓库，个人偏好留 Memory
+
+很多 AI 编码工具都提供"记忆层"（Claude Code 的 CLAUDE.md / Memory、Copilot 的用户 Memory、Cursor 的 Rules-for-User 等）。这层能力本身没有问题，但在多人协作的团队 Harness 里，**它不能成为团队约束的权威来源**：
+
+- **可以**：单人偏好（回答语种、常用 shell、个人快捷指令）、临时调试便签、当前会话的上下文片段
+- **不可以**：编码规范、提交格式、评审清单、追溯字段、阶段产物的命名约定，以及任何"两个人会因为说法不一致而吵架"的规矩
+
+判断口径：
+
+> **凡是可能被新人接手、可能被审计、可能影响交付质量的事实与规则，都必须落到 `docs/`、`agents/`、`AGENTS.md` 或 Scripts 里——它们能被 diff、被 review、被 CI 看见；记忆层做不到这三件事。**
+
+错题集与故障复盘特别要警惕：如果只在私人 Memory 里堆"上次踩过的坑"，下次换一个人或换一个会话就重新踩。重要的反例必须晋升一层——能机械判定的进 Scripts，不能机械判定的进 Rule，并且都要有 commit 记录。
 
 ## 7. 评审规范
 
@@ -383,46 +361,18 @@ Rule 是软约束：再清晰的自然语言，在长上下文与复杂需求下
 
 ## 10. 熵与技术债务 GC
 
-> 该节来自 OpenAI Codex 团队在"Harness engineering"文章中提出的实践经验。在 H6 交付后，AI 代码仓库会随时间产生"状态熵"，需要持续清理。
+> 在 H6 交付后，AI 代码仓库会随时间产生"状态熵"，需要持续清理。该实践经验来自 OpenAI Codex 团队在 *Harness engineering* 一文中提出的方案。
 
-### 10.1 黄金原则（Golden Principles）
+核心要点：
 
-团队应提炼出一组可机械化检查的"黄金原则"，描述项目期望代码库保持的形状：
+- **黄金原则**：每个团队应提炼一组可机械检查的代码形状不变式（共享工具优先、边界类型验证、跨层依赖方向、文件大小、命名约定等），并以 Lint / CI 硬拦截
+- **定期 GC**：配置后台 AI 任务扫描代码偏离与文档过期，开重构 / 修复 PR；对应 Agent 落点见 [`agents/doc-gardener/AGENT.md`](agents/doc-gardener/AGENT.md)
+- **持续偿还 > 集中重构**：一次评审捕获的品味，要么进 `AGENTS.md` / Skill，要么进 Lint / Hooks / CI；不要堆在脑子里
+- **小幅 PR 自动合并**：GC 产出可一分钟评完的 PR 应允许自动合并
 
-- 优先使用共享工具包，避免手写重复逻辑
-- 在边界始终使用类型验证（parse, don't validate），不凭猜测推送数据形状
-- 结构化日志、命名约定、文件大小上限等"品味不变式（taste invariants）"需以 Lint 硬拦截
-- 跨层依赖只能沿架构图预设方向，逾越者报错
+完整黄金原则示例、GC 任务清单与使用原则见 [`docs/tech-debt-gc.md`](docs/tech-debt-gc.md)。
 
-这些原则需写进 `docs/` 下的权威文档（如 `quality-grade.md`）并同步编码为可执行检查。
-
-### 10.2 定期 GC 任务
-
-建议在仓库中配置定期运行的后台 AI 任务，完成以下事项：
-
-- 扫描代码库与黄金原则的偏离，开启重构 PR
-- 扫描 `docs/` 下与代码实际行为不一致的过期文档（doc-gardening），开启修复 PR
-- 更新 `docs/06-implementation/exec-plans/tech-debt-tracker.md` 中的未完成项
-- 合并选项：质量评级 / quality grade 表可在项目初期仅补充到 `docs/04-detailed-design/` 或 `docs/07-release/` 中
-
-### 10.3 使用原则
-
-- **持续偿还 > 集中重构**：技术债务像高利息贷款，每日少量偿还远优于积压后被迫集中返工。
-- **人的品味一次捕获，机器永久执行**：评审心得、重构经验、线上故障复盘，要么转化为 `AGENTS.md` / Skill 里的指导，要么转化为 Lint / Hooks / CI 检查。
-- **允许小幅 PR 自动合并**：GC 产出的 PR 如果可以在一分钟内评审完毕，应设置成可自动合并。
-
-### 10.4 团队真相落仓库，个人偏好留 Memory
-
-很多 AI 编码工具都提供"记忆层"（Claude Code 的 CLAUDE.md / Memory、Copilot 的用户 Memory、Cursor 的 Rules-for-User 等）。这层能力本身没有问题，但在多人协作的团队 Harness 里，**它不能成为团队约束的权威来源**：
-
-- **可以**：单人偏好（回答语种、常用 shell、个人快捷指令）、临时调试便签、当前会话的上下文片段
-- **不可以**：编码规范、提交格式、评审清单、追溯字段、阶段产物的命名约定，以及任何"两个人会因为说法不一致而吵架"的规矩
-
-判断口径：
-
-> **凡是可能被新人接手、可能被审计、可能影响交付质量的事实与规则，都必须落到 `docs/`、`agents/`、`AGENTS.md` 或 Scripts 里——它们能被 diff、被 review、被 CI 看见；记忆层做不到这三件事。**
-
-错题集与故障复盘特别要警惕：如果只在私人 Memory 里堆"上次踩过的坑"，下次换一个人或换一个会话就重新踩。重要的反例必须晋升一层——能机械判定的进 Scripts，不能机械判定的进 Rule，并且都要有 commit 记录。
+关于团队真相 vs 个人 Memory 的边界，见 [第 6.6 节](#66-团队真相落仓库个人偏好留-memory)。
 
 ## 11. 附录：阶段门禁摘要
 
