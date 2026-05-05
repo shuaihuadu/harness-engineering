@@ -128,10 +128,6 @@ cp custom-agents/test-case-author.agent.template.md <your-repo>/.github/agents/t
 
 | 占位符                  | 含义               | 示例                                                                                           |
 | ----------------------- | ------------------ | ---------------------------------------------------------------------------------------------- |
-| `{{PROJECT_NAME}}`      | 项目名（中英不限） | `Inkwell`                                                                                      |
-| `{{PROJECT_ONE_LINER}}` | 项目一句话定位     | `基于 Microsoft Agent Framework 的 AI 内容平台`                                                |
-| `{{PRIMARY_LANGUAGE}}`  | 主语言             | `C#` / `TypeScript`                                                                            |
-| `{{TECH_STACK}}`        | 技术栈             | `.NET 10 + ASP.NET Core` / `Node.js 20 + React 18`                                             |
 | `{{TEST_COMMAND}}`      | 验收测试命令       | `dotnet test`                                                                                  |
 | `{{LINT_COMMAND}}`      | 代码风格检查命令   | `dotnet format --verify-no-changes`                                                            |
 | `{{HARNESS_REPO_REF}}`  | 引用本规范的方式   | `.harness-engineering`（已 vendor）或 `https://github.com/<owner>/harness-engineering`（外链） |

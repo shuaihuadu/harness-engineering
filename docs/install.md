@@ -34,15 +34,16 @@ cd harness-engineering
 
 ## 2. 占位符填入策略
 
-需要 7 个占位符（PROJECT_NAME / PROJECT_ONE_LINER / PRIMARY_LANGUAGE / TECH_STACK / TEST_COMMAND / LINT_COMMAND / HARNESS_REPO_REF），优先级：
+需要 3 个占位符（`TEST_COMMAND` / `LINT_COMMAND` / `HARNESS_REPO_REF`），优先级：
 
 ```
 CLI 参数  >  上次 manifest.replacements  >  自动探测  >  交互输入 / 空（→ <未配置>）
 ```
 
-- **自动探测**：脚本会读取 `*.csproj` / `package.json` / `pyproject.toml` / `go.mod` / `Cargo.toml` / `global.json` 等推断项目名、主语言、技术栈、测试和 Lint 命令。检测到的值作为 prompt 默认（回车采纳）
+- **自动探测**：脚本会读取 `*.csproj` / `package.json` / `pyproject.toml` / `go.mod` / `Cargo.toml` / `global.json` 等推断主语言，进而映射出测试和 Lint 命令的合理默认值
+- **菜单挑选 + 自定义**：`TEST_COMMAND` / `LINT_COMMAND` 在交互模式下不再裸奔为输入框，而是列出主流命令（`dotnet test` / `npm test` / `pytest` / `cargo test` / `go test ./...` / `mvn test` 等），同时支持 `c` 自定义、`s` 跳过；探测到的值会被插到首位并标注「推荐 / detected」，回车即采纳
 - **重装零输入**：上次安装的 `replacements` 写在 manifest 里，再次运行 `install` 时会自动作为最高优先级默认，覆盖探测结果
-- **可选字段允许留空**：除 `PROJECT_NAME` 和 `HARNESS_REPO_REF` 外，其余字段留空会被填为字面量 `<未配置>`，便于后续用 `grep '<未配置>'` 一次性补充
+- **`<未配置>` 占位**：`TEST_COMMAND` / `LINT_COMMAND` 选「跳过」时会被填为字面量 `<未配置>`，便于后续用 `grep '<未配置>'` 一次性补充
 - **零交互**：`-NonInteractive` 跳过所有 prompt（探测出什么用什么，仍缺则填 `<未配置>`）；`-Force` 隐含 `-NonInteractive` 并自动覆盖一切冲突
 
 ## 3. 卸载

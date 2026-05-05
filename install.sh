@@ -3,7 +3,8 @@
 #
 # 用法：
 #   ./install.sh --target-repo /path/to/repo [--targets copilot,claude-code] \
-#                [--project-name X] [--primary-language C#] ...
+#                [--test-command 'dotnet test'] [--lint-command 'dotnet format --verify-no-changes'] \
+#                [--harness-repo-ref .harness-engineering] [--non-interactive]
 #
 # 依赖：bash 4+，jq
 
@@ -14,10 +15,6 @@ set -euo pipefail
 # ----------------------------------------------------------------------------
 TARGET_REPO=""
 TARGETS="copilot"
-PROJECT_NAME=""
-PROJECT_ONE_LINER=""
-PRIMARY_LANGUAGE=""
-TECH_STACK=""
 TEST_COMMAND=""
 LINT_COMMAND=""
 HARNESS_REPO_REF=""
@@ -37,10 +34,6 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --target-repo)        TARGET_REPO="$2";        shift 2 ;;
         --targets)            TARGETS="$2";            shift 2 ;;
-        --project-name)       PROJECT_NAME="$2";       shift 2 ;;
-        --project-one-liner)  PROJECT_ONE_LINER="$2";  shift 2 ;;
-        --primary-language)   PRIMARY_LANGUAGE="$2";   shift 2 ;;
-        --tech-stack)         TECH_STACK="$2";         shift 2 ;;
         --test-command)       TEST_COMMAND="$2";       shift 2 ;;
         --lint-command)       LINT_COMMAND="$2";       shift 2 ;;
         --harness-repo-ref)   HARNESS_REPO_REF="$2";   shift 2 ;;
@@ -145,20 +138,118 @@ resolve_placeholder() {
     printf -v "$var_name" '%s' "$value"
 }
 
+# 3b) 命令选择：菜单 + 自定义 + 跳过
+#     非交互模式直接走 manifest > detected 的回退链
+resolve_command_with_menu() {
+    # $1=var_name $2=manifest_key $3=detected $4=title $5=options_array_name
+    local var_name="$1" mkey="$2" detected="$3" title="$4" opts_name="$5"
+    local cli_val="${!var_name}"
+    if [[ -n "$cli_val" ]]; then return 0; fi
+
+    local manifest_val="${PRIOR[$mkey]:-}"
+    local preferred=""
+    if [[ -n "$manifest_val" ]]; then preferred="$manifest_val"
+    elif [[ -n "$detected" ]]; then preferred="$detected"
+    fi
+
+    if [[ $NON_INTERACTIVE -eq 1 ]]; then
+        printf -v "$var_name" '%s' "$preferred"
+        return 0
+    fi
+
+    # 拷贝候选数组，必要时把推荐项插到首位
+    local -n _src="$opts_name"
+    local list=()
+    local default_index=""
+    if [[ -n "$preferred" ]]; then
+        list+=("$preferred")
+        default_index=1
+        local opt
+        for opt in "${_src[@]}"; do
+            [[ "$opt" == "$preferred" ]] && continue
+            list+=("$opt")
+        done
+    else
+        list=("${_src[@]}")
+    fi
+
+    echo
+    echo "    $title"
+    local i
+    for i in "${!list[@]}"; do
+        local n=$((i + 1))
+        local line
+        printf -v line '      %d) %s' "$n" "${list[$i]}"
+        if [[ "$n" == "$default_index" ]]; then line+='    (推荐 / detected)'; fi
+        echo "$line"
+    done
+    echo '      c) 自定义 / Custom...'
+    echo '      s) 跳过 / Skip (会渲染为 <未配置>)'
+
+    local default_label="c"
+    [[ -n "$default_index" ]] && default_label="$default_index"
+    local choice
+    read -r -p "    选择 / Choose [$default_label]: " choice
+    [[ -z "$choice" ]] && choice="$default_label"
+    choice="${choice,,}"
+    choice="${choice// /}"
+
+    if [[ "$choice" == "s" ]]; then
+        printf -v "$var_name" '%s' ""
+        return 0
+    fi
+    if [[ "$choice" == "c" ]]; then
+        local custom
+        read -r -p '    自定义命令 / Custom command: ' custom
+        if [[ -z "$custom" ]]; then
+            printf -v "$var_name" '%s' "$preferred"
+        else
+            printf -v "$var_name" '%s' "$custom"
+        fi
+        return 0
+    fi
+    if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= ${#list[@]} )); then
+        printf -v "$var_name" '%s' "${list[$((choice - 1))]}"
+        return 0
+    fi
+    echo "    [!] 无效选择 '$choice'，使用推荐值 / Invalid choice, falling back to recommended" >&2
+    printf -v "$var_name" '%s' "$preferred"
+}
+
+TEST_OPTIONS=(
+    'dotnet test'
+    'npm test'
+    'pnpm test'
+    'yarn test'
+    'pytest'
+    'cargo test'
+    'go test ./...'
+    'mvn test'
+    'gradle test'
+)
+LINT_OPTIONS=(
+    'dotnet format --verify-no-changes'
+    'npm run lint'
+    'pnpm run lint'
+    'eslint .'
+    'ruff check .'
+    'black --check .'
+    'cargo clippy -- -D warnings'
+    'gofmt -l . && go vet ./...'
+    'mvn checkstyle:check'
+)
+
 echo
 echo "==> Harness Engineering v$HARNESS_VERSION · 集成同步 / Integration sync"
 echo "    目标仓库 / Target repo : $TARGET_REPO"
 echo "    安装目标 / Targets     : $TARGETS"
 echo "    交互模式 / Interactive : $([[ $NON_INTERACTIVE -eq 1 ]] && echo '否 / no' || echo '是 / yes')"
 
-if [[ -n "$DETECTED_PROJECT_NAME$DETECTED_PRIMARY_LANGUAGE$DETECTED_TECH_STACK$DETECTED_TEST_COMMAND$DETECTED_LINT_COMMAND" ]]; then
+if [[ -n "$DETECTED_TEST_COMMAND$DETECTED_LINT_COMMAND" ]]; then
     echo
     echo '    自动探测 / Auto-detected:'
-    [[ -n "$DETECTED_PROJECT_NAME"     ]] && echo "      ProjectName     = $DETECTED_PROJECT_NAME"
-    [[ -n "$DETECTED_PRIMARY_LANGUAGE" ]] && echo "      PrimaryLanguage = $DETECTED_PRIMARY_LANGUAGE"
-    [[ -n "$DETECTED_TECH_STACK"       ]] && echo "      TechStack       = $DETECTED_TECH_STACK"
-    [[ -n "$DETECTED_TEST_COMMAND"     ]] && echo "      TestCommand     = $DETECTED_TEST_COMMAND"
-    [[ -n "$DETECTED_LINT_COMMAND"     ]] && echo "      LintCommand     = $DETECTED_LINT_COMMAND"
+    [[ -n "$DETECTED_TEST_COMMAND" ]] && echo "      TestCommand = $DETECTED_TEST_COMMAND"
+    [[ -n "$DETECTED_LINT_COMMAND" ]] && echo "      LintCommand = $DETECTED_LINT_COMMAND"
 fi
 if [[ ${#PRIOR[@]} -gt 0 ]]; then
     echo
@@ -166,12 +257,8 @@ if [[ ${#PRIOR[@]} -gt 0 ]]; then
 fi
 echo
 
-resolve_placeholder PROJECT_NAME      'PROJECT_NAME'      "$DETECTED_PROJECT_NAME"     '项目名称 / Project name (PROJECT_NAME)'
-resolve_placeholder PROJECT_ONE_LINER 'PROJECT_ONE_LINER' ''                           '一句话定位 / One-liner pitch (PROJECT_ONE_LINER, optional)'
-resolve_placeholder PRIMARY_LANGUAGE  'PRIMARY_LANGUAGE'  "$DETECTED_PRIMARY_LANGUAGE" '主语言 / Primary language (PRIMARY_LANGUAGE)'
-resolve_placeholder TECH_STACK        'TECH_STACK'        "$DETECTED_TECH_STACK"       '技术栈 / Tech stack (TECH_STACK)'
-resolve_placeholder TEST_COMMAND      'TEST_COMMAND'      "$DETECTED_TEST_COMMAND"     '测试命令 / Test command (TEST_COMMAND)'
-resolve_placeholder LINT_COMMAND      'LINT_COMMAND'      "$DETECTED_LINT_COMMAND"     '代码风格检查命令 / Lint command (LINT_COMMAND)'
+resolve_command_with_menu TEST_COMMAND 'TEST_COMMAND' "$DETECTED_TEST_COMMAND" '测试命令 / Test command (TEST_COMMAND)'         TEST_OPTIONS
+resolve_command_with_menu LINT_COMMAND 'LINT_COMMAND' "$DETECTED_LINT_COMMAND" '代码风格检查命令 / Lint command (LINT_COMMAND)' LINT_OPTIONS
 
 # Vendor 目录：CLI 显式传入 > 上次 manifest.vendor_dir > 默认 .harness-engineering
 if [[ $NO_VENDOR -eq 0 && $VENDOR_HARNESS_TO_EXPLICIT -eq 0 ]]; then
@@ -201,9 +288,8 @@ else
     [[ -z "$HARNESS_REPO_REF" ]] && HARNESS_REPO_REF="$VENDOR_HARNESS_TO"
 fi
 
-# 兼底 + 可选字段填 <未配置>
-[[ -z "$PROJECT_NAME" ]] && PROJECT_NAME="$(basename "$TARGET_REPO")"
-for v in PROJECT_ONE_LINER PRIMARY_LANGUAGE TECH_STACK TEST_COMMAND LINT_COMMAND; do
+# 兼底：可选字段填 <未配置>
+for v in TEST_COMMAND LINT_COMMAND; do
     if [[ -z "${!v}" ]]; then printf -v "$v" '%s' "$UNCONFIGURED"; fi
 done
 [[ -z "$HARNESS_REPO_REF" ]] && { echo "错误：HARNESS_REPO_REF 不能为空" >&2; exit 1; }
@@ -212,10 +298,6 @@ done
 # 上下文（全局变量供 lib 使用）
 # ----------------------------------------------------------------------------
 declare -A REPLACEMENTS=(
-    [PROJECT_NAME]="$PROJECT_NAME"
-    [PROJECT_ONE_LINER]="$PROJECT_ONE_LINER"
-    [PRIMARY_LANGUAGE]="$PRIMARY_LANGUAGE"
-    [TECH_STACK]="$TECH_STACK"
     [TEST_COMMAND]="$TEST_COMMAND"
     [LINT_COMMAND]="$LINT_COMMAND"
     [HARNESS_REPO_REF]="$HARNESS_REPO_REF"
@@ -234,7 +316,7 @@ declare -A SELECTIONS
 echo
 echo '==> 即将使用以下占位符渲染 / Rendering with placeholders:'
 UNCONFIGURED_COUNT=0
-for key in PROJECT_NAME PROJECT_ONE_LINER PRIMARY_LANGUAGE TECH_STACK TEST_COMMAND LINT_COMMAND HARNESS_REPO_REF; do
+for key in TEST_COMMAND LINT_COMMAND HARNESS_REPO_REF; do
     val="${REPLACEMENTS[$key]}"
     printf '    %-20s = %s\n' "$key" "$val"
     [[ "$val" == "$UNCONFIGURED" ]] && UNCONFIGURED_COUNT=$((UNCONFIGURED_COUNT + 1))
@@ -316,14 +398,10 @@ if [[ $DRY_RUN -eq 0 ]]; then
         --arg vendor  "$VENDOR_HARNESS_TO" \
         --argjson targets "$targets_json" \
         --argjson files   "$files_json" \
-        --arg pn  "$PROJECT_NAME" \
-        --arg pol "$PROJECT_ONE_LINER" \
-        --arg pl  "$PRIMARY_LANGUAGE" \
-        --arg ts2 "$TECH_STACK" \
         --arg tc  "$TEST_COMMAND" \
         --arg lc  "$LINT_COMMAND" \
         --arg hr  "$HARNESS_REPO_REF" \
-        '{schema:"v1", harness_version:$version, harness_commit:$commit, installed_at:$ts, targets:$targets, vendor_dir:$vendor, replacements:{PROJECT_NAME:$pn, PROJECT_ONE_LINER:$pol, PRIMARY_LANGUAGE:$pl, TECH_STACK:$ts2, TEST_COMMAND:$tc, LINT_COMMAND:$lc, HARNESS_REPO_REF:$hr}, files:$files}' \
+        '{schema:"v1", harness_version:$version, harness_commit:$commit, installed_at:$ts, targets:$targets, vendor_dir:$vendor, replacements:{TEST_COMMAND:$tc, LINT_COMMAND:$lc, HARNESS_REPO_REF:$hr}, files:$files}' \
         >"$manifest_path"
 
     echo

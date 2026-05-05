@@ -7,8 +7,9 @@
     一条命令搞定：把规范文档 vendor 进采用方仓库 + 为指定的 AI 编码工具渲染配置文件。
 
     默认为"智能交互"模式：
-    - 自动探测项目名、主语言、技术栈、测试命令、Lint 命令作为 prompt 默认值
+    - 自动探测测试命令、Lint 命令作为 prompt 默认值
     - 读取上次 manifest 中的填入值，作为最高优先级默认（重装时零输入）
+    - 测试 / Lint 命令以"常用命令菜单 + 自定义"方式提示，回车即采纳推荐
     - 可选字段留空会被填为 `<未配置>`，便于后续 grep 补充
     - `-NonInteractive` / `-Force` 则零 prompt，使用探测结果
 
@@ -21,7 +22,7 @@
     要安装的目标工具列表，对应 agents/_integrations/<name>/target.json。
     默认 'copilot'。可多选，例如 'copilot,claude-code'。
 
-.PARAMETER ProjectName, ProjectOneLiner, PrimaryLanguage, TechStack, TestCommand, LintCommand, HarnessRepoRef
+.PARAMETER TestCommand, LintCommand, HarnessRepoRef
     占位符替换值。优先级：CLI 参数 > 上次 manifest > 探测结果 > 交互输入 / 空默认。
     在不是 -NonInteractive / -Force 的情况下，未提供的字段会进入交互提示。
 
@@ -70,10 +71,6 @@ param(
 
     [string[]]$Targets = @('copilot'),
 
-    [string]$ProjectName,
-    [string]$ProjectOneLiner,
-    [string]$PrimaryLanguage,
-    [string]$TechStack,
     [string]$TestCommand,
     [string]$LintCommand,
     [string]$HarnessRepoRef,
@@ -185,6 +182,98 @@ function Resolve-Placeholder {
     return $value
 }
 
+# 3b) 命令选择：菜单 + 自定义 + 跳过；优先级同 Resolve-Placeholder
+#     非交互模式直接走 manifest > detected 的回退链，与 Resolve-Placeholder 等价
+function Resolve-CommandWithMenu {
+    param(
+        [string]$Cli,
+        [string]$ManifestKey,
+        [string]$Detected,
+        [string]$Title,
+        [string[]]$Options,
+        [bool]$Interactive
+    )
+    if (-not [string]::IsNullOrWhiteSpace($Cli)) { return $Cli }
+
+    $manifestVal = $null
+    if ($priorReplacements.ContainsKey($ManifestKey)) {
+        $manifestVal = [string]$priorReplacements[$ManifestKey]
+    }
+
+    $preferred = $null
+    if (-not [string]::IsNullOrWhiteSpace($manifestVal)) { $preferred = $manifestVal }
+    elseif (-not [string]::IsNullOrWhiteSpace($Detected)) { $preferred = $Detected }
+
+    if (-not $Interactive) {
+        return $preferred  # 可能是 $null
+    }
+
+    # 拷贝一份，必要时把推荐项插到首位
+    $list = @()
+    $defaultIndex = $null
+    if ($preferred) {
+        $list = , $preferred + @($Options | Where-Object { $_ -ne $preferred })
+        $defaultIndex = 1
+    }
+    else {
+        $list = @($Options)
+    }
+
+    Write-Host ''
+    Write-Host "    $Title" -ForegroundColor Cyan
+    for ($i = 0; $i -lt $list.Count; $i++) {
+        $line = "      {0}) {1}" -f ($i + 1), $list[$i]
+        if (($i + 1) -eq $defaultIndex) { $line += '    (推荐 / detected)' }
+        Write-Host $line
+    }
+    Write-Host '      c) 自定义 / Custom...'
+    Write-Host '      s) 跳过 / Skip (会渲染为 <未配置>)'
+
+    $defaultLabel = if ($defaultIndex) { [string]$defaultIndex } else { 'c' }
+    $choice = Read-Host "    选择 / Choose [$defaultLabel]"
+    if ([string]::IsNullOrWhiteSpace($choice)) { $choice = $defaultLabel }
+    # 去掉空白 / 控制字符 / BOM 等不可见字符（piped stdin 会出现）
+    $choice = ($choice -replace '[\p{C}\p{Z}]', '').ToLowerInvariant()
+
+    if ($choice -eq 's') { return $null }
+    if ($choice -eq 'c') {
+        $custom = Read-Host '    自定义命令 / Custom command'
+        if ([string]::IsNullOrWhiteSpace($custom)) { return $preferred }
+        return $custom.Trim()
+    }
+    if ($choice -match '^\d+$') {
+        $idx = [int]$choice
+        if ($idx -ge 1 -and $idx -le $list.Count) {
+            return $list[$idx - 1]
+        }
+    }
+    Write-Warning "无效选择 '$choice'，使用推荐值 / Invalid choice, falling back to recommended"
+    return $preferred
+}
+
+$TestOptions = @(
+    'dotnet test',
+    'npm test',
+    'pnpm test',
+    'yarn test',
+    'pytest',
+    'cargo test',
+    'go test ./...',
+    'mvn test',
+    'gradle test'
+)
+$LintOptions = @(
+    'dotnet format --verify-no-changes',
+    'npm run lint',
+    'pnpm run lint',
+    'eslint .',
+    'ruff check .',
+    'black --check .',
+    'cargo clippy -- -D warnings',
+    'gofmt -l . && go vet ./...',
+    'mvn checkstyle:check'
+)
+
 $Unconfigured = '<未配置>'
 $interactive = -not $NonInteractive
 
@@ -196,7 +285,7 @@ Write-Host "    交互模式 / Interactive : $(if ($NonInteractive) { '否 / no'
 
 # 探测摘要（仅用于提示用户）
 $detectedSummary = @()
-foreach ($k in @('ProjectName', 'PrimaryLanguage', 'TechStack', 'TestCommand', 'LintCommand')) {
+foreach ($k in @('TestCommand', 'LintCommand')) {
     if ($detected[$k]) { $detectedSummary += "$k = $($detected[$k])" }
 }
 if ($detectedSummary) {
@@ -210,12 +299,8 @@ if ($priorReplacements.Count -gt 0) {
 }
 Write-Host ''
 
-$ProjectName = Resolve-Placeholder -Cli $ProjectName     -ManifestKey 'PROJECT_NAME'      -Detected $detected.ProjectName     -Prompt '项目名称 / Project name (PROJECT_NAME)'                                 -Interactive $interactive
-$ProjectOneLiner = Resolve-Placeholder -Cli $ProjectOneLiner -ManifestKey 'PROJECT_ONE_LINER' -Detected ''                        -Prompt '一句话定位 / One-liner pitch (PROJECT_ONE_LINER, optional)'             -Interactive $interactive
-$PrimaryLanguage = Resolve-Placeholder -Cli $PrimaryLanguage -ManifestKey 'PRIMARY_LANGUAGE'  -Detected $detected.PrimaryLanguage -Prompt '主语言 / Primary language (PRIMARY_LANGUAGE, e.g. C# / TypeScript)'   -Interactive $interactive
-$TechStack = Resolve-Placeholder -Cli $TechStack       -ManifestKey 'TECH_STACK'        -Detected $detected.TechStack       -Prompt '技术栈 / Tech stack (TECH_STACK, e.g. .NET 10 + ASP.NET Core)'         -Interactive $interactive
-$TestCommand = Resolve-Placeholder -Cli $TestCommand     -ManifestKey 'TEST_COMMAND'      -Detected $detected.TestCommand     -Prompt '测试命令 / Test command (TEST_COMMAND)'                                 -Interactive $interactive
-$LintCommand = Resolve-Placeholder -Cli $LintCommand     -ManifestKey 'LINT_COMMAND'      -Detected $detected.LintCommand     -Prompt '代码风格检查命令 / Lint command (LINT_COMMAND)'                          -Interactive $interactive
+$TestCommand = Resolve-CommandWithMenu -Cli $TestCommand -ManifestKey 'TEST_COMMAND' -Detected $detected.TestCommand -Title '测试命令 / Test command (TEST_COMMAND)'                  -Options $TestOptions -Interactive $interactive
+$LintCommand = Resolve-CommandWithMenu -Cli $LintCommand -ManifestKey 'LINT_COMMAND' -Detected $detected.LintCommand -Title '代码风格检查命令 / Lint command (LINT_COMMAND)'         -Options $LintOptions -Interactive $interactive
 
 # Vendor 目录：CLI 显式传入 > 上次 manifest.vendor_dir > 参数默认值（.harness-engineering）；
 # 未显式传入且交互模式 → 弹 prompt，回车采纳默认。
@@ -247,9 +332,8 @@ else {
     if (-not $HarnessRepoRef) { $HarnessRepoRef = $VendorHarnessTo }
 }
 
-# ProjectName 兜底（避免空字符串）；其余可选字段留空 → 填 <未配置>
-if ([string]::IsNullOrWhiteSpace($ProjectName)) { $ProjectName = Split-Path -Leaf $TargetRepo }
-foreach ($v in @(@{ N = 'ProjectOneLiner'; R = [ref]$ProjectOneLiner }, @{ N = 'PrimaryLanguage'; R = [ref]$PrimaryLanguage }, @{ N = 'TechStack'; R = [ref]$TechStack }, @{ N = 'TestCommand'; R = [ref]$TestCommand }, @{ N = 'LintCommand'; R = [ref]$LintCommand })) {
+# 可选字段留空 → 填 <未配置>
+foreach ($v in @(@{ N = 'TestCommand'; R = [ref]$TestCommand }, @{ N = 'LintCommand'; R = [ref]$LintCommand })) {
     if ([string]::IsNullOrWhiteSpace($v.R.Value)) { $v.R.Value = $Unconfigured }
 }
 if ([string]::IsNullOrWhiteSpace($HarnessRepoRef)) {
@@ -257,10 +341,6 @@ if ([string]::IsNullOrWhiteSpace($HarnessRepoRef)) {
 }
 
 $Replacements = [ordered]@{
-    'PROJECT_NAME'                 = $ProjectName
-    'PROJECT_ONE_LINER'            = $ProjectOneLiner
-    'PRIMARY_LANGUAGE'             = $PrimaryLanguage
-    'TECH_STACK'                   = $TechStack
     'TEST_COMMAND'                 = $TestCommand
     'LINT_COMMAND'                 = $LintCommand
     'HARNESS_REPO_REF'             = $HarnessRepoRef
