@@ -9,7 +9,7 @@
 - **是什么**：一份将 Harness Engineering 思想落到团队 SDLC 的方法论 + 一组可直接使用的 Agent 提示词与文档模板 + 一套把它们一键铺到你仓库的脚本。
 - **为谁写**：在真实项目里和 AI 协作，并希望让交付保持可追溯、可评审、可维护的工程团队与个人开发者。
 - **解决什么**：把"AI 写得很快但难以验证 / 难以合并 / 难以维护"的现实问题，转化为一条由文档、评审、测试和提交记录组成的硬轨道。
-- **核心模型**：按 Agent **行动时序**划分的三层 Harness——约束层（行动前）/ 反馈层（行动中）/ 质量门禁层（行动后），配套 8 个职责单一的 Agent（H1–H6 + 横切两个）。
+- **核心模型**：按 Agent **行动时序**划分的三层 Harness——约束层（行动前）/ 反馈层（行动中）/ 质量门禁层（行动后），配套 9 个职责单一的 Agent（H1–H6 + 横切 1 个）。
 
 ### 这是什么 / 不是什么
 
@@ -52,7 +52,7 @@ cd harness-engineering
 本仓库是**规范型仓库**（specification repo），主体内容即 README 本身。常见使用方式有三种，可单独或组合使用：
 
 1. **作为方法论参考**：通读 README，按第 1–3 节把三层 Harness 与 H1–H6 流程映射到自己团队当前的 SDLC，识别缺口。
-2. **作为 Agent 提示词模板**：直接复用 [`agents/`](agents/) 下 8 个 Agent 的 `AGENT.md` + `prompt.md`，按需替换项目专属术语后接入到 Copilot Chat / Claude Code / Cursor / 自建工作流。
+2. **作为 Agent 提示词模板**：直接复用 [`agents/`](agents/) 下 9 个 Agent 的 `AGENT.md` + `prompt.md`，按需替换项目专属术语后接入到 Copilot Chat / Claude Code / Cursor / 自建工作流。
 3. **作为评审 / 门禁清单**：把 [`templates/phase-gate-checklist.md`](templates/phase-gate-checklist.md) 与 [`templates/review-record.md`](templates/review-record.md) 接入团队的 PR 模板与阶段评审，让规范从纸面落到流程。
 
 > 本规范不强制全部采用。建议从单一痛点切入（例如先落 H4 测试用例 + H5 编码约束），跑通再扩展。
@@ -69,7 +69,7 @@ harness-engineering/
 │   ├── repo-layout.md              # 目录规范与项目级索引（dev-map）
 │   ├── install.md                  # 安装、占位符、Vendor / NoVendor 模式
 │   └── tech-debt-gc.md             # 黄金原则、定期 GC、使用原则
-├── agents/                         # 8 个 Agent 的角色规格与提示词
+├── agents/                         # 9 个 Agent 的角色规格与提示词
 │   ├── README.md                   # Agent 协作拓扑、交接约定与调度纪律
 │   ├── _shared/                    # 跨 Agent 共享：术语表、I/O 契约、工具词表、模板
 │   ├── _skills/                    # 跨 Agent 复用的操作型 Skill
@@ -224,7 +224,7 @@ H1–H6 各阶段的输入、输出物、必填章节与评审门禁，详见独
 
 ## 5. 目录规范与 Agent 套件
 
-项目目录推荐结构、`AGENTS.md` 的使用约定、以及随规范附带的 8 个 Agent 套件说明，详见独立文件 [`docs/repo-layout.md`](docs/repo-layout.md)（该文件以第 10 节编号展开，可按 `第 10.1 节`、`第 10.2 节` 引用）。
+项目目录推荐结构、`AGENTS.md` 的使用约定、以及随规范附带的 9 个 Agent 套件说明，详见独立文件 [`docs/repo-layout.md`](docs/repo-layout.md)（该文件以第 10 节编号展开，可按 `第 10.1 节`、`第 10.2 节` 引用）。
 
 ## 6. AI 使用规范
 
@@ -406,7 +406,7 @@ Rule 是软约束：再清晰的自然语言，在长上下文与复杂需求下
 
 - **协议**：建议按 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.zh) 共享文档内容，按 [MIT](https://opensource.org/licenses/MIT) 共享 `agents/` 与 `templates/` 中的提示词与模板代码。仓库根目录的 `LICENSE` 文件以最终版本为准。
 - **引用**：如在博客、白皮书或公开演讲中引用本规范，建议注明：
-  > Harness Engineering 规范（驾驭工程），v0.1，<https://github.com/shuaihuadu/harness-engineering>
+  > Harness Engineering 规范（驾驭工程），v0.0.1，<https://github.com/shuaihuadu/harness-engineering>
 - **派生**：派生版本请保留对原仓库的引用，并在派生说明中标注差异点。
 
 ## 贡献

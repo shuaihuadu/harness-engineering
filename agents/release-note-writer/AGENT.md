@@ -99,4 +99,4 @@ REQ-NNN → HD/API/DB-NNN → TC-NNN → TASK-YYYY-MM-DD-NNN → commit hash
 
 - 不替代发布决策（"能否发"由人工 / 发布流水线判断）
 - 不识别"提交信息真实但实际未做"的造假——这类问题需要在 PR 评审环节兜住
-- 对没有 `Task:` 字段的历史遗留 commit（规范引入前），允许人工标注为 `legacy` 后入册，但应在矩阵中显式标记
+- 对采用方在落地本规范之前已有的、没有 `Task:` 字段的旧 commit，允许人工标注为 `legacy` 后入册，但应在矩阵中显式标记

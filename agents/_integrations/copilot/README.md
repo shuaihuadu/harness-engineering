@@ -8,8 +8,6 @@
 
 | 模板文件                                                                                                       | 复制到采用方仓库的位置                               | 何时启用                   |
 | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------- |
-| [`install.ps1`](./install.ps1)                                                                                 | 不复制（直接调用）                                   | Windows / 跨平台一键安装   |
-| [`install.sh`](./install.sh)                                                                                   | 不复制（直接调用）                                   | Linux / macOS 一键安装     |
 | [`copilot-instructions.template.md`](./copilot-instructions.template.md)                                       | `.github/copilot-instructions.md`                    | 所有 Copilot 会话自动加载  |
 | [`instructions/commit-format.instructions.template.md`](./instructions/commit-format.instructions.template.md) | `.github/instructions/commit-format.instructions.md` | 按 `applyTo` 自动加载      |
 | [`instructions/docs-style.instructions.template.md`](./instructions/docs-style.instructions.template.md)       | `.github/instructions/docs-style.instructions.md`    | 按 `applyTo` 自动加载      |
@@ -18,11 +16,11 @@
 | [`custom-agents/design-reviewer.agent.template.md`](./custom-agents/design-reviewer.agent.template.md)         | `.github/agents/design-reviewer.agent.md`            | 用户在 Chat 中**手动**切换 |
 | [`custom-agents/test-case-author.agent.template.md`](./custom-agents/test-case-author.agent.template.md)       | `.github/agents/test-case-author.agent.md`           | 用户在 Chat 中**手动**切换 |
 
-> 本仓库根目录下的 [`custom-agent.md.template`](./custom-agent.md.template) 是一份通用占位，可直接基于它派生其他 5 个 Agent（RequirementsInterviewer、RepoImpactMapper、CodingExecutor、ReleaseNoteWriter、DocGardener）的 Custom Agent。
+> 本仓库根目录下的 [`custom-agent.md.template`](./custom-agent.md.template) 是一份通用占位，可直接基于它派生其他 6 个 Agent（RequirementsInterviewer、RepoImpactMapper、ArchitectAdvisor、CodingExecutor、ReleaseNoteWriter、DocGardener）的 Custom Agent。
 
-## 2. 一键同步（推荐仓库根 install 脚本）
+## 2. 一键同步（仓库根 install 脚本）
 
-推荐使用**仓库根** [`install.ps1`](../../../install.ps1) / [`install.sh`](../../../install.sh)，它们可同时为多个目标工具（copilot / claude-code / codex）同步配置。本目录下的 [`install.ps1`](./install.ps1) / [`install.sh`](./install.sh) 是**向后兼容的薄 wrapper**，只转发到根脚本。
+一键安装使用**仓库根** [`install.ps1`](../../../install.ps1) / [`install.sh`](../../../install.sh)，它们可同时为多个目标工具（copilot / claude-code / codex）同步配置。下面示例中的 `./install.ps1` / `./install.sh` 均指仓库根脚本（请在 harness-engineering 仓库根目录运行）。
 
 脚本是**幂等**的：源未变化时再次运行不写任何文件、不发任何提示。源更新（修改 / 新增 / 删除）时，会自动检测并按交互策略处理。
 

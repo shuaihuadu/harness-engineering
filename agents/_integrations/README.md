@@ -60,7 +60,7 @@ Harness Engineering 与具体 AI 编码工具之间的关系，是**单一公共
 | OpenAI Codex / AGENTS.md | [`codex/agents.md.snippet`](./codex/agents.md.snippet)                           | 在仓库 `AGENTS.md` 末尾追加                                                     |
 | 自研 Runtime             | [`generic/runtime-config.yaml.template`](./generic/runtime-config.yaml.template) | 由 Runtime 项目自管理                                                           |
 
-> Copilot 一栏指向子目录而非单个文件——它包含一份顶层指令（`copilot-instructions.template.md`）、3 份切片指令（`instructions/`）、3 份专用 Custom Agent（`custom-agents/`），以及一份通用 Custom Agent 模板 `custom-agent.md.template`（可派生其他 5 个 Agent）。详细文件清单与复制步骤见 [copilot/README.md](./copilot/README.md)。
+> Copilot 一栏指向子目录而非单个文件——它包含一份顶层指令（`copilot-instructions.template.md`）、3 份切片指令（`instructions/`）、3 份专用 Custom Agent（`custom-agents/`），以及一份通用 Custom Agent 模板 `custom-agent.md.template`（可派生其他 6 个 Agent）。详细文件清单与复制步骤见 [copilot/README.md](./copilot/README.md)。
 
 ## 2. 通用替换占位符
 
