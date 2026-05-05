@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Harness Engineering · 卸载脚本（基于 manifest）。
@@ -7,18 +7,28 @@
     根据 <TargetRepo>/.harness-engineering/manifest.json 反向移除安装时落下的文件。
 
     安全策略：
-    - 必须存在 manifest，否则报错退出（不"野扫"用户仓库）。
+    - 优先用 manifest 精确卸载（按 sha256 比对）。
     - 文件已不存在 → 跳过（幂等）。
     - 文件存在且 sha256 与 manifest 一致 → 默认删除（用户未修改）。
     - 文件存在但 sha256 不一致 → 默认保留并列出告警，须加 -Force 才删。
     - 自下而上清理只剩空的目录；非空目录绝不递归删。
     - 全程支持 -DryRun。
 
+    Manifest 缺失时的兜底（残留清理）：
+    - 例如 install 中途按 Ctrl+C，manifest 还没写入但 .harness-engineering/
+      或 .github/ 下已经有部分文件落地。
+    - 此时脚本不报错退出，而是启动 best-effort 残留扫描：
+      * 整体清理 <TargetRepo>/.harness-engineering/ 目录（纯属本工具产物）。
+      * 对 .github/copilot-instructions.md / .github/instructions/*.instructions.md /
+        .github/agents/*.agent.md，仅当文件内含 "Harness Engineering" 标记时才删。
+      * 交互模式下会列出候选并请求确认；非交互模式必须显式 -Force 才执行删除。
+
 .PARAMETER TargetRepo
     采用方仓库根目录的绝对路径。必填。
 
 .PARAMETER Force
-    对内容已被本地修改的文件也执行删除。
+    对内容已被本地修改的文件也执行删除；在 manifest 缺失的兜底路径下，等价于
+    "不再需要交互确认，直接删除全部候选"。
 
 .PARAMETER DryRun
     只打印将要执行的动作，不写盘。
@@ -49,8 +59,166 @@ $TargetRepo = (Resolve-Path $TargetRepo).Path
 $manifestDir = Join-Path $TargetRepo '.harness-engineering'
 $manifestPath = Join-Path $manifestDir 'manifest.json'
 
+# ----------------------------------------------------------------------------
+# 公共：sha256 / 残留清理（manifest 缺失时的兜底）
+# ----------------------------------------------------------------------------
+function Get-Sha256Hex([string]$Path) {
+    $bytes = [System.IO.File]::ReadAllBytes($Path)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try { return [BitConverter]::ToString($sha.ComputeHash($bytes)).Replace('-', '').ToLowerInvariant() }
+    finally { $sha.Dispose() }
+}
+
+# 已渲染产物中始终包含 "Harness Engineering" 字面量（来自模板的 H1 / 引用脚注），
+# 用作残留清理的归属标记，避免误删用户写的同名文件。
+function Test-HarnessMarker([string]$Path) {
+    if (-not (Test-Path $Path -PathType Leaf)) { return $false }
+    try {
+        $content = Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
+        return ($content -match 'Harness Engineering' -or $content -match 'harness-engineering')
+    }
+    catch { return $false }
+}
+
+function Invoke-BestEffortCleanup {
+    param(
+        [string]$TargetRepo,
+        [string]$ManifestDir,
+        [bool]$DryRun,
+        [bool]$Force
+    )
+
+    Write-Host ''
+    Write-Host '[!] 未发现 manifest.json：' -ForegroundColor Yellow -NoNewline
+    Write-Host " $ManifestDir\manifest.json"
+    Write-Host '    安装可能在写入 manifest 前被中断（如 Ctrl+C）。' -ForegroundColor Yellow
+    Write-Host '    启动 best-effort 残留扫描 / Best-effort residual scan。' -ForegroundColor Yellow
+
+    $candidates = New-Object System.Collections.Generic.List[object]
+
+    # 1) .harness-engineering/ 目录：完全是本工具产物，整目录可删
+    if (Test-Path $ManifestDir -PathType Container) {
+        $entry = New-Object PSObject -Property @{
+            Kind   = 'dir'
+            Path   = $ManifestDir
+            Rel    = '.harness-engineering/'
+            Reason = '整目录（本工具专属）'
+            Safe   = $true
+        }
+        [void]$candidates.Add($entry)
+    }
+
+    # 2) .github/ 下的已知文件名 —— 必须含 Harness 标记才视为本工具产物
+    $githubKnown = @(
+        '.github/copilot-instructions.md'
+    )
+    foreach ($glob in @('.github/instructions/*.instructions.md', '.github/agents/*.agent.md')) {
+        $dir = Join-Path $TargetRepo (Split-Path -Parent $glob)
+        if (Test-Path $dir -PathType Container) {
+            $pattern = Split-Path -Leaf $glob
+            foreach ($f in Get-ChildItem -LiteralPath $dir -Filter $pattern -File -ErrorAction SilentlyContinue) {
+                $rel = (Resolve-Path $f.FullName).Path.Substring($TargetRepo.Length).TrimStart('\', '/')
+                $githubKnown += ($rel -replace '\\', '/')
+            }
+        }
+    }
+    foreach ($rel in $githubKnown | Select-Object -Unique) {
+        $abs = Join-Path $TargetRepo $rel
+        if (-not (Test-Path $abs -PathType Leaf)) { continue }
+        $hasMarker = Test-HarnessMarker $abs
+        if ($hasMarker) { $reasonText = '含 Harness 标记 ✓' } else { $reasonText = '无标记 (需 -Force)' }
+        $entry = New-Object PSObject -Property @{
+            Kind   = 'file'
+            Path   = $abs
+            Rel    = $rel
+            Reason = $reasonText
+            Safe   = $hasMarker
+        }
+        [void]$candidates.Add($entry)
+    }
+
+    if ($candidates.Count -eq 0) {
+        Write-Host ''
+        Write-Host '    未发现任何残留 / No residual files found.' -ForegroundColor Green
+        return
+    }
+
+    Write-Host ''
+    Write-Host '    候选 / Candidates:' -ForegroundColor Cyan
+    foreach ($c in $candidates) {
+        if ($c.Safe) { $color = 'Gray' } else { $color = 'Yellow' }
+        Write-Host ("      [{0}] {1,-55} {2}" -f $c.Kind, $c.Rel, $c.Reason) -ForegroundColor $color
+    }
+
+    # 确认：交互模式默认询问；-Force 跳过询问；非交互且非 Force → 仅打印不执行
+    $interactive = -not [System.Console]::IsInputRedirected
+    $proceed = $false
+    if ($DryRun) {
+        $proceed = $false  # DryRun 下走预览路径
+    }
+    elseif ($Force) {
+        $proceed = $true
+    }
+    elseif ($interactive) {
+        Write-Host ''
+        $ans = Read-Host '继续删除上述候选？/ Proceed? [y/N]'
+        $proceed = ($ans -and ($ans.Trim().ToLowerInvariant() -in @('y', 'yes')))
+    }
+    else {
+        Write-Host ''
+        Write-Host '    非交互模式且未传 -Force：仅预览，不执行删除。' -ForegroundColor Yellow
+        Write-Host '    Non-interactive without -Force: preview only.' -ForegroundColor Yellow
+    }
+
+    $deleted = 0
+    $kept = 0
+    foreach ($c in $candidates) {
+        $shouldDelete = $c.Safe -or $Force
+        $rel = $c.Rel
+        if (-not $shouldDelete) {
+            Write-Host "   keep   $rel (无 Harness 标记，使用 -Force 强制删除)" -ForegroundColor Yellow
+            $kept++
+            continue
+        }
+        if ($DryRun -or -not $proceed) {
+            Write-Host "   dryrun-delete $rel" -ForegroundColor DarkGray
+            continue
+        }
+        if ($c.Kind -eq 'dir') {
+            Remove-Item -LiteralPath $c.Path -Recurse -Force
+            Write-Host "   delete $rel (recursive)" -ForegroundColor Magenta
+        }
+        else {
+            Remove-Item -LiteralPath $c.Path -Force
+            Write-Host "   delete $rel" -ForegroundColor Magenta
+            $parent = Split-Path -Parent $c.Path
+            while ($parent -and ($parent.Length -gt $TargetRepo.Length) -and (Test-Path $parent -PathType Container)) {
+                $items = @(Get-ChildItem -LiteralPath $parent -Force)
+                if ($items.Count -gt 0) { break }
+                Remove-Item -LiteralPath $parent -Force
+                Write-Host "   rmdir  $parent" -ForegroundColor DarkMagenta
+                $parent = Split-Path -Parent $parent
+            }
+        }
+        $deleted++
+    }
+
+    Write-Host ''
+    if ($DryRun) {
+        Write-Host "DryRun 完成（best-effort）。预计删除 $($candidates.Count - $kept) / 保留 $kept" -ForegroundColor Cyan
+    }
+    elseif (-not $proceed) {
+        Write-Host '已取消（未删除任何文件）/ Cancelled (nothing removed).' -ForegroundColor DarkYellow
+    }
+    else {
+        Write-Host "完成（best-effort）。删除 $deleted / 保留 $kept" -ForegroundColor Cyan
+    }
+}
+
 if (-not (Test-Path $manifestPath)) {
-    throw "未发现 harness-engineering 安装记录：$manifestPath"
+    Invoke-BestEffortCleanup -TargetRepo $TargetRepo -ManifestDir $manifestDir -DryRun:$DryRun -Force:$Force
+    Write-Host ''
+    return
 }
 
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
@@ -64,14 +232,6 @@ Write-Host "    目标仓库：$TargetRepo"
 Write-Host "    manifest 版本：$($manifest.harness_version)（commit: $($manifest.harness_commit))"
 Write-Host "    待处理文件数：$(@($manifest.files).Count)"
 Write-Host ''
-
-# 计算 sha256
-function Get-Sha256Hex([string]$Path) {
-    $bytes = [System.IO.File]::ReadAllBytes($Path)
-    $sha = [System.Security.Cryptography.SHA256]::Create()
-    try { return [BitConverter]::ToString($sha.ComputeHash($bytes)).Replace('-', '').ToLowerInvariant() }
-    finally { $sha.Dispose() }
-}
 
 $deleted = 0
 $skipped = 0
