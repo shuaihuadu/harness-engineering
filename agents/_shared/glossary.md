@@ -4,20 +4,24 @@
 
 ## 1. 阶段术语
 
-| 编号 | 名称                | 主要产物目录                                                 |
-| ---- | ------------------- | ------------------------------------------------------------ |
-| H1   | 需求、UI 与交互原型 | `docs/01-requirements/`、`docs/02-prototype/`、`prototypes/` |
-| H2   | 技术架构选型        | `docs/03-architecture/`                                      |
-| H3   | 详细设计            | `docs/04-detailed-design/`                                   |
-| H4   | 测试用例设计        | `docs/05-test-design/`                                       |
-| H5   | AI 编码与自验证     | `docs/06-implementation/`                                    |
-| H6   | 运行验证与文档回写  | `docs/07-release/`                                           |
+> 编号 `H1`–`H6` 中的 `H` 取自 *Harness*。完整定义与"约束层 / 反馈层 / 质量门禁层"的正交关系见 [`../../README.md` 第 3 节](../../README.md#3-标准流程)。
+
+| 编号 | 中文名               | 英文名                               | 主要产物目录                                                 |
+| ---- | -------------------- | ------------------------------------ | ------------------------------------------------------------ |
+| H1   | 需求、UI 与交互原型  | Requirements, UI & Prototype         | `docs/01-requirements/`、`docs/02-prototype/`、`prototypes/` |
+| H2   | 技术架构选型         | Technical Architecture Selection     | `docs/03-architecture/`                                      |
+| H3   | 详细设计             | Detailed Design                      | `docs/04-detailed-design/`                                   |
+| H4   | 测试用例设计         | Test Case Design                     | `docs/05-test-design/`                                       |
+| H5   | AI 编码与自验证      | AI Coding & Self-Verification        | `docs/06-implementation/`                                    |
+| H6   | 运行验证与文档回写   | Runtime Verification & Doc Writeback | `docs/07-release/`                                           |
 
 ## 2. 三层 Harness
 
-- **约束层（Constraint Harness）**：通过 `AGENTS.md`、Lint、类型系统等前馈控制缩小 Agent 解空间。
-- **反馈层（Feedback Loop）**：通过测试、构建、运行结果向 Agent 回灌结构化信号。
-- **质量门禁层（Quality Gate）**：在 CI / 评审 / 合并环节硬拦截不合规产物。对应 Agent **行动后**时点。
+按 Agent **行动时序**划分的三个切面（与 H1–H6 阶段编号是正交关系）：
+
+- **约束层（Constraint Harness）—— 行动前**：通过 `AGENTS.md`、`copilot-instructions.md`、Lint、类型系统等前馈控制缩小 Agent 解空间。
+- **反馈层（Feedback Loop）—— 行动中**：通过测试、构建、运行结果向 Agent 回灌结构化信号。
+- **质量门禁层（Quality Gate）—— 行动后**：在 CI / 评审 / 合并环节硬拦截不合规产物。
 
 ## 3. 关键产物
 
@@ -52,3 +56,20 @@
 - `Approved with Changes`：小修改后可进入下一阶段
 - `Rejected`：不通过，必须返工
 - `Pending`：信息不足，暂缓决策
+
+## 6. 角色与载体
+
+本规范区分四种"约束怎么落地"的载体，不可混用（详见 [`../../README.md` 第 6.5 节](../../README.md#65-软约束的失败模式与处置阶梯)）：
+
+| 载体                  | 性质      | 适用约束                                                           |
+| --------------------- | --------- | ------------------------------------------------------------------ |
+| Scripts / Hooks / CI  | 硬约束    | 编译、测试、Lint、命名、文件大小、追溯字段等可机械判定项           |
+| Rule                  | 软约束    | 设计取舍、架构原则等不能机械判定项；落在 `AGENTS.md` / `instructions/` / Agent prompt |
+| Skill                 | 操作脚本  | 跨 Agent 复用的多步流程（追溯检查、任务卡生成、提交信息格式校验等） |
+| Memory                | 个人偏好  | 工具侧"记忆层"（Claude Code Memory / Copilot User Memory / Cursor Rules-for-User），仅作单人会话偏好，不进入团队规范（见 README 第 6.6 节） |
+
+并列三个**实体概念**：
+
+- **Agent**：本规范定义的 8 个职责单一角色（`requirements-interviewer` / `design-reviewer` / ...），落在 `agents/<name>/AGENT.md` + `prompt.md`。
+- **Skill**：跨 Agent 复用的操作型 SOP，落在 `agents/_skills/<name>/SKILL.md`，有标准化 frontmatter 与触发条件。
+- **Custom Agent**：AI 编码工具（Copilot / Cursor / Claude Code 等）侧的"会话级 Agent"装载方式，把上述 Agent 的 prompt 包装成工具自家的配置文件（如 `.github/agents/*.agent.md`）。Agent 是规范概念，Custom Agent 是工具落地形态。
