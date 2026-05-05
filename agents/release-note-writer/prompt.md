@@ -53,7 +53,7 @@
 每条记录格式：
 
 ```markdown
-- <一句话产品语言描述>（[`TASK-...`](path)，commit `<hash>`）
+- <一句话产品语言描述>（[`TASK-...`](<task-doc-path>)，commit `<hash>`）
 ```
 
 ### 第五步：回写追溯矩阵
