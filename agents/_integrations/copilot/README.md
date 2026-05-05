@@ -6,12 +6,12 @@
 
 ## 1. 文件清单与落地位置
 
-| 模板文件                                                                                                       | 复制到采用方仓库的位置                               | 何时启用                   |
-| -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------- |
-| [`copilot-instructions.template.md`](./copilot-instructions.template.md)                                       | `.github/copilot-instructions.md`                    | 所有 Copilot 会话自动加载  |
-| [`instructions/commit-format.instructions.template.md`](./instructions/commit-format.instructions.template.md) | `.github/instructions/commit-format.instructions.md` | 按 `applyTo` 自动加载      |
-| [`instructions/docs-style.instructions.template.md`](./instructions/docs-style.instructions.template.md)       | `.github/instructions/docs-style.instructions.md`    | 按 `applyTo` 自动加载      |
-| [`instructions/coding-style.instructions.template.md`](./instructions/coding-style.instructions.template.md)   | `.github/instructions/coding-style.instructions.md`  | 按 `applyTo` 自动加载      |
+| 模板文件                                                                                                                       | 复制到采用方仓库的位置                                | 何时启用                   |
+| ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- | -------------------------- |
+| [`copilot-instructions.template.md`](./copilot-instructions.template.md)                                                       | `.github/copilot-instructions.md`                     | 所有 Copilot 会话自动加载  |
+| [`instructions/commit-format.instructions.template.md`](./instructions/commit-format.instructions.template.md)                 | `.github/instructions/commit-format.instructions.md`  | 按 `applyTo` 自动加载      |
+| [`instructions/docs-style.instructions.template.md`](./instructions/docs-style.instructions.template.md)                       | `.github/instructions/docs-style.instructions.md`     | 按 `applyTo` 自动加载      |
+| [`instructions/coding-style.instructions.template.md`](./instructions/coding-style.instructions.template.md)                   | `.github/instructions/coding-style.instructions.md`   | 按 `applyTo` 自动加载      |
 | [`custom-agents/h1-requirements-interviewer.agent.template.md`](./custom-agents/h1-requirements-interviewer.agent.template.md) | `.github/agents/h1-requirements-interviewer.agent.md` | 用户在 Chat 中**手动**切换 |
 | [`custom-agents/h1-repo-impact-mapper.agent.template.md`](./custom-agents/h1-repo-impact-mapper.agent.template.md)             | `.github/agents/h1-repo-impact-mapper.agent.md`       | 用户在 Chat 中**手动**切换 |
 | [`custom-agents/h2-architect-advisor.agent.template.md`](./custom-agents/h2-architect-advisor.agent.template.md)               | `.github/agents/h2-architect-advisor.agent.md`        | 用户在 Chat 中**手动**切换 |
@@ -21,6 +21,7 @@
 | [`custom-agents/h5-commit-auditor.agent.template.md`](./custom-agents/h5-commit-auditor.agent.template.md)                     | `.github/agents/h5-commit-auditor.agent.md`           | 用户在 Chat 中**手动**切换 |
 | [`custom-agents/h6-release-note-writer.agent.template.md`](./custom-agents/h6-release-note-writer.agent.template.md)           | `.github/agents/h6-release-note-writer.agent.md`      | 用户在 Chat 中**手动**切换 |
 | [`custom-agents/hx-doc-gardener.agent.template.md`](./custom-agents/hx-doc-gardener.agent.template.md)                         | `.github/agents/hx-doc-gardener.agent.md`             | 用户在 Chat 中**手动**切换 |
+| [`../_skills/<name>/SKILL.md`](../_skills/)                                                                                    | `.github/skills/<name>/SKILL.md`                      | 模型按 description 语义命中加载   |
 
 > Custom Agent stem 以 `h<阶段号>-` 开头（`h1-` / `h2-` / … / `h6-` 对应 H1–H6；横切阶段用 `hx-`），与 [阶段细则](../../docs/stages.md) 对齐，方便 Copilot Chat 顶部下拉菜单一眼判断该选哪个。
 >
@@ -79,19 +80,19 @@
 | 目标文件不存在                                                                      | 写入                                                        |
 | 目标文件存在且内容一致                                                              | 静默跳过（`skip ... unchanged`）                            |
 | 目标文件存在但内容不一致（**冲突**）                                                | 交互提示 `[O]verwrite / [K]eep / [A]ll-overwrite / a[B]ort` |
-| 源文件已删除但目标仍存在（**孤儿**，仅 vendor + custom-agents 的 `all` 模式下检测） | 交互提示 `[D]elete / [K]eep / [A]ll-delete / a[B]ort`       |
+| 源文件已删除但目标仍存在（**孤儿**，vendor / custom-agents 的 `all` / skills 下检测） | 交互提示 `[D]elete / [K]eep / [A]ll-delete / a[B]ort`       |
 
 ### 2.4 选项
 
-| 选项                                                                 | 说明                                                                                                                                                                                |
-| -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-VendorHarnessTo <path>` / `--vendor-harness-to <path>`             | 改变 vendor 目录。默认 `.harness-engineering`（与安装清单同目录）                                                                                                                   |
-| `-NoVendor` / `--no-vendor`                                          | 不 vendor。必须配合 `-HarnessRepoRef` 传外部 URL（或自定义路径），否则交互询问                                                                                                      |
-| `-HarnessRepoRef <path-or-url>` / `--harness-repo-ref <path-or-url>` | 覆写 `{{HARNESS_REPO_REF}}` 替换值。不传时：vendor 模式下与 `-VendorHarnessTo` 一致；`-NoVendor` 下默认为 GitHub 在线链接                                                           |
+| 选项                                                                 | 说明                                                                                                                                                                                               |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-VendorHarnessTo <path>` / `--vendor-harness-to <path>`             | 改变 vendor 目录。默认 `.harness-engineering`（与安装清单同目录）                                                                                                                                  |
+| `-NoVendor` / `--no-vendor`                                          | 不 vendor。必须配合 `-HarnessRepoRef` 传外部 URL（或自定义路径），否则交互询问                                                                                                                     |
+| `-HarnessRepoRef <path-or-url>` / `--harness-repo-ref <path-or-url>` | 覆写 `{{HARNESS_REPO_REF}}` 替换值。不传时：vendor 模式下与 `-VendorHarnessTo` 一致；`-NoVendor` 下默认为 GitHub 在线链接                                                                          |
 | `-CopilotAgents <list>` / `--copilot-agents <list>`                  | 选择安装哪些 Copilot Custom Agent；**默认 `all`**（全装 9 个 Agent，覆盖 H1–H6 + 横切，并启用孤儿检测）；填具体 stem（如 `h3-design-reviewer,h5-coding-executor`）只装指定项；填 `none` 一个都不装 |
-| `-Force` / `--force`                                                 | 全自动：所有冲突直接覆盖，所有孤儿直接删除；不弹任何提示                                                                                                                            |
-| `-NoDelete` / `--no-delete`                                          | 一律不删除孤儿（即便 `-Force` 也不删）；CI 升级推荐配合此选项                                                                                                                       |
-| `-DryRun` / `--dry-run`                                              | 只打印动作不写盘                                                                                                                                                                    |
+| `-Force` / `--force`                                                 | 全自动：所有冲突直接覆盖，所有孤儿直接删除；不弹任何提示                                                                                                                                           |
+| `-NoDelete` / `--no-delete`                                          | 一律不删除孤儿（即便 `-Force` 也不删）；CI 升级推荐配合此选项                                                                                                                                      |
+| `-DryRun` / `--dry-run`                                              | 只打印动作不写盘                                                                                                                                                                                   |
 
 ### 2.5 升级流程
 
@@ -133,6 +134,9 @@ cp custom-agents/h5-coding-executor.agent.template.md          <your-repo>/.gith
 cp custom-agents/h5-commit-auditor.agent.template.md           <your-repo>/.github/agents/h5-commit-auditor.agent.md
 cp custom-agents/h6-release-note-writer.agent.template.md      <your-repo>/.github/agents/h6-release-note-writer.agent.md
 cp custom-agents/hx-doc-gardener.agent.template.md             <your-repo>/.github/agents/hx-doc-gardener.agent.md
+# Skills：保留 <name>/SKILL.md 这层子目录（Copilot 仅识别这个路径）
+mkdir -p <your-repo>/.github/skills
+cp -r ../_skills/*/  <your-repo>/.github/skills/
 # 复制后逐文件去掉文件名中的 ".template" 段，并按第 4 节的表替换 {{...}} 占位符
 ```
 
@@ -140,11 +144,11 @@ cp custom-agents/hx-doc-gardener.agent.template.md             <your-repo>/.gith
 
 模板内全部使用 `{{...}}` 双花括号占位。脚本会一次性替换；手动复制时按下表逐个处理：
 
-| 占位符                  | 含义               | 示例                                                                                           |
-| ----------------------- | ------------------ | ---------------------------------------------------------------------------------------------- |
-| `{{TEST_COMMAND}}`      | 验收测试命令       | `dotnet test`                                                                                  |
-| `{{LINT_COMMAND}}`      | 代码风格检查命令   | `dotnet format --verify-no-changes`                                                            |
-| `{{HARNESS_REPO_REF}}`  | 引用本规范的方式   | `.harness-engineering`（已 vendor）或 `https://github.com/<owner>/harness-engineering`（外链） |
+| 占位符                 | 含义             | 示例                                                                                           |
+| ---------------------- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| `{{TEST_COMMAND}}`     | 验收测试命令     | `dotnet test`                                                                                  |
+| `{{LINT_COMMAND}}`     | 代码风格检查命令 | `dotnet format --verify-no-changes`                                                            |
+| `{{HARNESS_REPO_REF}}` | 引用本规范的方式 | `.harness-engineering`（已 vendor）或 `https://github.com/<owner>/harness-engineering`（外链） |
 
 > 推荐做法：用脚本的 `-VendorHarnessTo` / `--vendor-harness-to` 把本规范文档复制进采用方仓库（默认 `.harness-engineering/`），这样 Copilot 可以本地解析路径引用。如果不 vendor，引用退化为外链（仍可用，只是 Copilot 无法读取原文）。
 

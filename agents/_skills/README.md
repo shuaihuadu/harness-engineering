@@ -58,9 +58,9 @@ when_not_to_use: |
 
 ## 3. 触发与加载
 
-- **GitHub Copilot / VS Code**：Skill 文件随 vendor 落到消费仓库的 `.harness-engineering/agents/_skills/`，并由 `copilot-instructions.md` 中的引用列表暴露给模型。
-- **Claude Code / 自研 Runtime**：直接把目录路径加入 Agent runtime 的 skill 索引即可。
-- **触发逻辑**：模型基于 `description` 字段做语义匹配，自动决定是否阅读完整 `SKILL.md`。description 写得越精准、越接近真实用户语言，触发命中率越高。
+- **GitHub Copilot 项目技能**：安装脚本会把每个 Skill 渲染到采用方仓库的 `.github/skills/<name>/SKILL.md`。Copilot CLI 与 VS Code Copilot 会自动扫描该目录，按 frontmatter 里的 `description` 做语义匹配，命中后才把整份 `SKILL.md` 注入上下文；用户也可用 `/skill-name` 显式调用。详见[官方文档](https://docs.github.com/zh/copilot/how-tos/copilot-cli/customize-copilot/add-skills)。
+- **Claude Code / 自研 Runtime**：直接把 `agents/_skills/` 或 vendor 后的 `.harness-engineering/agents/_skills/` 加入 Agent runtime 的 skill 索引即可。
+- **触发逻辑**：模型基于 `description` 做语义匹配，自动决定是否阅读完整 `SKILL.md`。description 写得越精准、越接近真实用户语言，命中率越高。
 
 ## 4. 新增 Skill 的判断标准
 

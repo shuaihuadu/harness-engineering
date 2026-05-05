@@ -27,6 +27,12 @@
             "default_select": ["all"],
             "orphan_check": true,
             "orphan_check_only_when_all": true
+        },
+        {
+            "kind": "tree",
+            "source_dir": "../../_skills",
+            "target_dir": ".github/skills",
+            "orphan_check": true
         }
     ]
 }

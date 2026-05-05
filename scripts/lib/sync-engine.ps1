@@ -355,3 +355,48 @@ function Sync-RenderOrphans {
         }
     }
 }
+
+# Tree 渲染的孤儿检测：递归对比目标整棵子树，删除不在 expected 列表里的文件，再清空目录。
+function Sync-TreeOrphans {
+    param(
+        [Parameter(Mandatory)] [hashtable] $Context,
+        [Parameter(Mandatory)] [string]    $DestinationDir,
+        [Parameter(Mandatory)] [AllowEmptyCollection()] [System.Collections.Generic.List[string]] $ExpectedRelPaths
+    )
+
+    if (-not (Test-Path $DestinationDir)) { return }
+
+    $expectedSet = New-Object System.Collections.Generic.HashSet[string]
+    foreach ($p in $ExpectedRelPaths) { [void]$expectedSet.Add($p) }
+
+    $allFiles = @(Get-ChildItem -LiteralPath $DestinationDir -Recurse -File)
+    foreach ($file in $allFiles) {
+        $rel = [System.IO.Path]::GetRelativePath($DestinationDir, $file.FullName).Replace('\', '/')
+        if ($expectedSet.Contains($rel)) { continue }
+        $decision = Resolve-DeleteDecisionInternal -Context $Context -Path $file.FullName
+        switch ($decision) {
+            'delete' {
+                if ($Context.DryRun) {
+                    Write-Host "   dryrun-delete $($file.FullName)" -ForegroundColor DarkGray
+                }
+                else {
+                    Remove-Item -LiteralPath $file.FullName -Force
+                    Write-Host "   delete $($file.FullName)" -ForegroundColor Magenta
+                }
+            }
+            'keep' { Write-Host "   keep   $($file.FullName) (orphan)" -ForegroundColor DarkYellow }
+            'abort' { throw '用户中止' }
+        }
+    }
+
+    # 删完文件后清空目录（自下而上）
+    if (-not $Context.DryRun) {
+        $allDirs = @(Get-ChildItem -LiteralPath $DestinationDir -Recurse -Directory) |
+            Sort-Object -Property FullName -Descending
+        foreach ($d in $allDirs) {
+            if (-not (Get-ChildItem -LiteralPath $d.FullName -Force | Select-Object -First 1)) {
+                Remove-Item -LiteralPath $d.FullName -Force
+            }
+        }
+    }
+}

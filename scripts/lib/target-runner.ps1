@@ -18,7 +18,7 @@
               "target": ".github/copilot-instructions.md"
             },
             {
-              "kind": "directory",                 // 目录批量
+              "kind": "directory",                 // 目录批量（平铺，只看顶层文件）
               "source_dir": "instructions",
               "target_dir": ".github/instructions",
               "source_glob": "*.instructions.template.md",
@@ -28,6 +28,12 @@
               "default_select": [],                // 默认安装的 stem 列表
               "orphan_check": true,                // 是否做孤儿检测
               "orphan_check_only_when_all": false  // 仅 'all' 时检测（避免误删用户主动不装的项）
+            },
+            {
+              "kind": "tree",                      // 树形复制：递归拷贝 source_dir 下每个一级子目录中的全部文件
+              "source_dir": "../_skills",          //   顶层文件（如 _skills/README.md）被视为框架文档不拷入目标
+              "target_dir": ".github/skills",      //   供 GitHub Copilot Skills 机制发现（.github/skills/<name>/SKILL.md）
+              "orphan_check": true                 //   同 directory：源删除 → 目标检出后提示 / 删除
             }
           ]
         }
@@ -84,6 +90,9 @@ function Invoke-Target {
             }
             'directory' {
                 Invoke-RenderDirectory -Context $Context -Spec $render -TargetDir $TargetDir -TargetRepoRoot $TargetRepoRoot -Selections $Selections -TargetName $spec.name
+            }
+            'tree' {
+                Invoke-RenderTree -Context $Context -Spec $render -TargetDir $TargetDir -TargetRepoRoot $TargetRepoRoot
             }
             default {
                 throw "不支持的 render kind：$kind（in $($spec.name)）"
@@ -262,5 +271,41 @@ function Invoke-RenderDirectory {
 
     if ($orphanCheck -and (-not $orphanOnAll -or $useAll)) {
         Sync-RenderOrphans -Context $Context -SourceDir $srcDir -DestinationDir $dstDir -SourceGlob $srcGlob -TargetGlob $tgtGlob
+    }
+}
+
+function Invoke-RenderTree {
+    <#
+    .SYNOPSIS
+        树形复制：递归拷贝 source_dir 下每个一级子目录中的全部文件到 target_dir 对应路径。
+        顶层文件（如 README.md）不拷入目标，只拷 "一个子目录 = 一个业务单位" 这种结构化产物。
+        主要服务于 GitHub Copilot Skills（.github/skills/<name>/SKILL.md）这类需要保留一层名字子目录的场景。
+    #>
+    param([hashtable]$Context, [object]$Spec, [string]$TargetDir, [string]$TargetRepoRoot)
+
+    $srcDir = Join-Path $TargetDir $Spec.source_dir
+    $dstDir = Join-Path $TargetRepoRoot $Spec.target_dir
+
+    if (-not (Test-Path $srcDir)) {
+        Write-Host "   skip   $srcDir 不存在" -ForegroundColor DarkGray
+        return
+    }
+    $srcDirAbs = (Resolve-Path -LiteralPath $srcDir).Path
+
+    $expectedRel = New-Object System.Collections.Generic.List[string]
+    $subdirs = @(Get-ChildItem -LiteralPath $srcDirAbs -Directory)
+    foreach ($sub in $subdirs) {
+        Get-ChildItem -LiteralPath $sub.FullName -Recurse -File | ForEach-Object {
+            $rel = [System.IO.Path]::GetRelativePath($srcDirAbs, $_.FullName)
+            $dst = Join-Path $dstDir $rel
+            Sync-RenderedFile -Context $Context -Source $_.FullName -Destination $dst
+            [void]$expectedRel.Add($rel.Replace('\', '/'))
+        }
+    }
+
+    $orphanCheck = $false
+    if ($Spec.PSObject.Properties.Name -contains 'orphan_check') { $orphanCheck = [bool]$Spec.orphan_check }
+    if ($orphanCheck) {
+        Sync-TreeOrphans -Context $Context -DestinationDir $dstDir -ExpectedRelPaths $expectedRel
     }
 }
