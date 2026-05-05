@@ -4,16 +4,16 @@
 
 ## 1. 阶段术语
 
-> 编号 `H1`–`H6` 中的 `H` 取自 *Harness*。完整定义与"约束层 / 反馈层 / 质量门禁层"的正交关系见 [`../../README.md` 第 3 节](../../README.md#3-标准流程)。
+> 编号 `H1`–`H6` 中的 `H` 取自 *Harness*，`Hn` 是 **Harness Stage n**（Harness 阶段 n）的缩写。即 `H1 = Harness Stage 1`、`H2 = Harness Stage 2`，依此类推到 `H6 = Harness Stage 6`。完整定义与"约束层 / 反馈层 / 质量门禁层"的正交关系见 [`../../README.md` 第 3 节](../../README.md#3-标准流程)。
 
-| 编号 | 中文名               | 英文名                               | 主要产物目录                                                 |
-| ---- | -------------------- | ------------------------------------ | ------------------------------------------------------------ |
-| H1   | 需求、UI 与交互原型  | Requirements, UI & Prototype         | `docs/01-requirements/`、`docs/02-prototype/`、`prototypes/` |
-| H2   | 技术架构选型         | Technical Architecture Selection     | `docs/03-architecture/`                                      |
-| H3   | 详细设计             | Detailed Design                      | `docs/04-detailed-design/`                                   |
-| H4   | 测试用例设计         | Test Case Design                     | `docs/05-test-design/`                                       |
-| H5   | AI 编码与自验证      | AI Coding & Self-Verification        | `docs/06-implementation/`                                    |
-| H6   | 运行验证与文档回写   | Runtime Verification & Doc Writeback | `docs/07-release/`                                           |
+| 编号 | 中文名              | 英文名                               | 主要产物目录                                                 |
+| ---- | ------------------- | ------------------------------------ | ------------------------------------------------------------ |
+| H1   | 需求、UI 与交互原型 | Requirements, UI & Prototype         | `docs/01-requirements/`、`docs/02-prototype/`、`prototypes/` |
+| H2   | 技术架构选型        | Technical Architecture Selection     | `docs/03-architecture/`                                      |
+| H3   | 详细设计            | Detailed Design                      | `docs/04-detailed-design/`                                   |
+| H4   | 测试用例设计        | Test Case Design                     | `docs/05-test-design/`                                       |
+| H5   | AI 编码与自验证     | AI Coding & Self-Verification        | `docs/06-implementation/`                                    |
+| H6   | 运行验证与文档回写  | Runtime Verification & Doc Writeback | `docs/07-release/`                                           |
 
 ## 2. 三层 Harness
 
@@ -61,12 +61,12 @@
 
 本规范区分四种"约束怎么落地"的载体，不可混用（详见 [`../../README.md` 第 6.5 节](../../README.md#65-软约束的失败模式与处置阶梯)）：
 
-| 载体                  | 性质      | 适用约束                                                           |
-| --------------------- | --------- | ------------------------------------------------------------------ |
-| Scripts / Hooks / CI  | 硬约束    | 编译、测试、Lint、命名、文件大小、追溯字段等可机械判定项           |
-| Rule                  | 软约束    | 设计取舍、架构原则等不能机械判定项；落在 `AGENTS.md` / `instructions/` / Agent prompt |
-| Skill                 | 操作脚本  | 跨 Agent 复用的多步流程（追溯检查、任务卡生成、提交信息格式校验等） |
-| Memory                | 个人偏好  | 工具侧"记忆层"（Claude Code Memory / Copilot User Memory / Cursor Rules-for-User），仅作单人会话偏好，不进入团队规范（见 README 第 6.6 节） |
+| 载体                 | 性质     | 适用约束                                                                                                                                    |
+| -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Scripts / Hooks / CI | 硬约束   | 编译、测试、Lint、命名、文件大小、追溯字段等可机械判定项                                                                                    |
+| Rule                 | 软约束   | 设计取舍、架构原则等不能机械判定项；落在 `AGENTS.md` / `instructions/` / Agent prompt                                                       |
+| Skill                | 操作脚本 | 跨 Agent 复用的多步流程（追溯检查、任务卡生成、提交信息格式校验等）                                                                         |
+| Memory               | 个人偏好 | 工具侧"记忆层"（Claude Code Memory / Copilot User Memory / Cursor Rules-for-User），仅作单人会话偏好，不进入团队规范（见 README 第 6.6 节） |
 
 并列三个**实体概念**：
 
