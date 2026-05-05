@@ -4,7 +4,7 @@ applyTo: 'src/**'
 
 # 源码编写规范
 
-本规则覆盖 `src/**` 下的全部源码。以下要求与 Harness Engineering 规范第 6 节（H3 详细设计）和 [`docs/stages.md`]({{HARNESS_REPO_REF_FROM_GITHUB}}/docs/stages.md) 第 8 节（H5 编码与自验证）一致，AI 写代码时必须遵守。
+本规则覆盖 `src/**` 下的全部源码。以下要求与 Harness Engineering 规范第 6 节（H3 详细设计）和 [`stages.md`]({{HARNESS_REPO_REF_FROM_GITHUB}}/docs/stages.md) 第 8 节（H5 编码与自验证）一致，AI 写代码时必须遵守。
 
 ## 1. 改动前
 
@@ -26,7 +26,7 @@ applyTo: 'src/**'
 
 ## 4. 反模式（出现即停止）
 
-照搬 [Harness Engineering 规范第 6.4 节]({{HARNESS_REPO_REF_FROM_GITHUB}}/README.md) 的五条：
+照搬 [Harness Engineering 规范第 6.4 节](https://github.com/shuaihuadu/harness-engineering#64-五大反模式与替代做法) 的五条：
 
 - **杂烩会话**：当前对话已混入无关任务时，提醒用户开新会话或 `/clear`
 - **反复纠错**：同一问题超过两次未调通时停手，提醒用户重置上下文

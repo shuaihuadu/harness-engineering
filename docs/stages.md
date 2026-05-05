@@ -227,7 +227,7 @@ docs/04-detailed-design/
 - 日志要求
 - 测试要求
 
-示例：
+下面是一个C#类的示例：
 
 ```text
 文件：src/Orders/CreateOrderHandler.cs
@@ -240,8 +240,6 @@ docs/04-detailed-design/
 日志：记录订单创建开始、成功、失败原因，使用结构化日志字段 OrderId、CustomerId、TraceId
 测试：正常创建、库存不足、支付失败、重复提交、并发幂等
 ```
-
-> 如果是非 .NET 技术栈，按所属语言的目录与命名约定填写文件路径与类型签名即可，字段含义不变。
 
 ### 6.6 评审门禁
 

@@ -25,6 +25,61 @@
 Set-StrictMode -Version Latest
 
 # ============================================================================
+# INCLUDE 指令展开
+# ============================================================================
+# 支持两种形式：
+#   {{INCLUDE: <path>}}       原样 inline 整个文件
+#   {{INCLUDE_BODY: <path>}}  inline 时去掉 YAML frontmatter 和首个 H1 标题行
+#
+# path 是相对于 harness 仓库根（HarnessRoot）的路径，例如 'agents/repo-impact-mapper/AGENT.md'。
+#
+# inline 完成后会对内嵌 markdown 链接做"安全降级"：
+# 跨文件相对链接（指向 _shared/、docs/、根 README.md、同目录 AGENT.md 这些 inline 后必然失效的目标）
+# 一律剥成纯文本，避免 .github/ 下出现链向不存在路径的 broken link。
+function Expand-Includes {
+    param(
+        [Parameter(Mandatory)] [string] $Content,
+        [Parameter(Mandatory)] [string] $HarnessRoot
+    )
+
+    $regex = [regex]'\{\{INCLUDE(_BODY)?:\s*([^\}]+)\}\}'
+    $maxIter = 16
+    $iter = 0
+    while ($regex.IsMatch($Content)) {
+        $iter++
+        if ($iter -gt $maxIter) {
+            throw "INCLUDE 嵌套深度超过 $maxIter 层，疑似循环引用"
+        }
+        $Content = $regex.Replace($Content, {
+                param($m)
+                $stripBody = $m.Groups[1].Value -eq '_BODY'
+                $relPath = $m.Groups[2].Value.Trim()
+                $absPath = Join-Path $HarnessRoot $relPath
+                if (-not (Test-Path -LiteralPath $absPath -PathType Leaf)) {
+                    throw "INCLUDE 引用的源文件不存在：$absPath"
+                }
+                $body = [System.IO.File]::ReadAllText($absPath, [System.Text.UTF8Encoding]::new($false))
+
+                if ($stripBody) {
+                    # 去掉 YAML frontmatter
+                    $body = [regex]::Replace($body, '^---\r?\n[\s\S]*?\r?\n---\r?\n', '')
+                    # 去掉首个 H1 行
+                    $body = [regex]::Replace($body, '^\s*#\s+[^\r\n]*\r?\n', '')
+                }
+
+                # 安全降级：剥掉指向 inline 后必然失效的跨文件链接外壳，保留文字
+                $body = [regex]::Replace($body, '\[([^\]]+)\]\(\.\.\/_shared\/[^\)]+\)', '$1')
+                $body = [regex]::Replace($body, '\[([^\]]+)\]\(\.\.\/\.\.\/docs\/[^\)]+\)', '$1')
+                $body = [regex]::Replace($body, '\[([^\]]+)\]\(\.\.\/\.\.\/README\.md[^\)]*\)', '$1')
+                $body = [regex]::Replace($body, '\[([^\]]+)\]\(AGENT\.md[^\)]*\)', '$1')
+
+                return $body
+            })
+    }
+    return $Content
+}
+
+# ============================================================================
 # 占位符渲染
 # ============================================================================
 function Invoke-Placeholders {
@@ -152,6 +207,11 @@ function Sync-RenderedFile {
     )
 
     $rawText = [System.IO.File]::ReadAllText($Source, [System.Text.UTF8Encoding]::new($false))
+
+    # 先展开 INCLUDE 指令（如有），再做占位符替换
+    if ($Context.Contains('HarnessRoot') -and $Context.HarnessRoot) {
+        $rawText = Expand-Includes -Content $rawText -HarnessRoot $Context.HarnessRoot
+    }
 
     # 按目标文件深度动态计算 HARNESS_REPO_REF_FROM_GITHUB：
     # 链接 target 写在 .github/copilot-instructions.md 时需 ../，

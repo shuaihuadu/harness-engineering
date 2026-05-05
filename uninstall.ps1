@@ -24,7 +24,9 @@
       * 交互模式下会列出候选并请求确认；非交互模式必须显式 -Force 才执行删除。
 
 .PARAMETER TargetRepo
-    采用方仓库根目录的绝对路径。必填。
+    采用方仓库根目录的绝对路径。
+    省略时：若脚本位于 <TargetRepo>/.harness-engineering/ 下（即装到目标的副本），自动取脚本所在目录的父目录；
+    否则报错要求显式传入。
 
 .PARAMETER Force
     对内容已被本地修改的文件也执行删除；在 manifest 缺失的兜底路径下，等价于
@@ -34,14 +36,14 @@
     只打印将要执行的动作，不写盘。
 
 .EXAMPLE
+    # 源仓库直接卸载某采用方
     ./uninstall.ps1 -TargetRepo D:\Path\To\YourRepo
-    ./uninstall.ps1 -TargetRepo D:\Path\To\YourRepo -DryRun
-    ./uninstall.ps1 -TargetRepo D:\Path\To\YourRepo -Force
+    # 在采用方仓库内一键卸载（脚本已被装到 .harness-engineering/ 下）
+    pwsh -File .\.harness-engineering\uninstall.ps1
 #>
 
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory)]
     [string]$TargetRepo,
 
     [switch]$Force,
@@ -50,6 +52,17 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+
+# TargetRepo 智能默认：若脚本位于 .harness-engineering/ 内，取上级目录
+if (-not $TargetRepo) {
+    $hereLeaf = Split-Path -Leaf $PSScriptRoot
+    if ($hereLeaf -eq '.harness-engineering') {
+        $TargetRepo = Split-Path -Parent $PSScriptRoot
+    }
+    else {
+        throw '请用 -TargetRepo <path> 指定采用方仓库根，或把脚本放到 <TargetRepo>/.harness-engineering/ 下再运行'
+    }
+}
 
 if (-not (Test-Path $TargetRepo -PathType Container)) {
     throw "TargetRepo 不存在或不是目录：$TargetRepo"
@@ -294,9 +307,23 @@ if ($DryRun) {
     Write-Host "DryRun 完成。删除 $deleted / 保留 $kept / 缺失 $missing" -ForegroundColor Cyan
 }
 else {
+    # 写一行 uninstall 记录到 install.log（与 install.ps1 复用同一审计日志）
+    $logPath = Join-Path $manifestDir 'install.log'
+    $tsIso = (Get-Date).ToString('o')
+    $commitTag = if ($manifest.harness_commit) { $manifest.harness_commit } else { 'unknown' }
+    $logLine = "[$tsIso] uninstall · harness@$commitTag · deleted=$deleted · kept=$kept · missing=$missing`n"
+    if (Test-Path $manifestDir -PathType Container) {
+        [System.IO.File]::AppendAllText($logPath, $logLine, [System.Text.UTF8Encoding]::new($false))
+    }
+
     if ($shouldRemoveManifest) {
         Remove-Item -LiteralPath $manifestPath -Force
         Write-Host "   delete .harness-engineering/manifest.json" -ForegroundColor Magenta
+        # install.log 是审计日志、不在 manifest 里；clean uninstall 时一并移除以让目录归零
+        if (Test-Path $logPath -PathType Leaf) {
+            Remove-Item -LiteralPath $logPath -Force
+            Write-Host "   delete .harness-engineering/install.log" -ForegroundColor Magenta
+        }
         if ((Test-Path $manifestDir) -and -not @(Get-ChildItem -LiteralPath $manifestDir -Force)) {
             Remove-Item -LiteralPath $manifestDir -Force
             Write-Host "   rmdir  .harness-engineering" -ForegroundColor DarkMagenta
@@ -304,7 +331,7 @@ else {
     }
     else {
         Write-Host ''
-        Write-Host "[!] 以下文件被本地修改过，已保留；manifest 也保留：" -ForegroundColor Yellow
+        Write-Host "[!] 以下文件被本地修改过，已保留；manifest 与 install.log 也保留：" -ForegroundColor Yellow
         foreach ($p in $modifiedKept) { Write-Host "    $p" }
         Write-Host '    若要强制删除：-Force；若确认保留请手动删除 manifest 自身。' -ForegroundColor Yellow
     }

@@ -384,6 +384,7 @@ $Context = @{
     DeleteAll      = $false
     Replacements   = $Replacements
     TargetRepo     = $TargetRepo
+    HarnessRoot    = $RepoRoot
     Manifest       = [System.Collections.Generic.List[hashtable]]::new()
 }
 
@@ -394,22 +395,7 @@ if ($CopilotAgents) {
 }
 
 # ----------------------------------------------------------------------------
-# 1. Vendor（共享给所有 target）
-# ----------------------------------------------------------------------------
-if ($VendorHarnessTo) {
-    $vendorAbs = Join-Path $TargetRepo $VendorHarnessTo
-    Write-Host ''
-    Write-Host "==> Vendor 规范文档 / Vendor harness docs -> $vendorAbs" -ForegroundColor Cyan
-    Sync-VendoredTree -Context $Context -SourceRoot $RepoRoot -TargetRoot $vendorAbs `
-        -Items @('agents', 'docs', 'templates', 'README.md')
-}
-else {
-    Write-Host ''
-    Write-Host '==> 跳过 vendor / Skipping vendor (-NoVendor)' -ForegroundColor DarkYellow
-}
-
-# ----------------------------------------------------------------------------
-# 2. 逐个执行 target
+# 1. 执行 target（target.json 里的 directory/single/tree render 自行处理 vendor 投放）
 # ----------------------------------------------------------------------------
 foreach ($t in $validTargets) {
     Invoke-Target -Context $Context -TargetDir $t.Dir -TargetRepoRoot $TargetRepo -Selections $Selections
@@ -464,20 +450,47 @@ if (-not $DryRun) {
     [System.IO.File]::WriteAllText($manifestPath, $manifestJson, [System.Text.UTF8Encoding]::new($false))
     Write-Host ''
     Write-Host "==> 已写入 manifest / Manifest written: $manifestPath" -ForegroundColor Cyan
+
+    # ----------------------------------------------------------------------------
+    # install.log（每次 install / uninstall 追加一行，作为变更审计来源）
+    # ----------------------------------------------------------------------------
+    $renderedCount = @($Context.Manifest | Where-Object { $_.kind -eq 'rendered' }).Count
+    $vendoredCount = @($Context.Manifest | Where-Object { $_.kind -eq 'vendored' }).Count
+    $totalCount = @($Context.Manifest).Count
+    $logPath = Join-Path $manifestDir 'install.log'
+    $tsIso = (Get-Date).ToString('o')
+    $commitTag = if ($harnessCommit) { $harnessCommit } else { 'unknown' }
+    $targetsTag = ($Targets -join ',')
+    $logLine = "[$tsIso] install · harness@$commitTag · targets=$targetsTag · files=$totalCount (rendered=$renderedCount, vendored=$vendoredCount)`n"
+    [System.IO.File]::AppendAllText($logPath, $logLine, [System.Text.UTF8Encoding]::new($false))
 }
 
 # ----------------------------------------------------------------------------
-# 完成
+# 完成提示
 # ----------------------------------------------------------------------------
 Write-Host ''
 if ($DryRun) {
     Write-Host 'DryRun 完成，未写入任何文件 / DryRun done, nothing written.' -ForegroundColor Cyan
 }
 else {
-    Write-Host '完成。下一步建议 / Done. Suggested next steps:' -ForegroundColor Cyan
-    Write-Host "  1. cd $TargetRepo"
-    if ($VendorHarnessTo) { Write-Host "  2. git status $VendorHarnessTo" }
-    Write-Host '  3. git diff 检查修改是否符合预期 / inspect changes'
-    Write-Host "  4. 检查残留占位符 / scan for unrendered placeholders: Get-ChildItem (Join-Path '$TargetRepo' '.github') -Recurse -File | Select-String '\{\{'"
+    $githubCount = @($Context.Manifest | Where-Object { $_.path -like '.github/*' }).Count
+    $harnessCount = @($Context.Manifest | Where-Object { $_.path -like '.harness-engineering/*' }).Count
+
+    Write-Host '==> 安装完成 / Install complete' -ForegroundColor Green
+    Write-Host ("    [+] 写入 {0} 个文件到 .github/                  Copilot 开箱即用" -f $githubCount)
+    Write-Host ("    [+] 写入 {0} 个文件到 .harness-engineering/    HANDBOOK + docs + manifest" -f $harnessCount)
+    Write-Host ''
+    Write-Host '下一步 / Next steps:' -ForegroundColor Cyan
+    Write-Host '   1. 读 10 分钟操作手册 / Read the 10-min handbook:'
+    Write-Host '        notepad .\.harness-engineering\HANDBOOK.md'
+    Write-Host '   2. 起一个最小任务试手 / Try a smallest task:'
+    Write-Host '        在 Copilot Chat 输入 / In Copilot Chat type:  /new-task'
+    Write-Host '   3. 仓库根登记任务板 / Bootstrap your task board:'
+    Write-Host '        Copy-Item .github\templates\task-board.md task-board.md'
+    Write-Host '   4. 可选 / Optional: 把 .harness-engineering/ 加入 .gitignore'
+    Write-Host '        说明见 / See:  .\.harness-engineering\README.md'
+    Write-Host ''
+    Write-Host '卸载 / Uninstall:' -ForegroundColor DarkGray
+    Write-Host '   pwsh -File .\.harness-engineering\uninstall.ps1'
 }
 Write-Host ''
