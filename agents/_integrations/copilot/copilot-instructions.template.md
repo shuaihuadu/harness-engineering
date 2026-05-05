@@ -15,18 +15,22 @@
 
 ## 2. 何时切换到专用 Custom Agent
 
-当前项目已装的 Custom Agent（在 VS Code Copilot Chat 顶部下拉菜单中选择）。Agent 名以 `h<阶段号>-` 开头，对应 [Harness 阶段](`{{HARNESS_REPO_REF_FROM_GITHUB}}/docs/stages.md`) H1–H6：
+当前项目已装的 Custom Agent（在 VS Code Copilot Chat 顶部下拉菜单中选择）。Agent 名以 `h<阶段号>-` 开头，对应 [Harness 阶段](`{{HARNESS_REPO_REF_FROM_GITHUB}}/docs/stages.md`) H1–H6，横切阶段用 `hx-`：
 
-| 场景               | 使用 Agent             |
-| ------------------ | ---------------------- |
-| 评审 H3 详细设计   | `h3-design-reviewer`   |
-| 反推 H4 测试用例   | `h4-test-case-author`  |
-| H5 提交 / 评审 PR  | `h5-commit-auditor`    |
-| 其他编码           | 默认 Agent（即本指令） |
+| 场景                              | 使用 Agent                       |
+| --------------------------------- | -------------------------------- |
+| H1 需求访谈 / 模糊描述变需求初稿 | `h1-requirements-interviewer`    |
+| H1↔H3 仓库影响面映射          | `h1-repo-impact-mapper`          |
+| H2 架构说明 / 技术选型 / ADR    | `h2-architect-advisor`           |
+| H3 评审详细设计                  | `h3-design-reviewer`             |
+| H4 反推测试用例                  | `h4-test-case-author`            |
+| H5 按任务简报编码 + 自验证       | `h5-coding-executor`             |
+| H5 提交 / 评审 PR                | `h5-commit-auditor`              |
+| H6 发布说明 / 追溯矩阵回写       | `h6-release-note-writer`         |
+| 横切文档治理 / GC               | `hx-doc-gardener`                |
+| 其他编码                          | 默认 Agent（即本指令）           |
 
 > 默认 Agent 下不要尝试代行上述专用 Agent 的工作。专用 Agent 的判定逻辑写在各自的 `*.agent.md` 里，单独运行才能保证机械化。
->
-> Harness Engineering 还定义了 `RequirementsInterviewer`、`RepoImpactMapper`、`ArchitectAdvisor`、`CodingExecutor`、`ReleaseNoteWriter`、`DocGardener` 等 Agent 规格，但本项目还未将它们包装为 Custom Agent。需要时可参考 [`{{HARNESS_REPO_REF_FROM_GITHUB}}/agents/`]({{HARNESS_REPO_REF_FROM_GITHUB}}/agents/) 补充并重装。
 
 ## 3. 关键文档入口
 

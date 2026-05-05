@@ -36,8 +36,8 @@
     不 vendor 规范文档。需配合 -HarnessRepoRef 指定外部 URL。
 
 .PARAMETER CopilotAgents
-    Copilot 专属：选择安装哪些 Custom Agent（如 'h5-commit-auditor,h3-design-reviewer'）；'all' 全装；'none' 一个不装。
-    省略时使用 target.json 里的 default_select；当前默认为 'all'（全装并启用孤儿检测）。
+    Copilot 专属：选择安装哪些 Custom Agent（如 'h3-design-reviewer,h5-coding-executor'）；'all' 全装；'none' 一个不装。
+    省略时使用 target.json 里的 default_select；当前默认为 'all'（全装 9 个 Agent，覆盖 H1–H6 与横切阶段，并启用孤儿检测）。
 
 .PARAMETER NonInteractive
     零交互。缺位占位符使用探测结果，仍缺则填 `<未配置>`。附带 summary 不询问。
