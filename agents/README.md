@@ -9,7 +9,7 @@
 - **业务无关**：Agent 只读规范定义的产物（`docs/01-requirements/` ... `docs/07-release/`、`AGENTS.md`、`templates/`），不假设任何业务领域。
 - **模型中立**：所有 prompt 不依赖某个模型的特殊能力（thinking 标签、专有工具格式），任何具备工具调用能力的 LLM 都可装载。
 - **工具中立**：以纯 Markdown 描述 Agent 规格，需要落到具体工具时再做轻量适配（详见第 5 节）。
-- **小步交付**：H1–H6 全阶段 9 个岗位齐配。早期版本 H2 留作人工，0.0.2 起补齐 `ArchitectAdvisor` 形成完整链路。
+- **小步交付**：H1–H6 全阶段共 9 个岗位齐配，每个阶段都有对应的 Agent；横切配 1 个 DocGardener。
 
 ## 2. Agent 总索引
 
