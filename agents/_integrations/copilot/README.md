@@ -12,9 +12,9 @@
 | [`instructions/commit-format.instructions.template.md`](./instructions/commit-format.instructions.template.md) | `.github/instructions/commit-format.instructions.md` | 按 `applyTo` 自动加载      |
 | [`instructions/docs-style.instructions.template.md`](./instructions/docs-style.instructions.template.md)       | `.github/instructions/docs-style.instructions.md`    | 按 `applyTo` 自动加载      |
 | [`instructions/coding-style.instructions.template.md`](./instructions/coding-style.instructions.template.md)   | `.github/instructions/coding-style.instructions.md`  | 按 `applyTo` 自动加载      |
-| [`custom-agents/commit-auditor.agent.template.md`](./custom-agents/commit-auditor.agent.template.md)           | `.github/agents/commit-auditor.agent.md`             | 用户在 Chat 中**手动**切换 |
-| [`custom-agents/design-reviewer.agent.template.md`](./custom-agents/design-reviewer.agent.template.md)         | `.github/agents/design-reviewer.agent.md`            | 用户在 Chat 中**手动**切换 |
-| [`custom-agents/test-case-author.agent.template.md`](./custom-agents/test-case-author.agent.template.md)       | `.github/agents/test-case-author.agent.md`           | 用户在 Chat 中**手动**切换 |
+| [`custom-agents/h5-commit-auditor.agent.template.md`](./custom-agents/h5-commit-auditor.agent.template.md)     | `.github/agents/h5-commit-auditor.agent.md`          | 用户在 Chat 中**手动**切换 |
+| [`custom-agents/h3-design-reviewer.agent.template.md`](./custom-agents/h3-design-reviewer.agent.template.md)   | `.github/agents/h3-design-reviewer.agent.md`         | 用户在 Chat 中**手动**切换 |
+| [`custom-agents/h4-test-case-author.agent.template.md`](./custom-agents/h4-test-case-author.agent.template.md) | `.github/agents/h4-test-case-author.agent.md`        | 用户在 Chat 中**手动**切换 |
 
 > 本仓库根目录下的 [`custom-agent.md.template`](./custom-agent.md.template) 是一份通用占位，可直接基于它派生其他 6 个 Agent（RequirementsInterviewer、RepoImpactMapper、ArchitectAdvisor、CodingExecutor、ReleaseNoteWriter、DocGardener）的 Custom Agent。
 
@@ -80,7 +80,7 @@
 | `-VendorHarnessTo <path>` / `--vendor-harness-to <path>`             | 改变 vendor 目录。默认 `.harness-engineering`（与安装清单同目录）                                                                                                                   |
 | `-NoVendor` / `--no-vendor`                                          | 不 vendor。必须配合 `-HarnessRepoRef` 传外部 URL（或自定义路径），否则交互询问                                                                                                      |
 | `-HarnessRepoRef <path-or-url>` / `--harness-repo-ref <path-or-url>` | 覆写 `{{HARNESS_REPO_REF}}` 替换值。不传时：vendor 模式下与 `-VendorHarnessTo` 一致；`-NoVendor` 下默认为 GitHub 在线链接                                                           |
-| `-CopilotAgents <list>` / `--copilot-agents <list>`                  | 选择安装哪些 Copilot Custom Agent；**默认空集**（不安装任何 Custom Agent）；填具体 stem（如 `commit-auditor,design-reviewer`）安装指定项；填 `all` 全装并启用 Custom Agent 孤儿检测 |
+| `-CopilotAgents <list>` / `--copilot-agents <list>`                  | 选择安装哪些 Copilot Custom Agent；**默认 `all`**（全装并启用 Custom Agent 孤儿检测）；填具体 stem（如 `h5-commit-auditor,h3-design-reviewer`）只装指定项；填 `none` 一个都不装 |
 | `-Force` / `--force`                                                 | 全自动：所有冲突直接覆盖，所有孤儿直接删除；不弹任何提示                                                                                                                            |
 | `-NoDelete` / `--no-delete`                                          | 一律不删除孤儿（即便 `-Force` 也不删）；CI 升级推荐配合此选项                                                                                                                       |
 | `-DryRun` / `--dry-run`                                              | 只打印动作不写盘                                                                                                                                                                    |
@@ -116,9 +116,9 @@ grep -rn '{{' <your-repo>/.github/
 mkdir -p <your-repo>/.github/instructions <your-repo>/.github/agents
 cp copilot-instructions.template.md       <your-repo>/.github/copilot-instructions.md
 cp instructions/*.instructions.template.md <your-repo>/.github/instructions/
-cp custom-agents/commit-auditor.agent.template.md   <your-repo>/.github/agents/commit-auditor.agent.md
-cp custom-agents/design-reviewer.agent.template.md  <your-repo>/.github/agents/design-reviewer.agent.md
-cp custom-agents/test-case-author.agent.template.md <your-repo>/.github/agents/test-case-author.agent.md
+cp custom-agents/h5-commit-auditor.agent.template.md   <your-repo>/.github/agents/h5-commit-auditor.agent.md
+cp custom-agents/h3-design-reviewer.agent.template.md  <your-repo>/.github/agents/h3-design-reviewer.agent.md
+cp custom-agents/h4-test-case-author.agent.template.md <your-repo>/.github/agents/h4-test-case-author.agent.md
 # 复制后逐文件去掉文件名中的 ".template" 段，并按第 4 节的表替换 {{...}} 占位符
 ```
 

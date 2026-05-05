@@ -29,7 +29,7 @@ cd harness-engineering
 
 1. **Vendor 规范文档**：把 `agents/` `docs/` `templates/` `README.md` 同步进 `<your-repo>/.harness-engineering/`（与安装清单同住，一个隐藏目录装下所有 harness 产物）
 2. **渲染 Copilot 配置**：`.github/copilot-instructions.md` + `.github/instructions/*`，链接指向上一步的 vendor 目录
-3. **Custom Agent 装哪些由你定**：交互模式下脚本会列出可选的 Custom Agent 模板，让你按编号 / stem / `all` / `none` 现场挑选；非交互模式（`-NonInteractive` / `-Force`）走 `target.json` 的 `default_select`（当前 Copilot target 默认空集），也可以始终用 `-CopilotAgents` / `--copilot-agents` 显式覆盖
+3. **Custom Agent 默认全装**：交互模式下脚本会列出可选的 Custom Agent 模板，让你按编号 / stem / `all` / `none` 现场挑选，回车采纳默认（当前 Copilot target 默认 `all`，全装）；非交互模式（`-NonInteractive` / `-Force`）走 `target.json` 的 `default_select`，也可以始终用 `-CopilotAgents` / `--copilot-agents` 显式覆盖
 4. **写入安装清单**：`<your-repo>/.harness-engineering/manifest.json` 记录本次写入的所有文件（含 sha256）+ 本次填入的占位符（`replacements`），供 `uninstall` 使用，并在下次重装时自动预填
 
 ## 2. 占位符填入策略

@@ -15,13 +15,13 @@
 
 ## 2. 何时切换到专用 Custom Agent
 
-当前项目已装的 Custom Agent（在 VS Code Copilot Chat 顶部下拉菜单中选择）：
+当前项目已装的 Custom Agent（在 VS Code Copilot Chat 顶部下拉菜单中选择）。Agent 名以 `h<阶段号>-` 开头，对应 [Harness 阶段](`{{HARNESS_REPO_REF_FROM_GITHUB}}/docs/stages.md`) H1–H6：
 
 | 场景               | 使用 Agent             |
 | ------------------ | ---------------------- |
-| 评审 H3 详细设计   | `DesignReviewer`       |
-| 反推测试用例       | `TestCaseAuthor`       |
-| 准备提交 / 评审 PR | `CommitAuditor`        |
+| 评审 H3 详细设计   | `h3-design-reviewer`   |
+| 反推 H4 测试用例   | `h4-test-case-author`  |
+| H5 提交 / 评审 PR  | `h5-commit-auditor`    |
 | 其他编码           | 默认 Agent（即本指令） |
 
 > 默认 Agent 下不要尝试代行上述专用 Agent 的工作。专用 Agent 的判定逻辑写在各自的 `*.agent.md` 里，单独运行才能保证机械化。

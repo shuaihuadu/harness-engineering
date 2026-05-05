@@ -24,7 +24,7 @@
             "source_glob": "*.agent.template.md",
             "target_glob": "*.agent.md",
             "selectable": true,
-            "default_select": [],
+            "default_select": ["all"],
             "orphan_check": true,
             "orphan_check_only_when_all": true
         }
