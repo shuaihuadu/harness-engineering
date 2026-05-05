@@ -7,6 +7,8 @@ parent: ../README.md
 
 本文件是 Harness Engineering 规范的阶段细则部分，与 [`../README.md`](../README.md) 主体并列。全文采用第 4–9 节的编号体系，其他 Agent 与文档可按 `第 4.4 节`、`第 6.5 节`、`第 9.6 节` 等编号稳定引用。
 
+> 阶段编号 `H1`–`H6` 中的 `H` 取自 *Harness*：H1 需求 / H2 架构 / H3 详细设计 / H4 测试用例 / H5 AI 编码与自验证 / H6 运行验证与文档回写。完整定义见 [`../README.md` 第 3 节](../README.md#3-标准流程)。
+
 阅读路径建议：
 
 - 先看 [`../README.md`](../README.md) 第 1–3 节了解三层 Harness 与 H1–H6 总流程
