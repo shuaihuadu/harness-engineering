@@ -9,7 +9,7 @@
 - **业务无关**：Agent 只读规范定义的产物（`docs/01-requirements/` ... `docs/07-release/`、`AGENTS.md`、`templates/`），不假设任何业务领域。
 - **模型中立**：所有 prompt 不依赖某个模型的特殊能力（thinking 标签、专有工具格式），任何具备工具调用能力的 LLM 都可装载。
 - **工具中立**：以纯 Markdown 描述 Agent 规格，需要落到具体工具时再做轻量适配（详见第 5 节）。
-- **小步交付**：先打通 H1 / H3 / H4 / H5 / H6 与横切共 8 个核心岗位，验证后再扩展 H2 等其余阶段。
+- **小步交付**：H1–H6 全阶段 9 个岗位齐配。早期版本 H2 留作人工，0.0.2 起补齐 `ArchitectAdvisor` 形成完整链路。
 
 ## 2. Agent 总索引
 
@@ -17,6 +17,7 @@
 | -------------------------------------------------------------- | ---------- | ------------------- | --------------------------------------------------------------------------------- |
 | [RequirementsInterviewer](./requirements-interviewer/AGENT.md) | H1         | 反馈层              | 接收一句话需求，主动反问以暴露模糊点，产出可评审的 `requirements.md` 草稿         |
 | [RepoImpactMapper](./repo-impact-mapper/AGENT.md)              | H1↔H3 之间 | 约束层              | 在做计划前扫描真实代码，产出可审核的"仓库影响地图"，拦截"AI 凭空编 API"的失败模式 |
+| [ArchitectAdvisor](./architect-advisor/AGENT.md)               | H2         | 反馈层 + 约束层     | 反问补齐架构约束、对备选项机械化打分，产出 `architecture.md` / 选型 / 风险 / ADR  |
 | [DesignReviewer](./design-reviewer/AGENT.md)                   | H3         | 质量门禁层          | 机械化校验详细设计的完备性与一致性，挡住"设计没写清"流入 H4/H5                    |
 | [TestCaseAuthor](./test-case-author/AGENT.md)                  | H4         | 反馈层              | 从需求与设计反推 `TC-NNN`，确保每条 REQ 至少有可机械判断的覆盖                    |
 | [CodingExecutor](./coding-executor/AGENT.md)                   | H5         | 反馈层              | 严格按 `ai-task-brief.md` 完成单个工程单元，同步生成测试与提交元数据              |
@@ -24,9 +25,8 @@
 | [ReleaseNoteWriter](./release-note-writer/AGENT.md)            | H6         | 反馈层              | 从 commit-records 与追溯链生成 release notes 草稿，回写追溯矩阵                   |
 | [DocGardener](./doc-gardener/AGENT.md)                         | 跨阶段     | 质量门禁层 + 反馈层 | 定时巡检 `docs/` 与代码实际行为的偏离，开具修复 PR                                |
 
-后续候选（暂未交付，避免在缺乏真实样本时过早设计）：
+后续候选（仍按"避免缺乏真实样本时过早设计"原则保留）：
 
-- ArchitectAdvisor（H2）
 - PrototypeReviewer（H1 UI / 原型评审辅助）
 - IncidentResponder（H6 之后的故障复盘辅助）
 
@@ -35,8 +35,8 @@
 ```text
 H1: RequirementsInterviewer ──► RepoImpactMapper
                                         │
-H2: 人工 / ArchitectAdvisor（待补）  ────┤
-                                        ▼
+H2:                              ArchitectAdvisor
+                                        │
 H3:                              DesignReviewer
                                         │
 H4:                              TestCaseAuthor
