@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Harness Engineering · 通用同步引擎（target-agnostic）。
 
@@ -23,6 +23,44 @@
 #>
 
 Set-StrictMode -Version Latest
+
+# ============================================================================
+# 跨平台 / 跨 PowerShell 版本：相对路径计算
+# ============================================================================
+# .NET 5+ / PowerShell 7+ 原生提供 [System.IO.Path]::GetRelativePath，
+# 但 Windows PowerShell 5.1 跑在 .NET Framework 4.x 上没有这个方法。
+# 这里检测一下：有就用原生，没有就用 System.Uri.MakeRelativeUri 兜底
+# （两者在同卷文件系统路径上结果等价）。
+function Get-RelativePathInternal {
+    param(
+        [Parameter(Mandatory)] [string]$Base,
+        [Parameter(Mandatory)] [string]$Path
+    )
+
+    $method = [System.IO.Path].GetMethod('GetRelativePath', [Type[]]@([string], [string]))
+    if ($null -ne $method) {
+        return [string]$method.Invoke($null, @($Base, $Path))
+    }
+
+    if ([string]::IsNullOrEmpty($Base)) { return $Path }
+    if ([string]::IsNullOrEmpty($Path)) { return '' }
+
+    $baseFull = [System.IO.Path]::GetFullPath($Base)
+    $pathFull = [System.IO.Path]::GetFullPath($Path)
+
+    $sep = [System.IO.Path]::DirectorySeparatorChar
+    if (-not $baseFull.EndsWith([string]$sep)) { $baseFull = $baseFull + $sep }
+
+    $baseUri = [System.Uri]::new($baseFull)
+    $pathUri = [System.Uri]::new($pathFull)
+    if ($baseUri.Scheme -ne $pathUri.Scheme) { return $pathFull }
+
+    $rel = [System.Uri]::UnescapeDataString($baseUri.MakeRelativeUri($pathUri).ToString())
+    # MakeRelativeUri 返回 '/' 分隔，转成本地分隔符以与 .NET 5+ GetRelativePath 行为一致
+    $rel = $rel.Replace('/', $sep)
+    if ([string]::IsNullOrEmpty($rel)) { return '.' }
+    return $rel
+}
 
 # ============================================================================
 # INCLUDE 指令展开
@@ -171,7 +209,7 @@ function Add-ManifestEntryInternal {
     param([hashtable]$Context, [string]$AbsPath, [byte[]]$CanonicalBytes, [string]$Kind)
     if (-not $Context.ContainsKey('Manifest') -or $null -eq $Context.Manifest) { return }
     if (-not $Context.ContainsKey('TargetRepo') -or [string]::IsNullOrWhiteSpace($Context.TargetRepo)) { return }
-    $rel = [System.IO.Path]::GetRelativePath($Context.TargetRepo, $AbsPath).Replace('\', '/')
+    $rel = (Get-RelativePathInternal -Base $Context.TargetRepo -Path $AbsPath).Replace('\', '/')
     $Context.Manifest.Add(@{
             path   = $rel
             sha256 = (Get-Sha256HexInternal -Bytes $CanonicalBytes)
@@ -258,7 +296,7 @@ function Sync-RenderedFile {
         }
         else {
             $destDir = Split-Path -Parent $Destination
-            $relDir = [System.IO.Path]::GetRelativePath($Context.TargetRepo, $destDir)
+            $relDir = Get-RelativePathInternal -Base $Context.TargetRepo -Path $destDir
             $depth = if ([string]::IsNullOrWhiteSpace($relDir) -or $relDir -eq '.') { 0 } else { ($relDir -split '[\\/]+').Count }
             $prefix = ('../' * $depth)
             $perFileReplacements['HARNESS_REPO_REF_FROM_GITHUB'] = "$prefix$ref"
@@ -317,7 +355,7 @@ function Sync-VendoredTree {
                 # 排除 sync-engine 的输入产物（仅供渲染，不应进 vendor）
                 $_.Name -notlike '*.template.md' -and $_.Name -notlike '*.md.template' -and $_.Name -ne 'target.json'
             } | ForEach-Object {
-                $rel = [System.IO.Path]::GetRelativePath($SourceRoot, $_.FullName).Replace('\', '/')
+                $rel = (Get-RelativePathInternal -Base $SourceRoot -Path $_.FullName).Replace('\', '/')
                 $sourceFiles[$rel] = $_.FullName
             }
         }
@@ -332,7 +370,7 @@ function Sync-VendoredTree {
         }
         else {
             Get-ChildItem -Path $itemPath -Recurse -File | ForEach-Object {
-                $rel = [System.IO.Path]::GetRelativePath($TargetRoot, $_.FullName).Replace('\', '/')
+                $rel = (Get-RelativePathInternal -Base $TargetRoot -Path $_.FullName).Replace('\', '/')
                 $targetFiles[$rel] = $_.FullName
             }
         }
@@ -464,7 +502,7 @@ function Sync-TreeOrphans {
 
     $allFiles = @(Get-ChildItem -LiteralPath $DestinationDir -Recurse -File)
     foreach ($file in $allFiles) {
-        $rel = [System.IO.Path]::GetRelativePath($DestinationDir, $file.FullName).Replace('\', '/')
+        $rel = (Get-RelativePathInternal -Base $DestinationDir -Path $file.FullName).Replace('\', '/')
         if ($expectedSet.Contains($rel)) { continue }
         $decision = Resolve-DeleteDecisionInternal -Context $Context -Path $file.FullName
         switch ($decision) {

@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Harness Engineering · 多工具集成统一入口（Copilot / Claude Code / Codex / ...）。

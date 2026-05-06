@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Harness Engineering · 项目默认值探测器（target-agnostic, read-only）。
 

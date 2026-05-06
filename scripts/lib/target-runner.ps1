@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Harness Engineering · Target 调度器（读取 target.json 并按声明执行渲染）。
 
@@ -296,7 +296,7 @@ function Invoke-RenderTree {
     $subdirs = @(Get-ChildItem -LiteralPath $srcDirAbs -Directory)
     foreach ($sub in $subdirs) {
         Get-ChildItem -LiteralPath $sub.FullName -Recurse -File | ForEach-Object {
-            $rel = [System.IO.Path]::GetRelativePath($srcDirAbs, $_.FullName)
+            $rel = Get-RelativePathInternal -Base $srcDirAbs -Path $_.FullName
             $dst = Join-Path $dstDir $rel
             Sync-RenderedFile -Context $Context -Source $_.FullName -Destination $dst
             [void]$expectedRel.Add($rel.Replace('\', '/'))
