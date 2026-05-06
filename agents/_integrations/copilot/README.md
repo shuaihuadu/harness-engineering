@@ -22,7 +22,7 @@
 | `../../_skills/*/SKILL.md`                        | `.github/skills/*/SKILL.md`              | 模型按 description 语义命中后自动调用              |
 | `../../templates/*.md` (× 4)                      | `.github/templates/*.md`                 | 给 Skills / Prompts / 人手共用的产物模板           |
 | `handbook.md`                                     | `.harness-engineering/HANDBOOK.md`       | 操作手册，10 分钟上手                              |
-| `vendor-readme.md`                                | `.harness-engineering/README.md`         | 解释 `.harness-engineering/` 角色 + gitignore 建议 |
+| `vendor-readme.template.md`                       | `.harness-engineering/README.md`         | 解释 `.harness-engineering/` 角色 + gitignore 建议 |
 | `../../docs/{stages,repo-layout,tech-debt-gc}.md` | `.harness-engineering/docs/*.md`         | 设计文档（深度阅读）                               |
 
 安装产物分两个目录：

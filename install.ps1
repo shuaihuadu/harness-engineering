@@ -344,6 +344,7 @@ $Replacements = [ordered]@{
     'TEST_COMMAND'                 = $TestCommand
     'LINT_COMMAND'                 = $LintCommand
     'HARNESS_REPO_REF'             = $HarnessRepoRef
+    'HARNESS_VERSION'              = $HarnessVersion
     # 派生占位符：从 .github/ 子目录链接回 vendor 时需多一级 ../；URL 则保持原样
     'HARNESS_REPO_REF_FROM_GITHUB' = $(if ($HarnessRepoRef -match '^(https?://|/)') { $HarnessRepoRef } else { "../$HarnessRepoRef" })
 }

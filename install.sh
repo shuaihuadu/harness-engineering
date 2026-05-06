@@ -301,6 +301,7 @@ declare -A REPLACEMENTS=(
     [TEST_COMMAND]="$TEST_COMMAND"
     [LINT_COMMAND]="$LINT_COMMAND"
     [HARNESS_REPO_REF]="$HARNESS_REPO_REF"
+    [HARNESS_VERSION]="$HARNESS_VERSION"
 )
 # 派生占位符：从 .github/ 子目录链接回 vendor 时需多一级 ../；URL 则保持原样
 if [[ "$HARNESS_REPO_REF" =~ ^(https?://|/) ]]; then

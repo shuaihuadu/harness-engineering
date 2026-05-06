@@ -61,7 +61,7 @@
         },
         {
             "kind": "single",
-            "source": "vendor-readme.md",
+            "source": "vendor-readme.template.md",
             "target": ".harness-engineering/README.md"
         },
         {

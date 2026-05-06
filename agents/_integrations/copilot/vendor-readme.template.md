@@ -1,6 +1,6 @@
 # `.harness-engineering/`
 
-这个目录是 [Harness Engineering](https://github.com/shuaihuadu/harness-engineering) v0.0.1 的**安装产物保管区**。
+这个目录是 [Harness Engineering](https://github.com/shuaihuadu/harness-engineering) v{{HARNESS_VERSION}} 的**安装产物保管区**。
 
 ## 它装了什么
 
@@ -61,4 +61,4 @@ git -C <path-to-harness-engineering> pull
 pwsh -File <path-to-harness-engineering>/install.ps1 -TargetRepo .
 ```
 
-> 这份 README 由 install.ps1 渲染生成；如要修订其内容，去 Harness Engineering 源仓库改 `agents/_integrations/copilot/vendor-readme.md`。
+> 这份 README 由 install.ps1 渲染生成；如要修订其内容，去 Harness Engineering 源仓库改 `agents/_integrations/copilot/vendor-readme.template.md`。
