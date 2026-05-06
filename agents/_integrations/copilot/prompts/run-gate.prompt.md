@@ -1,7 +1,18 @@
 ---
 mode: 'agent'
 description: '跑一次当前 H 阶段的 phase-gate-checklist：逐项核对、给出 PASS/FAIL/UNKNOWN，不达标即列出阻塞清单与补救建议'
-tools: ['search/codebase', 'search', 'usages', 'changes']
+tools:
+  [
+    search/codebase,
+    search/textSearch,
+    search/fileSearch,
+    search/listDirectory,
+    search/usages,
+    search/changes,
+    read/readFile,
+    read/problems,
+    read/getNotebookSummary,
+  ]
 ---
 
 # /run-gate — 跑当前阶段的 Phase Gate 检查

@@ -12,7 +12,8 @@
 4. [`.harness-engineering/` 里都装了什么](#4-harness-engineering-里都装了什么)
 5. [Templates 怎么用、怎么改](#5-templates-怎么用怎么改)
 6. [Skills / Prompts / Agents 速查](#6-skills--prompts--agents-速查)
-7. [常见问题 / 排查 / 升级 / 卸载](#7-常见问题--排查--升级--卸载)
+7. [给 Agent / Prompt 配置工具白名单](#7-给-agent--prompt-配置工具白名单)
+8. [常见问题 / 排查 / 升级 / 卸载](#8-常见问题--排查--升级--卸载)
 
 ---
 
@@ -231,7 +232,93 @@ Copy-Item .github\templates\ai-task-brief.md docs\06-tasks\T-001-<slug>.md
 
 ---
 
-## 7. 常见问题 / 排查 / 升级 / 卸载
+## 7. 给 Agent / Prompt 配置工具白名单
+
+每个 Custom Agent 与 `/` Prompt 文件最顶上的 frontmatter 都有一行 `tools: [...]`——这就是它能调用的工具白名单。Copilot Chat 在加载这个 Agent 时，**只允许它使用列在这里的工具**；不在表里的工具即使在用户可见的工具下拉里出现，Agent 也调不到。
+
+### 7.1 命名空间一览（49 个内置工具）
+
+VS Code Copilot Chat 把所有内置工具按"用途"分到 9 个命名空间下，写 `tools` 字段时必须用 `<namespace>/<name>` 的全名。下表是当前完整清单：
+
+| 命名空间      | 工具                                                                                                                                                                                                                                                              | 主要用途                                                  |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `vscode/*`    | `extensions`, `getProjectSetupInfo`, `installExtension`, `memory`, `newWorkspace`, `resolveMemoryFileUri`, `runCommand`, `vscodeAPI`, `askQuestions`, `toolSearch`                                                                                                 | 与 VS Code 自身交互（装扩展 / 查项目信息 / 触发命令面板） |
+| `execute/*`   | `runInTerminal`, `getTerminalOutput`, `sendToTerminal`, `killTerminal`, `createAndRunTask`, `runNotebookCell`                                                                                                                                                     | 跑命令、跑 Notebook 单元格、管理终端会话                  |
+| `read/*`      | `readFile`, `viewImage`, `problems`, `terminalSelection`, `terminalLastCommand`, `getNotebookSummary`                                                                                                                                                             | 只读取上下文（文件 / 图片 / 报错 / 终端 / Notebook）      |
+| `search/*`    | `codebase`, `textSearch`, `fileSearch`, `listDirectory`, `usages`, `changes`                                                                                                                                                                                      | 语义搜索 / 全文搜索 / 找引用 / 看 git diff                |
+| `edit/*`      | `createFile`, `editFiles`, `createDirectory`, `rename`, `createJupyterNotebook`, `editNotebook`                                                                                                                                                                   | 写文件 / 改文件 / 新建目录 / 重命名                       |
+| `web/*`       | `fetch`, `githubRepo`, `githubTextSearch`                                                                                                                                                                                                                         | 抓网页 / 拉 GitHub 仓库 / 搜 GitHub 代码                  |
+| `browser/*`   | `openBrowserPage`, `readPage`, `screenshotPage`, `navigatePage`, `clickElement`, `dragElement`, `hoverElement`, `typeInPage`, `runPlaywrightCode`, `handleDialog`                                                                                                 | Playwright 驱动浏览器（前端验证 / 抓页面）                |
+| `agent/*`     | `runSubagent`                                                                                                                                                                                                                                                     | 让本 Agent 启动一个子 Agent 跑独立任务                    |
+| `todo`        | （无前缀，独立工具）                                                                                                                                                                                                                                              | 维护 Copilot 内置的 todo list                             |
+
+> 旧裸名（`codebase` / `fetch` / `editFiles` / `runCommands` 等）在新版 VS Code 里仍可用，但运行时会打 `Tool 'X' has been renamed, use 'Y' instead.` 警告。**新建 / 修改 Agent 一律写命名空间形式**。
+
+### 7.2 默认配置：H1–H6 全套放开 49 个工具
+
+本仓库自带的 9 个 Custom Agent + 4 个 Prompt 中，**除了 `/run-gate` 之外的 12 个文件**默认把整套 49 个工具都放进白名单。原因是 H1–H6 阶段虽然角色分明，但每个角色都可能临时需要：起草文档（`edit/*`）、看代码上下文（`search/*` + `read/*`）、查官方 docs（`web/fetch`）、跑构建命令验证（`execute/runInTerminal`）、对前端改动做截图核对（`browser/*`）。预留满集合可以省掉用户每加一种工作就回头改 frontmatter 的麻烦。
+
+**真正的角色边界由 system prompt 文字（即 `agents/<role>/AGENT.md` 的指令章节）来约束**——比如 `H1-RequirementsInterviewer` 的指令明确写着"主动反问、不臆测、待澄清问题进 open-questions"，AI 不会因为有 `execute/runInTerminal` 就突然跑去执行 `dotnet test`，因为它的角色脚本没让它做这件事。换言之：**`tools` 是物理边界，prompt 是行为边界，两道闸门各司其职**。
+
+### 7.3 唯一的例外：`/run-gate` 是只读的
+
+`/run-gate` 的角色就是"按 `phase-gate-checklist` 机械核对当前阶段是否能进下一阶段"——它需要看代码、看文档、看构建产物，但**不能写文件、不能改任务板、不能跑命令**。否则它会自作主张去补缺项，让 gate 形同虚设。所以它的 `tools` 字段是个精挑过的子集：
+
+```yaml
+tools:
+  [
+    search/codebase,
+    search/textSearch,
+    search/fileSearch,
+    search/listDirectory,
+    search/usages,
+    search/changes,
+    read/readFile,
+    read/problems,
+    read/getNotebookSummary,
+  ]
+```
+
+只有 `search/*` 与 `read/*`，**没有任何 `edit/*` / `execute/*` / `web/*` / `browser/*`**。
+
+### 7.4 你想自定义时该怎么改
+
+frontmatter 里的 `tools:` 是 YAML flow 风格列表，下面两种形式都合法：
+
+```yaml
+# 单行紧凑形式（工具少时用）
+tools: [search/codebase, read/readFile, web/fetch]
+
+# 多行展开形式（工具多时更易读）
+tools:
+  [
+    search/codebase,
+    read/readFile,
+    web/fetch,
+  ]
+```
+
+常见自定义场景与改法：
+
+| 场景                                                                  | 改法                                                                                              |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| 想把某个 Agent 限制为只读（防止它修改你的代码）                       | 把所有 `edit/*` 与 `execute/*` 从 `tools` 里删掉，参考 `/run-gate` 的子集                         |
+| 想让某个 Agent 能 call subagent 拆活                                  | 加上 `agent/runSubagent`                                                                          |
+| 不想让 Agent 跑浏览器（节省 token）                                   | 把 `browser/*` 全部从 `tools` 里删掉                                                              |
+| 想加自定义 MCP 工具                                                   | MCP 工具不在 49 个内置工具里——它的命名空间由 MCP server 自己定，按 server 文档写就行              |
+| 改完没生效                                                            | Custom Agent 的 frontmatter 在 Copilot Chat **重启 / 切 Agent** 时才会重读；如果已是当前 Agent，先切到别的 Agent 再切回来 |
+
+> 修改的是 `.github/agents/*.agent.md` / `.github/prompts/*.prompt.md`（采用方落地路径）。如果你装了 vendor 模式（默认），下一次 `install.ps1` 跑回来会按 manifest 校验你改过的文件——会触发 `[O]/[K]/[A]/[B]` 四选一询问，选 `K` 保留你的本地修改即可。
+
+### 7.5 如何确认配置生效
+
+切到目标 Agent 之后，在 Chat 输入框旁边的工具图标（🔧）下拉里能看到 Copilot **实际允许这个 Agent 用的工具列表**——下拉里出现的就是 `tools` 白名单的渲染结果。如果你删除了某个工具但下拉里还在，说明没生效（多半是没重启 / 没切 Agent）。
+
+另一种确认方式：让 Agent 干一件你已经从白名单里删掉的事，它应当回复"我无权使用 `<tool>`"或类似拒绝信息，而不是真的去跑。
+
+---
+
+## 8. 常见问题 / 排查 / 升级 / 卸载
 
 ### Q1: Copilot 看不到我装的 Agent / Skill / Prompt
 
