@@ -1,8 +1,6 @@
 # Harness Engineering · 操作手册（HANDBOOK）
 
-这份手册写给已经把 Harness Engineering v0.0.1 安装到自家仓库的人。**目标是你 10 分钟之内能用起来**：知道每个目录是干嘛的、什么时候切哪个 Agent / 用哪个 Prompt、怎么修模板、卸载升级怎么办。
-
-> 你看到的这份 HANDBOOK 是**已渲染产物**——所有占位符已经被你安装时给的实际值替换掉了，可以直接读。
+**10 分钟读完即可上手。** 涵盖：每个目录放了什么、什么时候切哪个 Agent、什么时候打哪条 `/` 命令、模板怎么改、要卸载或升级怎么办。
 
 ---
 
@@ -20,13 +18,15 @@
 
 ## 1. 5 分钟速通：装完后该干啥
 
-1. **看一眼板**：仓库根没有 `task-board.md`？把 `.github/templates/task-board.md` 复制到根，去掉示例行。
-2. **挑个最小任务起手**：在 Copilot Chat 里输入 `/new-task` + 你想做的小事；它会反问、起草 `docs/06-tasks/T-001-xxx.md`、登记 `task-board.md`。
-3. **人工审任务说明**：看 `允许修改的文件` / `Verify 命令` 是否合理；OK 就把 `task-board.md` 里这行的 `status` 改 `ready`。
-4. **切到 `H5-CodingExecutor`**：在 Copilot Chat 顶部 Agent 下拉里选它，让它按任务说明执行。
-5. **提交前切到 `H5-CommitAuditor`**：让它机械化校验 commit message 六字段（Design / Tests / Verify / Docs / Risk / Task）。
+跟着这五步，把最小闭环跑一遍：
 
-走通这一圈，剩下的功能（H1 反问需求 → H2 ADR → H3 设计评审 → H4 测试用例 → H6 release notes → Hx 文档巡检）就是同一套手势的复制粘贴。
+1. **建一块任务板**：仓库根还没有 `task-board.md`？把 `.github/templates/task-board.md` 复制过去，删掉示例行。
+2. **起一个最小任务**：在 Copilot Chat 输入 `/new-task` 加你想做的小事；它会反问、起草 `docs/06-tasks/T-001-xxx.md`、并登记到 `task-board.md`。
+3. **人工审任务说明**：核对 `允许修改的文件` 与 `Verify 命令` 是否合理；OK 之后把 `task-board.md` 里这一行的 `status` 改成 `ready`。
+4. **切到 `H5-CodingExecutor`**：在 Copilot Chat 顶部的 Agent 下拉里选它，让它按任务说明执行。
+5. **提交前切到 `H5-CommitAuditor`**：让它逐字段校验 commit message（Design / Tests / Verify / Docs / Risk / Task）。
+
+跑通这一圈，剩下的环节（H1 反问需求 → H2 ADR → H3 设计评审 → H4 测试用例 → H6 release notes → Hx 文档巡检）都是同一套手势的复制。
 
 ---
 
@@ -52,7 +52,7 @@
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
-不强制按 H1 → H6 全走完才能动手；中小变更可以从 H5 起跳，但要回头补 `requirements.md` / `task-board.md` 链路。
+并不强制把 H1 → H6 全走完才能动手；中小变更可以从 H5 起跳，但记得回头补上 `requirements.md` 与 `task-board.md` 的链路。
 
 ---
 
@@ -92,7 +92,7 @@
     └── task-board.md
 ```
 
-**这 29 个文件都是 Copilot 开箱即用的——不需要你再做任何配置，进 Copilot Chat 直接选 Agent / 输 `/` 就有。**
+**这 25 个文件全部开箱即用，不用再做任何配置：进 Copilot Chat，直接选 Agent / 输 `/` 即可。**
 
 ---
 
@@ -108,15 +108,15 @@
 └── uninstall.ps1     ← 一键反向清理
 ```
 
-这个目录的作用是**让你随时能查文档、能干净卸载**。安装完成后**它不需要再被修改**——你做的修改都应该发生在 `.github/` 里。
+这个目录承担两件事：**随时能查规范文档**（HANDBOOK + docs/），以及**能干净卸载**（manifest + uninstall.ps1）。安装完成后它不需要你再去改——所有自定义都应该发生在 `.github/` 里。
 
-如果你觉得它跟项目本身无关、不想把它入版本库，**推荐在 `.gitignore` 里加上**：
+如果觉得它和项目本身无关、不想入版本库，**推荐把它加进 `.gitignore`**：
 
 ```gitignore
 .harness-engineering/
 ```
 
-代价：团队其他人 `git pull` 之后没有 HANDBOOK 和 docs/，得自己再跑一次 `install.ps1`。如果想让所有人都能直接读这份手册，就**别 ignore**。
+代价：团队其他人 `git pull` 后看不到这份手册，需要自己再跑一次 `install.ps1`。如果想让所有人都能直接读，就保留入版本库。
 
 ---
 
@@ -137,13 +137,19 @@ Copy-Item .github/templates/task-board.md task-board.md
 
 ### 5.2 让 Agent / Prompt 引用
 
-`/new-task` 会读 `.github/templates/ai-task-brief.md`、`/run-gate` 会读 `.github/templates/phase-gate-checklist.md`、`/log-review` 会读 `.github/templates/review-record.md`、`/new-task` 也会同步登记 `task-board.md`。
+四条 `/` 命令背后都会读模板：
 
-**所以，你修改 `.github/templates/*.md` 之后：**
+| Slash 命令    | 读取的模板                                            |
+| ------------- | ----------------------------------------------------- |
+| `/new-task`   | `ai-task-brief.md`，并把任务登记到 `task-board.md`    |
+| `/run-gate`   | `phase-gate-checklist.md`                             |
+| `/log-review` | `review-record.md`                                    |
 
-- 直接复制使用的人下一次复制就拿到新版
-- AI 在执行 Prompt 时会读到新版
-- **不需要重启 VS Code，不需要重跑 install.ps1**
+所以你改完 `.github/templates/*.md` 之后：
+
+- 直接复制使用的人，下一次复制就拿到新版
+- AI 执行 Prompt 时也会读到新版
+- **不需要重启 VS Code，不需要重跑 `install.ps1`**
 
 ### 5.3 推荐的修改方向
 
@@ -202,27 +208,36 @@ Copy-Item .github/templates/task-board.md task-board.md
 
 ### Q1: Copilot 看不到我装的 Agent / Skill / Prompt
 
-- 重启 VS Code 一次（Copilot 启动时才扫 `.github/`）
-- 检查文件是否真在 `.github/agents/` / `.github/skills/<name>/SKILL.md` / `.github/prompts/`
-- 检查 frontmatter 是否完整（`description` 字段必填）
-- 看 Copilot 的 Output Panel（"GitHub Copilot Chat"）有无解析报错
+- 重启一次 VS Code（Copilot 只在启动时扫描 `.github/`）
+- 确认文件确实在 `.github/agents/` / `.github/skills/<name>/SKILL.md` / `.github/prompts/`
+- 检查 frontmatter 是否完整，`description` 字段必填
+- 翻一下 Output Panel 的 "GitHub Copilot Chat"，看有没有解析报错
 
-### Q2: 我改了 `.github/copilot-instructions.md`，下次 install 会不会被覆盖？
+### Q2: 我改了 `.github/` 下的某个文件，下次 install 会被覆盖吗？
 
-- 默认行为：install 检测到差异会**问你**（除非传了 `-Force`）
-- 如果你想长期 own 这份文件，把它的差异通过 `-NoDelete` 或自己回写 source 模板的方式管理
-- 真要彻底脱钩：从 `.harness-engineering/manifest.json` 里删掉这一行，下次 install 不再托管
+不会自动覆盖。`install.ps1` 拿你本地版本与 manifest 里登记的 `sha256` 比对，发现差异就**逐个弹**四选一：
+
+```
+[O]verwrite  /  [K]eep  /  [A]ll-overwrite  /  a[B]ort
+```
+
+- 选 `K`：保留本地改动，本次跳过
+- 选 `O`：用新版覆盖
+- 选 `A`：本次后续所有冲突一律覆盖
+- 选 `B`：中断本次 install
+
+只有传 `-Force` 才会全部静默覆盖。想长期 own 某个文件，每次升级时按 `K` 即可；想彻底脱钩、连询问都不要，从 `.harness-engineering/manifest.json` 里删掉对应那一行。
 
 ### Q3: 升级到新版本
 
 ```powershell
-# 1. 先看新版改了什么
+# 1. 拉取新版本
 git -C <harness-source-repo> pull
-# 2. 重新跑 install（会走 diff 流程）
+# 2. 重新跑 install
 pwsh -File <harness-source-repo>/install.ps1 -TargetRepo .
 ```
 
-升级是**非破坏性**的：每个文件 install 都会跟现状 diff，让你逐个决定 keep / overwrite / merge。
+升级是**非破坏性**的：未改过的文件直接同步，已改过的文件按 Q2 的四选一逐个询问；新版本里删掉的文件会作为孤儿询问是否清理（不想清就加 `-NoDelete`）。
 
 ### Q4: 一键卸载
 
@@ -230,7 +245,7 @@ pwsh -File <harness-source-repo>/install.ps1 -TargetRepo .
 pwsh -File .\.harness-engineering\uninstall.ps1
 ```
 
-它读 `manifest.json`，把所有 install 写过的文件 / 目录干净移除。**不会动**你自己改过、不在 manifest 里的文件。
+按 `manifest.json` 反向移除全部装过的文件。本地改过的文件默认**保留**并打 `keep` 标记，加 `-Force` 才会一并删除；不在 manifest 里的文件全程不动。
 
 ### Q5: 我想看完整安装日志
 
@@ -238,12 +253,12 @@ pwsh -File .\.harness-engineering\uninstall.ps1
 Get-Content .\.harness-engineering\install.log
 ```
 
-每次 install / uninstall 都会追加一行：时间戳、harness commit、目标列表、文件计数、冲突 / 孤儿数。可作为变更审计来源。
+每次 install / uninstall 追加一行：时间戳 / harness commit / 目标列表 / 文件计数。可作为变更审计来源。
 
-### Q6: 模板改了之后，已存在的产物文档（比如已经写好的 task-board.md）会被 overwrite 吗？
+### Q6: 模板更新后，已经写好的产物文档（比如现有的 `task-board.md`）会被覆盖吗？
 
-不会。**模板只是"新文档的起点"**。已存在的产物文档完全归你管，install / 模板更新都不动它们。要享受新模板的字段，需要你自己手动 backport 到现有文档里。
+不会。**模板只是新文档的起点**。已存在的产物文档完全归你管，install 与模板更新都不会动它们；想用上新模板的字段，需要自己手动 backport。
 
 ---
 
-如对手册本身有疑问或建议，去 [Harness Engineering 源仓库](https://github.com/shuaihuadu/harness-engineering) 提 Issue。
+对手册本身有疑问或建议，去 [Harness Engineering 源仓库](https://github.com/shuaihuadu/harness-engineering) 提 Issue。
