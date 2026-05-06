@@ -6,7 +6,7 @@
 
 ## 目录
 
-1. [5 分钟速通：装完后该干啥](#1-5-分钟速通装完后该干啥)
+1. [装完后该干啥（按项目状态分流）](#1-装完后该干啥按项目状态分流)
 2. [全流程一览：H1 → H6 + Hx](#2-全流程一览h1--h6--hx)
 3. [`.github/` 里都装了什么](#3-github-里都装了什么)
 4. [`.harness-engineering/` 里都装了什么](#4-harness-engineering-里都装了什么)
@@ -16,16 +16,41 @@
 
 ---
 
-## 1. 5 分钟速通：装完后该干啥
+## 1. 装完后该干啥（按项目状态分流）
 
-跟着这四步，把最小闭环跑一遍：
+先看你属于哪种情况，再决定从哪进门：
+
+| 你的状态 | 入口 |
+| --- | --- |
+| **全新空仓 / 项目还没启动 / 还没有任何 `REQ-NNN`** | 走 [1.1 节：全新项目从 H1 起步](#11-全新项目从-h1-起步) |
+| **老仓改造 / 给已有项目加一个具体小功能（已有 REQ/HD 凭证）** | 走 [1.2 节：已有项目从 H5 起跳](#12-已有项目从-h5-起跳) |
+
+> 关键概念：`/new-task` 是 **H5（编码）的入口，不是项目的入口**。它把"已有 REQ/HD"切成可执行的代码改动；空仓没有 REQ 可指，它会反问 / 阻塞返回。**别用 `/new-task` 起新项目**——切 Agent 才是。
+
+### 1.1 全新项目从 H1 起步
+
+依次切 Agent 跑下去，每一步的产出会成为下一步的输入；不要跳级，跳级会让追溯链断在你身上。
+
+1. **H1 需求**：Copilot Chat 顶部 Agent 下拉切到 `h1-requirements-interviewer`，用一段大白话描述目标用户、核心场景、必做与可选——它会反问、追问、把回答落成 `docs/01-requirements/requirements.md` 草稿，分配 `REQ-001`、`REQ-002`…，没答清的进 `open-questions.md`，**不会自动用 `<TBD>` 占位**。
+2. **（可选）H1 影响图**：切 `h1-repo-impact-mapper`。全新空仓基本是全部新建，可跳过；老仓改造时它会列出受影响的模块 / 文件 / 接口 / 测试。
+3. **H2 架构 / ADR**：切 `h2-architect-advisor`。它基于上一步的 requirements 给一份初版架构（项目划分、技术栈、依赖关系）+ 关键 `ADR-NNN`（每条含"选择 / 为什么 / 替代 / 放弃理由 / 维护成本 / 性能-安全-交付影响"六字段）。这一步决定源码树长什么样、用什么栈。
+4. **H3 详细设计**：人手起草 `docs/04-detailed-design/<feature>/HD-NNN.md`（接口、数据模型、错误码、并发与失败语义）。写完切 `h3-design-reviewer` 让它逐项核对完备性，挡住"设计还没写清"流入下一阶段。
+5. **H4 测试用例**：切 `h4-test-case-author`。它从 REQ + HD 反推 `docs/05-test-design/test-cases.md`（每条 `TC-NNN`），保证每个 `REQ-NNN` 都有至少一条机械可判断的覆盖。
+6. **H5 起任务 → 编码 → 审提交**：上游凭证齐全后，就可以走 [1.2 节](#12-已有项目从-h5-起跳) 那四步把每条任务跑完。
+7. **H6 发版说明**：版本切出来时切 `h6-release-note-writer`，从 commit 抽取生成 `docs/07-release/release-notes.md`，回写追溯矩阵。
+
+> 第 1 步产出的 `requirements.md` 是后面所有阶段的"上游凭证"——commit message 里的 `Design: REQ-001` / `Tests: TC-NNN` / `Task: TASK-NNN` 都是顺着它往下挂的。**没有这一步，提交格式校验会一路把你打回来**。
+
+### 1.2 已有项目从 H5 起跳
+
+仓库已经有 `docs/01-requirements/requirements.md`（或等价的需求凭证），这次只想加一个具体的小功能，跟着这四步把最小闭环跑一遍：
 
 1. **起一个最小任务**：在 Copilot Chat 输入 `/new-task` 加你想做的小事；首次运行它会按模板自动建 `docs/06-tasks/task-board.md`，并起草 `docs/06-tasks/T-001-xxx.md`、同时登记一行到看板。
 2. **人工审任务说明**：核对 `允许修改的文件` 与 `Verify 命令` 是否合理；OK 之后把 `docs/06-tasks/task-board.md` 里这一行的 `status` 改成 `ready`。
 3. **切到 `H5-CodingExecutor`**：在 Copilot Chat 顶部的 Agent 下拉里选它，让它按任务说明执行。
 4. **提交前切到 `H5-CommitAuditor`**：让它逐字段校验 commit message（Design / Tests / Verify / Docs / Risk / Task）。
 
-跑通这一圈，剩下的环节（H1 反问需求 → H2 ADR → H3 设计评审 → H4 测试用例 → H6 release notes → Hx 文档巡检）都是同一套手势的复制。
+> 中小变更允许跳过 H1–H4 直接从 H5 起跳，但底线是：**每个 commit 至少要能映射到一条 `REQ-NNN`**。如果这次改动连 REQ 都对不上，先回 1.1 节第 1 步把 requirements 补齐再来——`H5-CommitAuditor` 不会替你豁免这条。
 
 ---
 
@@ -51,7 +76,7 @@
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
-并不强制把 H1 → H6 全走完才能动手；中小变更可以从 H5 起跳，但记得回头补上 `requirements.md` 与 `docs/06-tasks/task-board.md` 的链路。
+并不强制把 H1 → H6 全走完才能动手——分流规则见 [第 1 节](#1-装完后该干啥按项目状态分流)：全新项目按 1.1 节老老实实从 H1 起步；老仓加小功能按 1.2 节从 H5 起跳，事后补 `requirements.md` 链路。
 
 ---
 
