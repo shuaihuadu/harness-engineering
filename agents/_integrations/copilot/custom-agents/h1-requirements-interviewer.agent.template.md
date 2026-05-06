@@ -1,6 +1,6 @@
 ---
 description: '把模糊的需求描述通过反问转化为可评审的 H1 requirements.md 草稿与 open-questions.md 待澄清清单时使用：主动反问、不臆测合规/性能/权限要求、所有未答清问题进 open-questions 而非默认值'
-tools: ['codebase', 'fetch']
+tools: ['search/codebase', 'web/fetch']
 ---
 
 # RequirementsInterviewer（GitHub Copilot Chat Custom Agent）

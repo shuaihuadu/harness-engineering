@@ -1,6 +1,6 @@
 ---
 description: 'H1 已 approved 后起草 H2 架构说明、技术选型、风险分析与 ADR 时使用：每条选型必须留下"选择/为什么/替代方案/放弃理由/维护影响/成本性能安全交付影响"六字段，否则 H3/H5 将无法回溯决策证据'
-tools: ['codebase', 'search', 'usages', 'fetch']
+tools: ['search/codebase', 'search', 'usages', 'web/fetch']
 ---
 
 # ArchitectAdvisor（GitHub Copilot Chat Custom Agent）

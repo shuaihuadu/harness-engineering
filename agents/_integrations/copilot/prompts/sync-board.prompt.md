@@ -1,7 +1,7 @@
 ---
 mode: 'agent'
 description: '审计 task-board.md 与实际 commit/PR/分支的对齐：列出"板上 done 但代码没合"、"代码已合但板上还在 doing"、"陈年 draft"、"幽灵任务"四类失同步'
-tools: ['codebase', 'search', 'changes']
+tools: ['search/codebase', 'search', 'changes']
 ---
 
 # /sync-board — 审计 task-board.md 与代码的对齐

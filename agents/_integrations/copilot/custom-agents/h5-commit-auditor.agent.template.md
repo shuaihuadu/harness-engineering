@@ -1,6 +1,6 @@
 ---
 description: '准备提交 commit、生成 PR 描述或合并前最终复核时使用：机械化校验 commit message 的 Design / Tests / Verify / Docs / Risk / Task 六字段、改动范围与追溯链，不达标即拒绝合并'
-tools: ['codebase', 'search', 'changes', 'fetch']
+tools: ['search/codebase', 'search', 'changes', 'web/fetch']
 ---
 
 # CommitAuditor（GitHub Copilot Chat Custom Agent）

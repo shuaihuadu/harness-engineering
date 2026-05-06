@@ -1,6 +1,6 @@
 ---
 description: '版本发布前从 commit-records / tech-debt-tracker 抽取已合入变更、生成 H6 release-notes.md 草稿并回写 traceability-matrix 时使用：每条变更必须可反向追溯到 commit + Task/REQ，破坏性变更单独章节给迁移指引'
-tools: ['codebase', 'search', 'changes', 'fetch']
+tools: ['search/codebase', 'search', 'changes', 'web/fetch']
 ---
 
 # ReleaseNoteWriter（GitHub Copilot Chat Custom Agent）

@@ -1,6 +1,6 @@
 ---
 description: '需求与详细设计已 reviewed、需要起草或更新 H4 测试用例（docs/05-test-design/）时使用：从需求与设计反推 TC-NNN 测试矩阵与分组用例草稿，确保每条 REQ 至少有可机械判断的覆盖'
-tools: ['codebase', 'search', 'usages', 'fetch']
+tools: ['search/codebase', 'search', 'usages', 'web/fetch']
 ---
 
 # TestCaseAuthor（GitHub Copilot Chat Custom Agent）

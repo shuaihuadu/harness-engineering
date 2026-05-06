@@ -1,6 +1,6 @@
 ---
 description: '将已 reviewed 的需求映射到真实仓库代码与文档、产出 H1↔H3 衔接的 repo-impact-map.md 时使用：列出受影响模块/文件/接口/测试与置信度，禁止凭命名臆造文件，禁止跨 AGENTS.md 禁区'
-tools: ['codebase', 'search', 'usages']
+tools: ['search/codebase', 'search', 'usages']
 ---
 
 # RepoImpactMapper（GitHub Copilot Chat Custom Agent）

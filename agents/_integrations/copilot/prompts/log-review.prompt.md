@@ -1,7 +1,7 @@
 ---
 mode: 'agent'
 description: '把会议/PR/Issue 评审记录誊写到 review-record.md：保留发言人、决议、行动项、争议未决，机械化、不脑补'
-tools: ['codebase', 'editFiles', 'fetch']
+tools: ['search/codebase', 'editFiles', 'web/fetch']
 ---
 
 # /log-review — 把评审记录归档为 review-record.md

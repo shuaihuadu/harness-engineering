@@ -1,6 +1,6 @@
 ---
 description: '在 ai-task-brief.md 已被人工评审通过、需要 AI 严格按任务说明完成 H5 编码 + 自验证时使用：仅修改"允许修改的文件"，禁止扩大范围，每次修改后跑 Verify 命令，超范围或缺命令时返回阻塞而非自行降级'
-tools: ['codebase', 'search', 'usages', 'editFiles', 'runCommands']
+tools: ['search/codebase', 'search', 'usages', 'editFiles', 'runCommands']
 ---
 
 # CodingExecutor（GitHub Copilot Chat Custom Agent）

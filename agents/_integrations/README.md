@@ -78,7 +78,7 @@ Harness Engineering 与具体 AI 编码工具之间的关系，是**单一公共
 | `{{HARNESS_REPO_REF_FROM_GITHUB}}` | 同上含义的**带回跳层级**版本。Custom Agent 文件落地在 `.github/agents/`，引用本地 vendor 时需要 `../.harness-engineering` 这种回跳路径才能正确点击 |
 | `{{HARNESS_VERSION}}`              | 当前 Harness Engineering 版本号，从仓库根 `VERSION` 文件读取（与 `manifest.json` 的 `harness_version` 字段同源）                                   |
 
-> 工具命名与抽象 vs 厂商：业务规则在 `agents/` 一份维护，但**工具白名单的命名空间不能强行抽象**——Copilot 要求 `tools` 字段写官方注册名（`codebase` / `search` / `changes` / `fetch` / `usages` 等），Claude Code 则用 `Read` / `Grep` / `Bash` 等大写动词。因此 Copilot Custom Agent 模板的 `tools` 字段直接写 Copilot 注册名，Claude Code 模板才使用 `{{TOOL_LIST}}` 占位符；两端的抽象映射只在 `_shared/tool-vocabulary.md` 一份维护。
+> 工具命名与抽象 vs 厂商：业务规则在 `agents/` 一份维护，但**工具白名单的命名空间不能强行抽象**——Copilot 要求 `tools` 字段写官方注册名（`search/codebase` / `search` / `changes` / `web/fetch` / `usages` 等；其中 `search/codebase` 与 `web/fetch` 是新版的命名空间形式，旧裸名 `codebase` / `fetch` 已被弃用，运行时仍兼容但会发警告），Claude Code 则用 `Read` / `Grep` / `Bash` 等大写动词。因此 Copilot Custom Agent 模板的 `tools` 字段直接写 Copilot 注册名，Claude Code 模板才使用 `{{TOOL_LIST}}` 占位符；两端的抽象映射只在 `_shared/tool-vocabulary.md` 一份维护。
 
 ## 3. 使用约定
 

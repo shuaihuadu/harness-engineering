@@ -1,6 +1,6 @@
 ---
 description: '周期性比对 docs/ 与代码/提交记录的真实状态、识别已腐化或与代码不一致的文档时使用：列出过期项 / 不一致项 / 悬挂引用 / 被遗忘的 draft，每条必须附证据（文件:行号 + 真实命令或源码片段），不删除文档只标记 deprecated'
-tools: ['codebase', 'search', 'usages', 'changes']
+tools: ['search/codebase', 'search', 'usages', 'changes']
 ---
 
 # DocGardener（GitHub Copilot Chat Custom Agent）
