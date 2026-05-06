@@ -6,7 +6,7 @@
 
 ## 目录
 
-1. [装完后该干啥（按项目状态分流）](#1-装完后该干啥按项目状态分流)
+1. [装完后该干啥](#1-装完后该干啥按项目状态分流)
 2. [全流程一览：H1 → H6 + Hx](#2-全流程一览h1--h6--hx)
 3. [`.github/` 里都装了什么](#3-github-里都装了什么)
 4. [`.harness-engineering/` 里都装了什么](#4-harness-engineering-里都装了什么)
@@ -17,11 +17,11 @@
 
 ---
 
-## 1. 装完后该干啥（按项目状态分流）
+## 1. 装完后该干啥
 
 先看你属于哪种情况，再决定从哪进门：
 
-| 你的状态                                                      | 入口                                                    |
+| 项目状态                                                      | 入口                                                    |
 | ------------------------------------------------------------- | ------------------------------------------------------- |
 | **全新空仓 / 项目还没启动 / 还没有任何 `REQ-NNN`**            | 走 [1.1 节：全新项目从 H1 起步](#11-全新项目从-h1-起步) |
 | **老仓改造 / 给已有项目加一个具体小功能（已有 REQ/HD 凭证）** | 走 [1.2 节：已有项目从 H5 起跳](#12-已有项目从-h5-起跳) |
@@ -33,18 +33,128 @@
 依次切 Agent 跑下去，每一步的产出会成为下一步的输入；不要跳级，跳级会让追溯链断在你身上。
 
 1. **H1 上半段 · 需求文本**：Copilot Chat 输入框下方的 Agent 下拉切到 `h1-requirements-interviewer`，用一段大白话描述目标用户、核心场景、必做与可选——它会反问、追问、把回答落成 `docs/01-requirements/requirements.md` 草稿，分配 `REQ-001`、`REQ-002`…，没答清的进 `open-questions.md`，**不会自动用 `<TBD>` 占位**。
+
+   _示例输入_（粗暴说目标，把模糊点交给它反问）：
+
+   ```text
+   做一个 AI 内容工厂：
+   - 目标用户：个人技术博客作者
+   - 核心场景：输入题目 → AI 多轮迭代 → 输出可发布的 markdown
+   - 必做：本地运行 + 多 LLM 厂商可切换
+   - 可选：直接发布到微信公众号
+   先把模糊点反问出来，再起草 requirements.md。
+   ```
+
 2. **H1 下半段 · UI 说明 + 原型 + 评审 + 留档**：H1 不是只写 `requirements.md` 就结束了。完整 H1 还包含「UI 说明、可交互原型、评审、留档」四件事，按顺序切两个专属 Agent + 一个外部工具走完：
    - **UI 说明**：切到 `h1-ui-spec-author`，给它 `requirements.md` + 你手头的截图或参考页面，它会按 [stages.md 第 4.5 节](../../docs/stages.md#45-ui-说明必须包含) 那 10 项反问一轮，然后产出 `docs/01-requirements/ui-spec.md` / `user-flow.md` / `acceptance-criteria.md`，没答清的**追加**到同一份 `open-questions.md`。
+
+     _示例输入_（明确上游凭证 + 手头素材 + 推不清走 open-questions）：
+
+     ```text
+     上游：docs/01-requirements/requirements.md 里 REQ-001~REQ-005。
+     手头素材：prototypes/ai-content-factory/screenshots/draft-{1,2,3}.png
+     任务：按 stages.md 4.5 节 10 项反问一轮，
+     产出 ui-spec.md / user-flow.md / acceptance-criteria.md；
+     你不能推出的项追加到 open-questions.md，不要用 <TBD> 占位。
+     ```
+
    - **可交互原型**：你自己挑工具做（HTML/CSS 静态页面、Figma 导出、V0、Lovable、手绘扫描都行），落到 `prototypes/<feature>/` 目录，关键屏幕被截图在 `prototypes/<feature>/screenshots/` 下。
    - **原型评审**：切到 `h1-prototype-reviewer`，它会只读 `ui-spec.md` + `prototypes/<feature>/` + `phase-gate-checklist.md`，按 H1 那 12 条逼出 `PASS / FAIL / UNKNOWN`与补救动作；**它只读不写，不会替你产出 `prototype-review.md`**（评审纪要由人写，避免 AI 给自己开绿灯）。
+
+     _示例输入_（上游证据、评审目标、打分口径，三件说清就行）：
+
+     ```text
+     评审目标：prototypes/ai-content-factory/
+     上游证据：
+     - docs/01-requirements/ui-spec.md
+     - docs/01-requirements/user-flow.md
+     - docs/01-requirements/acceptance-criteria.md
+     打分口径：.github/templates/phase-gate-checklist.md 里 H1 那 12 条。
+     逐项给 PASS / FAIL / UNKNOWN + 补救动作；不写任何文件，输出在聊天里。
+     ```
+
    - **纪要留档**：拿上一步的 PASS/FAIL 报告作为评审纪要起点，补充你的调整后请人评审一轮，走 `/log-review` 落到 `docs/07-reviews/YYYY-MM-DD-h1-review.md`，同时把评审结论摘要回写到 `docs/02-prototype/prototype-review.md`（这份是 H2 架构选型的输入凭证之一，不能省）。
+
+     _示例输入_（叫出 `/log-review`，主题 + 参与者 + 结论摘要三者齐）：
+
+     ```text
+     /log-review h1-review-2026-05-06
+     参与者：产品 / 设计 / 后端 / 前端
+     结论摘要：12 条门禁通过 9 条，
+     待补 3 条（页面状态 / 错误提示 / 权限差异），
+     由 X 负责本周内补齐后重跑 /run-gate H1。
+     ```
+
 3. **跑一次 `/run-gate H1`**：在 Copilot Chat 输入 `/run-gate`，它会按上面那 12 条机械核对，给出 PASS / FAIL / UNKNOWN。**只有全 PASS 才能进 H2**——这是设计上的硬卡口，绕过去后面的 commit 审计会让你在 H5 阶段重新偿还。
+
+   _示例输入_（`/` 后面接阶段号，不需要额外参数）：
+
+   ```text
+   /run-gate H1
+   ```
+
 4. **（可选）H1 影响图**：切 `h1-repo-impact-mapper`。全新空仓基本是全部新建，可跳过；老仓改造时它会列出受影响的模块 / 文件 / 接口 / 测试。
+
+   _示例输入_（老仓改造场景，强调不凭命名臆造）：
+
+   ```text
+   上游：docs/01-requirements/requirements.md REQ-001~REQ-005。
+   列出受影响的模块 / 文件 / 接口 / 测试，
+   每条标置信度（高 / 中 / 低）；
+   查不到的不要凭命名臆造，直接标 UNKNOWN，
+   结果落到 docs/01-requirements/repo-impact-map.md。
+   ```
+
 5. **H2 架构 / ADR**：切 `h2-architect-advisor`。它基于上一步的 requirements + ui-spec 给一份初版架构（项目划分、技术栈、依赖关系）+ 关键 `ADR-NNN`（每条含"选择 / 为什么 / 替代 / 放弃理由 / 维护成本 / 性能-安全-交付影响"六字段）。这一步决定源码树长什么样、用什么栈。
+
+   _示例输入_（上游凭证 + 硬约束，让 ADR 有边界）：
+
+   ```text
+   上游：docs/01-requirements/{requirements.md, ui-spec.md}。
+   硬约束：.NET 8、单仓多项目（src/core/* + src/app/*）、
+   本地优先（不强依赖云）、可选 Docker。
+   交付：
+   - 初版架构说明（项目划分 / 技术栈 / 依赖关系）
+   - 3~5 条关键 ADR-NNN，每条六字段：
+     选择 / 为什么 / 替代 / 放弃理由 / 维护成本 / 影响
+   ```
+
 6. **H3 详细设计**：人手起草 `docs/04-detailed-design/<feature>/HD-NNN.md`（接口、数据模型、错误码、并发与失败语义）。写完切 `h3-design-reviewer` 让它逐项核对完备性，挡住"设计还没写清"流入下一阶段。
+
+   _示例输入_（只评审不修改，明确口径 + 期望交付）：
+
+   ```text
+   评审 docs/04-detailed-design/ai-content-factory/HD-001.md。
+   口径：stages.md 第 6 节那份章节列表（接口 / 数据模型 / 错误码 /
+   并发与失败语义 / 可观测性 / 发布与回滚）。
+   逐项给 PASS/FAIL，缺项列出 + 下一步行动；本次只评审，不修改文档。
+   ```
+
 7. **H4 测试用例**：切 `h4-test-case-author`。它从 REQ + HD 反推 `docs/05-test-design/test-cases.md`（每条 `TC-NNN`），保证每个 `REQ-NNN` 都有至少一条机械可判断的覆盖。
+
+   _示例输入_（上游 + 覆盖下限 + 分组约束）：
+
+   ```text
+   上游：REQ-001~REQ-005 + HD-001~HD-003。
+   反推到 docs/05-test-design/test-cases.md：
+   - 每条 REQ 至少一条 TC-NNN 覆盖
+   - 每条 TC 必须可机械判断（命令 / 期望输出 / 失败标准）
+   分组：契约测试 / 集成测试 / E2E 关键流。
+   ```
+
 8. **H5 起任务 → 编码 → 审提交**：上游凭证齐全后，就可以走 [1.2 节](#12-已有项目从-h5-起跳) 那四步把每条任务跑完。
 9. **H6 发版说明**：版本切出来时切 `h6-release-note-writer`，从 commit 抽取生成 `docs/07-release/release-notes.md`，回写追溯矩阵。
+
+   _示例输入_（版本 + commit 范围 + 破坏性变更隔离要求）：
+
+   ```text
+   版本：v0.2.0
+   commit 范围：afa72c7..HEAD
+   产出 docs/08-releases/v0.2.0.md：
+   - 特性 / 修复 / 文档 / 重构 分类
+   - 破坏性变更单独章节，每条给迁移指引
+   - 同步回写追溯矩阵（REQ ↔ HD ↔ TC ↔ Task ↔ Commit）
+   ```
 
 > 第 1+2 步产出的 `requirements.md` / `ui-spec.md` / `acceptance-criteria.md` 是后面所有阶段的"上游凭证"——commit message 里的 `Design: REQ-001` / `Tests: TC-NNN` / `Task: TASK-NNN` 都是顺着它们往下挂的。**没有这两步，提交格式校验会一路把你打回来**。
 
@@ -53,9 +163,36 @@
 仓库已经有 `docs/01-requirements/requirements.md`（或等价的需求凭证），这次只想加一个具体的小功能，跟着这四步把最小闭环跑一遍：
 
 1. **起一个最小任务**：在 Copilot Chat 输入 `/new-task` 加你想做的小事；首次运行它会按模板自动建 `docs/06-tasks/task-board.md`，并起草 `docs/06-tasks/T-001-xxx.md`、同时登记一行到看板。
+
+   _示例输入_（一句话说清要做什么 + 上游凭证号）：
+
+   ```text
+   /new-task 给 ChatHistoryService 增加 SQL Server 持久化实现，
+   对应 REQ-007 + HD-012；先给我任务草稿 + 板上登记，暂不动代码。
+   ```
+
 2. **人工审任务说明**：核对 `允许修改的文件` 与 `Verify 命令` 是否合理；OK 之后把 `docs/06-tasks/task-board.md` 里这一行的 `status` 改成 `ready`。
 3. **切到 `H5-CodingExecutor`**：在 Copilot Chat 输入框下方的 Agent 下拉里选它，让它按任务说明执行。
+
+   _示例输入_（明确任务卡 + 不越界 + 每改必验）：
+
+   ```text
+   按 docs/06-tasks/T-007-sqlserver-chat-history.md 执行：
+   - 只改任务卡里“允许修改的文件”列出的范围；
+   - 每改完一处跑 Verify：dotnet test；
+   - 超出范围或 Verify 失败时阻塞返回，不要自作主张扩大改动。
+   ```
+
 4. **提交前切到 `H5-CommitAuditor`**：让它逐字段校验 commit message（Design / Tests / Verify / Docs / Risk / Task）。
+
+   _示例输入_（说清本次 commit 范围 + 期望被否决的下限）：
+
+   ```text
+   准备提交：HEAD 这次改动覆盖 T-007（SQL Server 聊天历史）。
+   校验 commit message 的六字段：
+   Design / Tests / Verify / Docs / Risk / Task。
+   不合格直接拒绝，告诉我缺哪条、怎么补；不要代笔编造编号。
+   ```
 
 > 中小变更允许跳过 H1–H4 直接从 H5 起跳，但底线是：**每个 commit 至少要能映射到一条 `REQ-NNN`**。如果这次改动连 REQ 都对不上，先回 1.1 节第 1 步把 requirements 补齐再来——`H5-CommitAuditor` 不会替你豁免这条。
 
