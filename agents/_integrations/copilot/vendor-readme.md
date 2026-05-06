@@ -61,4 +61,4 @@ git -C <path-to-harness-engineering> pull
 pwsh -File <path-to-harness-engineering>/install.ps1 -TargetRepo .
 ```
 
-> 这份 README 由 install.ps1 渲染生成；如要修订其内容，去 Harness Engineering 源仓库改 `agents/_integrations/copilot/vendor-readme.template.md`。
+> 这份 README 由 install.ps1 渲染生成；如要修订其内容，去 Harness Engineering 源仓库改 `agents/_integrations/copilot/vendor-readme.md`。

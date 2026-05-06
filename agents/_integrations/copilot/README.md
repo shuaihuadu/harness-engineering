@@ -2,7 +2,9 @@
 
 本目录是 [Harness Engineering](../../README.md) 给 **GitHub Copilot**（VS Code / GitHub.com / Copilot CLI）准备的"开箱即用安装包"源。
 
-> **重要**：本目录下的所有 `*.template.md` 文件**不是**本仓库自身在用的 Copilot 配置——它们是被 [`install.ps1`](../../../install.ps1) / [`install.sh`](../../../install.sh) 渲染并落到**采用方仓库**的样板源。Copilot 只识别仓库根 `.github/`，不会自动加载本目录。
+> **重要**：本目录下的所有文件都**不是**本仓库自身在用的 Copilot 配置——它们是被 [`install.ps1`](../../../install.ps1) / [`install.sh`](../../../install.sh) 渲染并落到**采用方仓库**的样板源。Copilot 只识别仓库根 `.github/`，不会自动加载本目录。
+>
+> **后缀约定**：名字带 `.template.md` 的文件含占位符（`{{KEY}}`）或正文拼装指令（`{{INCLUDE_BODY:}}` / `{{INCLUDE:}}`），装时需要走 sync-engine 渲染；名字不带 `.template` 的 `.md` 是 verbatim 源，照原样拷贝。
 
 ## 1. 渲染规则（target.json）
 
@@ -13,11 +15,11 @@
 | `copilot-instructions.template.md`                | `.github/copilot-instructions.md`        | Copilot 全会话自动加载                             |
 | `instructions/*.instructions.template.md`         | `.github/instructions/*.instructions.md` | 按 `applyTo` 自动加载                              |
 | `custom-agents/*.agent.template.md` (× 9)         | `.github/agents/*.agent.md`              | Chat 顶部下拉手动切换                              |
-| `prompts/*.prompt.template.md` (× 4)              | `.github/prompts/*.prompt.md`            | `/<name>` 显式触发                                 |
+| `prompts/*.prompt.md` (× 4)                       | `.github/prompts/*.prompt.md`            | `/<name>` 显式触发                                 |
 | `../../_skills/*/SKILL.md`                        | `.github/skills/*/SKILL.md`              | 模型按 description 语义命中后自动调用              |
 | `../../templates/*.md` (× 4)                      | `.github/templates/*.md`                 | 给 Skills / Prompts / 人手共用的产物模板           |
-| `handbook.template.md`                            | `.harness-engineering/HANDBOOK.md`       | 操作手册，10 分钟上手                              |
-| `vendor-readme.template.md`                       | `.harness-engineering/README.md`         | 解释 `.harness-engineering/` 角色 + gitignore 建议 |
+| `handbook.md`                                     | `.harness-engineering/HANDBOOK.md`       | 操作手册，10 分钟上手                              |
+| `vendor-readme.md`                                | `.harness-engineering/README.md`         | 解释 `.harness-engineering/` 角色 + gitignore 建议 |
 | `../../docs/{stages,repo-layout,tech-debt-gc}.md` | `.harness-engineering/docs/*.md`         | 设计文档（深度阅读）                               |
 
 安装产物分两个目录：

@@ -32,7 +32,7 @@
             "kind": "directory",
             "source_dir": "prompts",
             "target_dir": ".github/prompts",
-            "source_glob": "*.prompt.template.md",
+            "source_glob": "*.prompt.md",
             "target_glob": "*.prompt.md",
             "selectable": false,
             "orphan_check": true,
@@ -56,12 +56,12 @@
         },
         {
             "kind": "single",
-            "source": "handbook.template.md",
+            "source": "handbook.md",
             "target": ".harness-engineering/HANDBOOK.md"
         },
         {
             "kind": "single",
-            "source": "vendor-readme.template.md",
+            "source": "vendor-readme.md",
             "target": ".harness-engineering/README.md"
         },
         {
