@@ -65,7 +65,7 @@ H6:                                                                             
 - [`_shared/glossary.md`](./_shared/glossary.md)：阶段编号、产物路径、追溯字段等术语统一定义。
 - [`_shared/io-contracts.md`](./_shared/io-contracts.md)：输入输出文件命名、frontmatter 字段、提交信息格式、错误返回结构。
 - [`_shared/tool-vocabulary.md`](./_shared/tool-vocabulary.md)：Agent 工具能力共享词表，由各 `AGENT.md` 的工具集引用。
-- [`_shared/AGENT.skeleton.md`](./_shared/AGENT.skeleton.md) / [`_shared/prompt.skeleton.md`](./_shared/prompt.skeleton.md)：新增 Agent 时使用的干净骨架。
+- [`_skeletons/AGENT.skeleton.md`](./_skeletons/AGENT.skeleton.md) / [`_skeletons/prompt.skeleton.md`](./_skeletons/prompt.skeleton.md)：新增 Agent 时使用的干净骨架。
 
 ## 5. 通用 Skills（跨 Agent 的可复用 SOP）
 
@@ -133,7 +133,7 @@ H6:                                                                             
 2. 该职责是否真的需要独立系统提示？还是仅在 `AGENT.md` 加一节"工作流变体"即可？
 3. 是否已有至少一个真实项目跑出了"缺这个 Agent"的具体卡点？没有就是空想，押后
 
-通过以上三问后，再按 [`_shared/AGENT.skeleton.md`](./_shared/AGENT.skeleton.md) 与 [`_shared/prompt.skeleton.md`](./_shared/prompt.skeleton.md) 起草。
+通过以上三问后，再按 [`_skeletons/AGENT.skeleton.md`](./_skeletons/AGENT.skeleton.md) 与 [`_skeletons/prompt.skeleton.md`](./_skeletons/prompt.skeleton.md) 起草。
 
 ### 7.4 退役
 

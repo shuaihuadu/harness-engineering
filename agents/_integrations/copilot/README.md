@@ -7,7 +7,7 @@
 > **后缀约定**：
 > - `*.template.md`：含占位符（`{{KEY}}`）或正文拼装指令（`{{INCLUDE_BODY:}}` / `{{INCLUDE:}}`），装时由 sync-engine 渲染。
 > - `*.md`（不带 `.template`）：verbatim 源，照原样字节拷贝。
-> - `*.skeleton.md`：人手抄写的骨架（如 `custom-agent.skeleton.md`），用 `<占位>` 而非 `{{KEY}}`，不进 sync-engine、不落到采用方仓库。
+> - `*.skeleton.md`：人手抄写的骨架（集中收纳在 [`../_skeletons/`](../../_skeletons/)，如 `copilot-custom-agent.skeleton.md`），用 `<占位>` 而非 `{{KEY}}`，不进 sync-engine、不落到采用方仓库。
 
 ## 1. 渲染规则（target.json）
 

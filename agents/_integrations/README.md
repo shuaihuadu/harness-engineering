@@ -53,30 +53,30 @@ Harness Engineering 与具体 AI 编码工具之间的关系，是**单一公共
 
 ## 1. 模板清单
 
-| 工具                     | 模板                                                                             | 落地位置（使用方仓库）                                                          |
-| ------------------------ | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Claude Code              | [`claude-code/agent.skeleton.md`](./claude-code/agent.skeleton.md)               | `.claude/agents/<name>.md`                                                      |
-| GitHub Copilot           | [`copilot/`](./copilot/README.md)（指令 + Custom Agent 套件）                    | `.github/copilot-instructions.md` / `.github/instructions/` / `.github/agents/` |
-| OpenAI Codex / AGENTS.md | [`codex/agents.md.snippet`](./codex/agents.md.snippet)                           | 在仓库 `AGENTS.md` 末尾追加                                                     |
-| 自研 Runtime             | [`generic/runtime-config.yaml.template`](./generic/runtime-config.yaml.template) | 由 Runtime 项目自管理                                                           |
+| 工具                     | 模板                                                                                             | 落地位置（使用方仓库）                                                          |
+| ------------------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| Claude Code              | [`../_skeletons/claude-code-wrapper.skeleton.md`](../_skeletons/claude-code-wrapper.skeleton.md) | `.claude/agents/<name>.md`                                                      |
+| GitHub Copilot           | [`copilot/`](./copilot/README.md)（指令 + Custom Agent 套件）                                    | `.github/copilot-instructions.md` / `.github/instructions/` / `.github/agents/` |
+| OpenAI Codex / AGENTS.md | [`codex/agents.md.snippet`](./codex/agents.md.snippet)                                           | 在仓库 `AGENTS.md` 末尾追加                                                     |
+| 自研 Runtime             | [`generic/runtime-config.yaml.template`](./generic/runtime-config.yaml.template)                 | 由 Runtime 项目自管理                                                           |
 
-> Copilot 一栏指向子目录而非单个文件——它包含一份顶层指令（`copilot-instructions.template.md`）、3 份切片指令（`instructions/`）、3 份专用 Custom Agent（`custom-agents/`），以及一份通用 Custom Agent 骨架 `custom-agent.skeleton.md`（可派生其他 6 个 Agent）。详细文件清单与复制步骤见 [copilot/README.md](./copilot/README.md)。
+> Copilot 一栏指向子目录而非单个文件——它包含一份顶层指令（`copilot-instructions.template.md`）、3 份切片指令（`instructions/`）、3 份专用 Custom Agent（`custom-agents/`）。通用 Custom Agent 骨架另行收纳在 [`../_skeletons/copilot-custom-agent.skeleton.md`](../_skeletons/copilot-custom-agent.skeleton.md)（可派生其他 6 个 Agent）。详细文件清单与复制步骤见 [copilot/README.md](./copilot/README.md)。
 
 ## 2. 通用替换占位符
 
 所有模板中以下占位符在落地时替换：
 
-| 占位符                          | 含义                                                                                                                                                |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `{{TEST_COMMAND}}`              | 项目级测试命令（如 `dotnet test`）                                                                                                                  |
-| `{{LINT_COMMAND}}`              | 项目级风格检查命令                                                                                                                                  |
-| `{{AGENT_NAME}}`                | Agent 名（如 `CodingExecutor`）                                                                                                                     |
-| `{{AGENT_DIR}}`                 | Agent 目录的本地相对路径（如 `harness-engineering/agents/coding-executor`）                                                                         |
-| `{{ONE_LINER}}`                 | Agent 一句话职责（来自 `AGENT.md` 「定位」章节首句）                                                                                                |
-| `{{TOOL_LIST}}`                 | 工具白名单。抽象 ID 取自 [`_shared/tool-vocabulary.md`](../_shared/tool-vocabulary.md)，由各适配模板按目标工具的注册名做一次映射                    |
-| `{{HARNESS_REPO_REF}}`          | 在采用方仓库中**引用 Harness 资源的本地路径**。默认安装走 vendor 模式，渲染为 `.harness-engineering`；`-NoVendor` 模式下渲染为远端 URL              |
+| 占位符                             | 含义                                                                                                                                               |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `{{TEST_COMMAND}}`                 | 项目级测试命令（如 `dotnet test`）                                                                                                                 |
+| `{{LINT_COMMAND}}`                 | 项目级风格检查命令                                                                                                                                 |
+| `{{AGENT_NAME}}`                   | Agent 名（如 `CodingExecutor`）                                                                                                                    |
+| `{{AGENT_DIR}}`                    | Agent 目录的本地相对路径（如 `harness-engineering/agents/coding-executor`）                                                                        |
+| `{{ONE_LINER}}`                    | Agent 一句话职责（来自 `AGENT.md` 「定位」章节首句）                                                                                               |
+| `{{TOOL_LIST}}`                    | 工具白名单。抽象 ID 取自 [`_shared/tool-vocabulary.md`](../_shared/tool-vocabulary.md)，由各适配模板按目标工具的注册名做一次映射                   |
+| `{{HARNESS_REPO_REF}}`             | 在采用方仓库中**引用 Harness 资源的本地路径**。默认安装走 vendor 模式，渲染为 `.harness-engineering`；`-NoVendor` 模式下渲染为远端 URL             |
 | `{{HARNESS_REPO_REF_FROM_GITHUB}}` | 同上含义的**带回跳层级**版本。Custom Agent 文件落地在 `.github/agents/`，引用本地 vendor 时需要 `../.harness-engineering` 这种回跳路径才能正确点击 |
-| `{{HARNESS_VERSION}}`           | 当前 Harness Engineering 版本号，从仓库根 `VERSION` 文件读取（与 `manifest.json` 的 `harness_version` 字段同源）                                    |
+| `{{HARNESS_VERSION}}`              | 当前 Harness Engineering 版本号，从仓库根 `VERSION` 文件读取（与 `manifest.json` 的 `harness_version` 字段同源）                                   |
 
 > 工具命名与抽象 vs 厂商：业务规则在 `agents/` 一份维护，但**工具白名单的命名空间不能强行抽象**——Copilot 要求 `tools` 字段写官方注册名（`codebase` / `search` / `changes` / `fetch` / `usages` 等），Claude Code 则用 `Read` / `Grep` / `Bash` 等大写动词。因此 Copilot Custom Agent 模板的 `tools` 字段直接写 Copilot 注册名，Claude Code 模板才使用 `{{TOOL_LIST}}` 占位符；两端的抽象映射只在 `_shared/tool-vocabulary.md` 一份维护。
 
