@@ -57,7 +57,7 @@ GC 的执行者是 [`hx-DocGardener`](../agents/doc-gardener/AGENT.md)。Agent �
 
 ### 为什么 H1–H6 阶段 Agent 不够用
 
-H1–H6 是开发期一次性走完的流程；交付后没人会再触发它们。但腐败是**持续**发生的，所以必须有一个**横切、长期常驻**的 agent。这就是 9 个 agent 里只有 `hx-DocGardener` 用 `hx-` 前缀的原因——它不属于任何阶段，是阶段之外的常驻反馈机制。后续这条 `hx-*` 线还可能扩展：`hx-dependency-watcher`（依赖与 CVE 监控）、`hx-perf-regression-detector`（性能告警）、`hx-security-scanner`（安全扫描）等，**它们全都是交付后才真正发挥价值的 agent**。
+H1–H6 是开发期一次性走完的流程；交付后没人会再触发它们。但腐败是**持续**发生的，所以必须有一个**横切、长期常驻**的 agent。这就是 11 个 agent 里只有 `hx-DocGardener` 用 `hx-` 前缀的原因——它不属于任何阶段，是阶段之外的常驻反馈机制。后续这条 `hx-*` 线还可能扩展：`hx-dependency-watcher`（依赖与 CVE 监控）、`hx-perf-regression-detector`（性能告警）、`hx-security-scanner`（安全扫描）等，**它们全都是交付后才真正发挥价值的 agent**。
 
 ## 3. 黄金原则（Golden Principles）
 

@@ -105,6 +105,8 @@ agents/                    # 配套 Agent 套件（与业务无关，详见第 1
 | Agent                   | 阶段   | Harness 层          |
 | ----------------------- | ------ | ------------------- |
 | RequirementsInterviewer | H1     | 反馈层              |
+| UISpecAuthor            | H1     | 反馈层              |
+| PrototypeReviewer       | H1     | 质量门禁层          |
 | RepoImpactMapper        | H1↔H3  | 约束层              |
 | DesignReviewer          | H3     | 质量门禁层          |
 | TestCaseAuthor          | H4     | 反馈层              |

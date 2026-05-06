@@ -21,9 +21,9 @@
 
 先看你属于哪种情况，再决定从哪进门：
 
-| 你的状态 | 入口 |
-| --- | --- |
-| **全新空仓 / 项目还没启动 / 还没有任何 `REQ-NNN`** | 走 [1.1 节：全新项目从 H1 起步](#11-全新项目从-h1-起步) |
+| 你的状态                                                      | 入口                                                    |
+| ------------------------------------------------------------- | ------------------------------------------------------- |
+| **全新空仓 / 项目还没启动 / 还没有任何 `REQ-NNN`**            | 走 [1.1 节：全新项目从 H1 起步](#11-全新项目从-h1-起步) |
 | **老仓改造 / 给已有项目加一个具体小功能（已有 REQ/HD 凭证）** | 走 [1.2 节：已有项目从 H5 起跳](#12-已有项目从-h5-起跳) |
 
 > 关键概念：`/new-task` 是 **H5（编码）的入口，不是项目的入口**。它把"已有 REQ/HD"切成可执行的代码改动；空仓没有 REQ 可指，它会反问 / 阻塞返回。**别用 `/new-task` 起新项目**——切 Agent 才是。
@@ -33,11 +33,11 @@
 依次切 Agent 跑下去，每一步的产出会成为下一步的输入；不要跳级，跳级会让追溯链断在你身上。
 
 1. **H1 上半段 · 需求文本**：Copilot Chat 顶部 Agent 下拉切到 `h1-requirements-interviewer`，用一段大白话描述目标用户、核心场景、必做与可选——它会反问、追问、把回答落成 `docs/01-requirements/requirements.md` 草稿，分配 `REQ-001`、`REQ-002`…，没答清的进 `open-questions.md`，**不会自动用 `<TBD>` 占位**。
-2. **H1 下半段 · UI 说明 + 原型 + 评审 + 留档**：H1 不是只写 `requirements.md` 就结束了。完整 H1 还包含「UI 说明、可交互原型、评审、留档」四件事——这部分**没有专属 Custom Agent**（详见第 6 节末尾的设计取舍），用默认 Agent 跟着清单做即可：
-   - **UI 说明**：在默认 Agent 下让它对照 `requirements.md` 的核心场景，按 [stages.md 第 4.5 节](../../docs/stages.md#45-ui-说明必须包含)清单产出 `docs/01-requirements/ui-spec.md`、`user-flow.md`、`acceptance-criteria.md`
-   - **可交互原型**：你自己挑工具做（HTML/CSS 静态页面、Figma 导出、V0、Lovable、手绘扫描都行），落到 `prototypes/<feature>/` 目录
-   - **拉一次评审**：哪怕只有你一个人，也对照 [phase-gate-checklist 第 1 节 H1](../templates/phase-gate-checklist.md#h1需求ui-与交互原型) 那 12 条逐项 PASS / FAIL，会议或自审纪要用 `/log-review` 落到 `docs/07-reviews/YYYY-MM-DD-h1-review.md`
-   - **结论留档**：把评审结论摘要回写到 `docs/02-prototype/prototype-review.md`（这份是 H2 架构选型的输入凭证之一，不能省）
+2. **H1 下半段 · UI 说明 + 原型 + 评审 + 留档**：H1 不是只写 `requirements.md` 就结束了。完整 H1 还包含「UI 说明、可交互原型、评审、留档」四件事，按顺序切两个专属 Agent + 一个外部工具走完：
+   - **UI 说明**：切到 `h1-ui-spec-author`，给它 `requirements.md` + 你手头的截图或参考页面，它会按 [stages.md 第 4.5 节](../../docs/stages.md#45-ui-说明必须包含) 那 10 项反问一轮，然后产出 `docs/01-requirements/ui-spec.md` / `user-flow.md` / `acceptance-criteria.md`，没答清的**追加**到同一份 `open-questions.md`。
+   - **可交互原型**：你自己挑工具做（HTML/CSS 静态页面、Figma 导出、V0、Lovable、手绘扫描都行），落到 `prototypes/<feature>/` 目录，关键屏幕被截图在 `prototypes/<feature>/screenshots/` 下。
+   - **原型评审**：切到 `h1-prototype-reviewer`，它会只读 `ui-spec.md` + `prototypes/<feature>/` + `phase-gate-checklist.md`，按 H1 那 12 条逼出 `PASS / FAIL / UNKNOWN`与补救动作；**它只读不写，不会替你产出 `prototype-review.md`**（评审纪要由人写，避免 AI 给自己开绿灯）。
+   - **纪要留档**：拿上一步的 PASS/FAIL 报告作为评审纪要起点，补充你的调整后请人评审一轮，走 `/log-review` 落到 `docs/07-reviews/YYYY-MM-DD-h1-review.md`，同时把评审结论摘要回写到 `docs/02-prototype/prototype-review.md`（这份是 H2 架构选型的输入凭证之一，不能省）。
 3. **跑一次 `/run-gate H1`**：在 Copilot Chat 输入 `/run-gate`，它会按上面那 12 条机械核对，给出 PASS / FAIL / UNKNOWN。**只有全 PASS 才能进 H2**——这是设计上的硬卡口，绕过去后面的 commit 审计会让你在 H5 阶段重新偿还。
 4. **（可选）H1 影响图**：切 `h1-repo-impact-mapper`。全新空仓基本是全部新建，可跳过；老仓改造时它会列出受影响的模块 / 文件 / 接口 / 测试。
 5. **H2 架构 / ADR**：切 `h2-architect-advisor`。它基于上一步的 requirements + ui-spec 给一份初版架构（项目划分、技术栈、依赖关系）+ 关键 `ADR-NNN`（每条含"选择 / 为什么 / 替代 / 放弃理由 / 维护成本 / 性能-安全-交付影响"六字段）。这一步决定源码树长什么样、用什么栈。
@@ -46,7 +46,7 @@
 8. **H5 起任务 → 编码 → 审提交**：上游凭证齐全后，就可以走 [1.2 节](#12-已有项目从-h5-起跳) 那四步把每条任务跑完。
 9. **H6 发版说明**：版本切出来时切 `h6-release-note-writer`，从 commit 抽取生成 `docs/07-release/release-notes.md`，回写追溯矩阵。
 
-> 第 1+2 步产出的 `requirements.md` 和 `ui-spec.md` 是后面所有阶段的"上游凭证"——commit message 里的 `Design: REQ-001` / `Tests: TC-NNN` / `Task: TASK-NNN` 都是顺着它们往下挂的。**没有这两步，提交格式校验会一路把你打回来**。
+> 第 1+2 步产出的 `requirements.md` / `ui-spec.md` / `acceptance-criteria.md` 是后面所有阶段的"上游凭证"——commit message 里的 `Design: REQ-001` / `Tests: TC-NNN` / `Task: TASK-NNN` 都是顺着它们往下挂的。**没有这两步，提交格式校验会一路把你打回来**。
 
 ### 1.2 已有项目从 H5 起跳
 
@@ -67,9 +67,11 @@
 ┌─────────────────────── 一个特性 / 一次发版的生命周期 ───────────────────────┐
 │                                                                              │
 │  H1 需求文本      → H1-RequirementsInterviewer  → docs/01-requirements/      │
-│  H1 UI / 原型     → 默认 Agent + 你选的原型工具 → docs/01-requirements/      │
-│                                                   docs/02-prototype/         │
-│                                                   prototypes/<feature>/      │
+│  H1 UI 说明       → H1-UISpecAuthor             → docs/01-requirements/      │
+│  H1 原型评审      → H1-PrototypeReviewer        → 只读 PASS/FAIL（不写文件） │
+│                                                   人手回写 docs/02-prototype/│
+│                                                   prototype-review.md        │
+│  H1 原型实践      → 你自选原型工具              → prototypes/<feature>/      │
 │  H1 影响图（可选）→ H1-RepoImpactMapper         → docs/01-requirements/      │
 │  H2 架构 / ADR    → H2-ArchitectAdvisor         → docs/03-architecture/      │
 │  H3 详细设计评审  → H3-DesignReviewer           → docs/04-detailed-design/   │
@@ -86,7 +88,7 @@
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
-> H1 是双段：**上半段**（需求文本）由 `H1-RequirementsInterviewer` 主导，**下半段**（UI 说明 / 用户流 / 验收标准 / 可交互原型 / 评审 / 留档）用默认 Agent + 你选的原型工具，参见 [1.1 节第 2 步](#11-全新项目从-h1-起步)。`/run-gate H1` 会把两段一起核对，只过上半段不算 H1 完成。
+> H1 是双段：**上半段**（需求文本）由 `H1-RequirementsInterviewer` 主导；**下半段**拆为三个环节：UI 说明由 `H1-UISpecAuthor` 反问产出，中间你用外部工具做 `prototypes/<feature>/` 原型，`H1-PrototypeReviewer` 只读原型 + UI 文档给 PASS/FAIL（评审纪要由人写，避免 AI 自我满足），参见 [1.1 节第 2 步](#11-全新项目从-h1-起步)。`/run-gate H1` 会把两段一起核对，只过上半段不算 H1 完成。
 
 并不强制把 H1 → H6 全走完才能动手——分流规则见 [第 1 节](#1-装完后该干啥按项目状态分流)：全新项目按 1.1 节老老实实从 H1 起步；老仓加小功能按 1.2 节从 H5 起跳，事后补 `requirements.md` 链路。
 
@@ -101,9 +103,11 @@
 │   ├── coding-style.instructions.md
 │   ├── commit-format.instructions.md
 │   └── docs-style.instructions.md
-├── agents/                          ← 9 个 Custom Agent，下拉菜单可选
+├── agents/                          ← 11 个 Custom Agent，下拉菜单可选
 │   ├── h1-repo-impact-mapper.agent.md
 │   ├── h1-requirements-interviewer.agent.md
+│   ├── h1-ui-spec-author.agent.md
+│   ├── h1-prototype-reviewer.agent.md
 │   ├── h2-architect-advisor.agent.md
 │   ├── h3-design-reviewer.agent.md
 │   ├── h4-test-case-author.agent.md
@@ -128,7 +132,7 @@
     └── task-board.md
 ```
 
-**这 25 个文件全部开箱即用，不用再做任何配置：进 Copilot Chat，直接选 Agent / 输 `/` 即可。**
+**这 27 个文件全部开箱即用，不用再做任何配置：进 Copilot Chat，直接选 Agent / 输 `/` 即可。**
 
 ---
 
@@ -178,11 +182,11 @@ Copy-Item .github\templates\ai-task-brief.md docs\06-tasks\T-001-<slug>.md
 
 四条 `/` 命令背后都会读模板：
 
-| Slash 命令    | 读取的模板                                            |
-| ------------- | ----------------------------------------------------- |
+| Slash 命令    | 读取的模板                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------- |
 | `/new-task`   | `ai-task-brief.md`；首次运行同时按 `task-board.md` 模板自动建 `docs/06-tasks/task-board.md` |
-| `/run-gate`   | `phase-gate-checklist.md`                             |
-| `/log-review` | `review-record.md`                                    |
+| `/run-gate`   | `phase-gate-checklist.md`                                                                   |
+| `/log-review` | `review-record.md`                                                                          |
 
 所以你改完 `.github/templates/*.md` 之后：
 
@@ -227,11 +231,13 @@ Copy-Item .github\templates\ai-task-brief.md docs\06-tasks\T-001-<slug>.md
 | `/log-review` | 把会议 / PR 评审誊到 `docs/07-reviews/YYYY-MM-DD-*.md` |
 | `/sync-board` | 审计 task-board 与代码 / commit 的对齐，列失同步       |
 
-### Agents（在 Chat 顶部下拉手动切）
+### Agents（在Copilot对话窗口的Agent中下拉手动切）
 
 | Agent                        | 阶段  | 用途                                       |
 | ---------------------------- | ----- | ------------------------------------------ |
 | `H1-RequirementsInterviewer` | H1    | 反问把模糊需求转成可评审 `requirements.md` |
+| `H1-UISpecAuthor`            | H1    | 反问把 UI 细节逼出，按 stages.md 4.5 节 10 项产出 ui-spec / user-flow / acceptance-criteria |
+| `H1-PrototypeReviewer`       | H1    | 只读评审：读原型 + UI 文档，按 phase-gate H1 12 条 PASS/FAIL，不写文件 |
 | `H1-RepoImpactMapper`        | H1↔H3 | 把已 reviewed 需求映射到真实仓库代码       |
 | `H2-ArchitectAdvisor`        | H2    | 起草架构选型 + ADR，每条选型留六字段       |
 | `H3-DesignReviewer`          | H3    | 评审详细设计是否可进 H4                    |
@@ -241,29 +247,36 @@ Copy-Item .github\templates\ai-task-brief.md docs\06-tasks\T-001-<slug>.md
 | `H6-ReleaseNoteWriter`       | H6    | 从 commit-records 抽变更生成 release notes |
 | `Hx-DocGardener`             | Hx    | 周期巡检 docs/ 与代码偏离                  |
 
-### 6.1 为什么 H1 下半段没有专属 Agent
+### 6.1 H1 下半段的两个专属 Agent：UISpecAuthor + PrototypeReviewer
 
-H1 完整定义见 [stages.md 第 4 节](../../docs/stages.md#4-h1需求ui-与交互原型阶段)，包含五件事：**需求文本 / UI 说明 / 用户流 / 可交互原型 / 评审留档**。其中只有"需求文本"做成了专属 Agent（`H1-RequirementsInterviewer`），下半段四件事统一**用默认 Agent + 外部工具**完成。这是设计决策，不是疏漏：
+H1 完整定义见 [stages.md 第 4 节](../../docs/stages.md#4-h1需求ui-与交互原型阶段)，包含五件事：**需求文本 / UI 说明 / 用户流 / 可交互原型 / 评审留档**。最初版本只把"需求文本"做成了专属 Agent，下半段统一交给默认 Agent + 外部工具。**这一决策在采用方第一次跑 `/run-gate H1` 时被推翻了**：12 条门禁里下半段那 6 条经常 FAIL，原因是"默认 Agent 不会按 stages.md 4.5 节那 10 项主动反问"——同一组反问纪律已在上半段的 `H1-RequirementsInterviewer` 上证明有效，下半段当然也吃这套。从 v0.0.2 起，H1 下半段拆为两个专属 Agent：
 
-- **UI 说明 / 用户流 / 验收标准是结构化文本**，但需要你看着原型边写边调整——把它们关进固化 Agent 反而限制了你跨场景的灵活引用（默认 Agent 同时能读 stages.md / 已写好的 requirements.md / 你打开的 Figma 截图）
-- **可交互原型本身不是 markdown**——HTML/CSS、Figma、V0、Lovable、手绘扫描都行，工具选择五花八门，做一个"原型生成 Agent"等于把工具选择钉死，反而妨碍迭代
-- **评审是人的活**——评审 Agent 容易自我满足（参见 [run-gate 设计](#73-唯一的例外run-gate-是只读的)），所以 H1 评审走 `/log-review` 把人工纪要落档，而不是让 Agent 替你拍板
+| Agent                  | 性质        | 干什么                                                                                  |
+| ---------------------- | ----------- | --------------------------------------------------------------------------------------- |
+| `H1-UISpecAuthor`      | 反问写文档  | 平移 RequirementsInterviewer 的纪律到 UI 维度，按 stages.md 4.5 节 10 项产出三份文档     |
+| `H1-PrototypeReviewer` | 只读评审员  | 读原型 + UI 文档，按 phase-gate H1 12 条 PASS/FAIL/UNKNOWN，**不写文件**——评审纪要由人写 |
+
+设计取舍：
+
+- **PrototypeReviewer 为什么不能让 Agent 写评审纪要**：评审 Agent 容易自我满足（参见 [run-gate 设计](#73-两个只读例外run-gate-与-h1-prototype-reviewer)）。把它限制成"只读 + 不能写 prototype-review.md"，复用 run-gate 的同一招——用工具集物理隔离取代行为约束，让 AI 评审与人评审之间留出独立空间。
+- **可交互原型本身仍由你自选工具实现**：HTML/CSS、Figma、V0、Lovable、手绘扫描都行。`H1-UISpecAuthor` 写 ui-spec markdown，`H1-PrototypeReviewer` 读原型目录里的 markdown / 截图，原型工具的选择被严格隔离在两个 Agent 之外。
+- **v1 边界**：`H1-PrototypeReviewer` 当前只读 markdown 描述与本地截图。要让 Agent 真的去渲染 React / 点击按钮 / 截图比对，是 v2 的事——届时给它开 `browser/*`。
 
 实操上，H1 下半段的工作流是：
 
 ```
-默认 Agent (写 ui-spec.md / user-flow.md / acceptance-criteria.md)
+H1-UISpecAuthor (反问 + 写 ui-spec.md / user-flow.md / acceptance-criteria.md)
     ↓
-外部工具 (做 prototypes/<feature>/ 可交互原型)
+外部工具 (做 prototypes/<feature>/ 可交互原型，关键截图归档到 screenshots/)
     ↓
-人工评审 + /log-review (把纪要落到 docs/07-reviews/)
+H1-PrototypeReviewer (只读评审：12 条 PASS/FAIL/UNKNOWN，不写文件)
     ↓
-回写 docs/02-prototype/prototype-review.md
+人工评审纪要 + /log-review (把纪要落到 docs/07-reviews/)
     ↓
-/run-gate H1 (机械核对 12 条)
+回写 docs/02-prototype/prototype-review.md (由人写)
+    ↓
+/run-gate H1 (机械核对 12 条做最终复核)
 ```
-
-如果将来你确实想把这一段也做成 Agent，思路是：拆成一个 `h1-ui-spec-author`（按 stages.md 第 4.5 节清单产出 ui-spec）+ 一个 `h1-prototype-reviewer`（读 HTML/React 原型 + ui-spec，按 phase-gate H1 那 12 条逐项 PASS/FAIL）。**但目前阶段，默认 Agent 够用。**
 
 ---
 
@@ -275,29 +288,31 @@ H1 完整定义见 [stages.md 第 4 节](../../docs/stages.md#4-h1需求ui-与�
 
 VS Code Copilot Chat 把所有内置工具按"用途"分到 9 个命名空间下，写 `tools` 字段时必须用 `<namespace>/<name>` 的全名。下表是当前完整清单：
 
-| 命名空间      | 工具                                                                                                                                                                                                                                                              | 主要用途                                                  |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| `vscode/*`    | `extensions`, `getProjectSetupInfo`, `installExtension`, `memory`, `newWorkspace`, `resolveMemoryFileUri`, `runCommand`, `vscodeAPI`, `askQuestions`, `toolSearch`                                                                                                 | 与 VS Code 自身交互（装扩展 / 查项目信息 / 触发命令面板） |
-| `execute/*`   | `runInTerminal`, `getTerminalOutput`, `sendToTerminal`, `killTerminal`, `createAndRunTask`, `runNotebookCell`                                                                                                                                                     | 跑命令、跑 Notebook 单元格、管理终端会话                  |
-| `read/*`      | `readFile`, `viewImage`, `problems`, `terminalSelection`, `terminalLastCommand`, `getNotebookSummary`                                                                                                                                                             | 只读取上下文（文件 / 图片 / 报错 / 终端 / Notebook）      |
-| `search/*`    | `codebase`, `textSearch`, `fileSearch`, `listDirectory`, `usages`, `changes`                                                                                                                                                                                      | 语义搜索 / 全文搜索 / 找引用 / 看 git diff                |
-| `edit/*`      | `createFile`, `editFiles`, `createDirectory`, `rename`, `createJupyterNotebook`, `editNotebook`                                                                                                                                                                   | 写文件 / 改文件 / 新建目录 / 重命名                       |
-| `web/*`       | `fetch`, `githubRepo`, `githubTextSearch`                                                                                                                                                                                                                         | 抓网页 / 拉 GitHub 仓库 / 搜 GitHub 代码                  |
-| `browser/*`   | `openBrowserPage`, `readPage`, `screenshotPage`, `navigatePage`, `clickElement`, `dragElement`, `hoverElement`, `typeInPage`, `runPlaywrightCode`, `handleDialog`                                                                                                 | Playwright 驱动浏览器（前端验证 / 抓页面）                |
-| `agent/*`     | `runSubagent`                                                                                                                                                                                                                                                     | 让本 Agent 启动一个子 Agent 跑独立任务                    |
-| `todo`        | （无前缀，独立工具）                                                                                                                                                                                                                                              | 维护 Copilot 内置的 todo list                             |
+| 命名空间    | 工具                                                                                                                                                               | 主要用途                                                  |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
+| `vscode/*`  | `extensions`, `getProjectSetupInfo`, `installExtension`, `memory`, `newWorkspace`, `resolveMemoryFileUri`, `runCommand`, `vscodeAPI`, `askQuestions`, `toolSearch` | 与 VS Code 自身交互（装扩展 / 查项目信息 / 触发命令面板） |
+| `execute/*` | `runInTerminal`, `getTerminalOutput`, `sendToTerminal`, `killTerminal`, `createAndRunTask`, `runNotebookCell`                                                      | 跑命令、跑 Notebook 单元格、管理终端会话                  |
+| `read/*`    | `readFile`, `viewImage`, `problems`, `terminalSelection`, `terminalLastCommand`, `getNotebookSummary`                                                              | 只读取上下文（文件 / 图片 / 报错 / 终端 / Notebook）      |
+| `search/*`  | `codebase`, `textSearch`, `fileSearch`, `listDirectory`, `usages`, `changes`                                                                                       | 语义搜索 / 全文搜索 / 找引用 / 看 git diff                |
+| `edit/*`    | `createFile`, `editFiles`, `createDirectory`, `rename`, `createJupyterNotebook`, `editNotebook`                                                                    | 写文件 / 改文件 / 新建目录 / 重命名                       |
+| `web/*`     | `fetch`, `githubRepo`, `githubTextSearch`                                                                                                                          | 抓网页 / 拉 GitHub 仓库 / 搜 GitHub 代码                  |
+| `browser/*` | `openBrowserPage`, `readPage`, `screenshotPage`, `navigatePage`, `clickElement`, `dragElement`, `hoverElement`, `typeInPage`, `runPlaywrightCode`, `handleDialog`  | Playwright 驱动浏览器（前端验证 / 抓页面）                |
+| `agent/*`   | `runSubagent`                                                                                                                                                      | 让本 Agent 启动一个子 Agent 跑独立任务                    |
+| `todo`      | （无前缀，独立工具）                                                                                                                                               | 维护 Copilot 内置的 todo list                             |
 
 > 旧裸名（`codebase` / `fetch` / `editFiles` / `runCommands` 等）在新版 VS Code 里仍可用，但运行时会打 `Tool 'X' has been renamed, use 'Y' instead.` 警告。**新建 / 修改 Agent 一律写命名空间形式**。
 
 ### 7.2 默认配置：H1–H6 全套放开 49 个工具
 
-本仓库自带的 9 个 Custom Agent + 4 个 Prompt 中，**除了 `/run-gate` 之外的 12 个文件**默认把整套 49 个工具都放进白名单。原因是 H1–H6 阶段虽然角色分明，但每个角色都可能临时需要：起草文档（`edit/*`）、看代码上下文（`search/*` + `read/*`）、查官方 docs（`web/fetch`）、跑构建命令验证（`execute/runInTerminal`）、对前端改动做截图核对（`browser/*`）。预留满集合可以省掉用户每加一种工作就回头改 frontmatter 的麻烦。
+本仓库自带的 11 个 Custom Agent + 4 个 Prompt 中，**除了 `/run-gate` 与 `h1-prototype-reviewer` 之外的 13 个文件**默认把整套 49 个工具都放进白名单。原因是 H1–H6 阶段虽然角色分明，但每个角色都可能临时需要：起草文档（`edit/*`）、看代码上下文（`search/*` + `read/*`）、查官方 docs（`web/fetch`）、跑构建命令验证（`execute/runInTerminal`）、对前端改动做截图核对（`browser/*`）。预留满集合可以省掉用户每加一种工作就回头改 frontmatter 的麻烦。
 
 **真正的角色边界由 system prompt 文字（即 `agents/<role>/AGENT.md` 的指令章节）来约束**——比如 `H1-RequirementsInterviewer` 的指令明确写着"主动反问、不臆测、待澄清问题进 open-questions"，AI 不会因为有 `execute/runInTerminal` 就突然跑去执行 `dotnet test`，因为它的角色脚本没让它做这件事。换言之：**`tools` 是物理边界，prompt 是行为边界，两道闸门各司其职**。
 
-### 7.3 唯一的例外：`/run-gate` 是只读的
+### 7.3 两个只读例外：`/run-gate` 与 `h1-prototype-reviewer`
 
-`/run-gate` 的角色就是"按 `phase-gate-checklist` 机械核对当前阶段是否能进下一阶段"——它需要看代码、看文档、看构建产物，但**不能写文件、不能改任务板、不能跑命令**。否则它会自作主张去补缺项，让 gate 形同虚设。所以它的 `tools` 字段是个精挑过的子集：
+这两个文件的角色都是**机械化评审员**——看代码、看文档、看构建产物，**但不能写文件、不能改任务板、不能跑命令**。否则它们会自作主张去补缺项，让 gate / 评审形同虚设。
+
+`/run-gate` 的白名单：
 
 ```yaml
 tools:
@@ -314,7 +329,25 @@ tools:
   ]
 ```
 
-只有 `search/*` 与 `read/*`，**没有任何 `edit/*` / `execute/*` / `web/*` / `browser/*`**。
+`h1-prototype-reviewer` 在上述基础上多一个 `read/viewImage`（读 `prototypes/<feature>/screenshots/` 下的截图）：
+
+```yaml
+tools:
+  [
+    search/codebase,
+    search/textSearch,
+    search/fileSearch,
+    search/listDirectory,
+    search/usages,
+    search/changes,
+    read/readFile,
+    read/problems,
+    read/getNotebookSummary,
+    read/viewImage,
+  ]
+```
+
+两个都只有 `search/*` 与 `read/*`，**没有任何 `edit/*` / `execute/*` / `web/*` / `browser/*`**。`h1-prototype-reviewer` 不开 `browser/*` 是 v1 的有意设计：v1 只消费人手走过原型后留下的 markdown 与截图，让 Agent 真的去渲染 React / 点击按钮 / 截图比对是 v2 的事。
 
 ### 7.4 你想自定义时该怎么改
 
@@ -335,13 +368,13 @@ tools:
 
 常见自定义场景与改法：
 
-| 场景                                                                  | 改法                                                                                              |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| 想把某个 Agent 限制为只读（防止它修改你的代码）                       | 把所有 `edit/*` 与 `execute/*` 从 `tools` 里删掉，参考 `/run-gate` 的子集                         |
-| 想让某个 Agent 能 call subagent 拆活                                  | 加上 `agent/runSubagent`                                                                          |
-| 不想让 Agent 跑浏览器（节省 token）                                   | 把 `browser/*` 全部从 `tools` 里删掉                                                              |
-| 想加自定义 MCP 工具                                                   | MCP 工具不在 49 个内置工具里——它的命名空间由 MCP server 自己定，按 server 文档写就行              |
-| 改完没生效                                                            | Custom Agent 的 frontmatter 在 Copilot Chat **重启 / 切 Agent** 时才会重读；如果已是当前 Agent，先切到别的 Agent 再切回来 |
+| 场景                                            | 改法                                                                                                                      |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| 想把某个 Agent 限制为只读（防止它修改你的代码） | 把所有 `edit/*` 与 `execute/*` 从 `tools` 里删掉，参考 `/run-gate` 的子集                                                 |
+| 想让某个 Agent 能 call subagent 拆活            | 加上 `agent/runSubagent`                                                                                                  |
+| 不想让 Agent 跑浏览器（节省 token）             | 把 `browser/*` 全部从 `tools` 里删掉                                                                                      |
+| 想加自定义 MCP 工具                             | MCP 工具不在 49 个内置工具里——它的命名空间由 MCP server 自己定，按 server 文档写就行                                      |
+| 改完没生效                                      | Custom Agent 的 frontmatter 在 Copilot Chat **重启 / 切 Agent** 时才会重读；如果已是当前 Agent，先切到别的 Agent 再切回来 |
 
 > 修改的是 `.github/agents/*.agent.md` / `.github/prompts/*.prompt.md`（采用方落地路径）。如果你装了 vendor 模式（默认），下一次 `install.ps1` 跑回来会按 manifest 校验你改过的文件——会触发 `[O]/[K]/[A]/[B]` 四选一询问，选 `K` 保留你的本地修改即可。
 

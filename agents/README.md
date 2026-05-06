@@ -9,13 +9,15 @@
 - **业务无关**：Agent 只读规范定义的产物（`docs/01-requirements/` ... `docs/07-release/`、`AGENTS.md`、`templates/`），不假设任何业务领域。
 - **模型中立**：所有 prompt 不依赖某个模型的特殊能力（thinking 标签、专有工具格式），任何具备工具调用能力的 LLM 都可装载。
 - **工具中立**：以纯 Markdown 描述 Agent 规格，需要落到具体工具时再做轻量适配（详见第 5 节）。
-- **小步交付**：H1–H6 全阶段共 9 个岗位齐配，每个阶段都有对应的 Agent；横切配 1 个 DocGardener。
+- **小步交付**：H1–H6 全阶段共 11 个岗位齐配，每个阶段都有对应的 Agent；横切配 1 个 DocGardener。
 
 ## 2. Agent 总索引
 
 | Agent                                                          | 阶段       | Harness 层          | 一句话职责                                                                        |
 | -------------------------------------------------------------- | ---------- | ------------------- | --------------------------------------------------------------------------------- |
 | [RequirementsInterviewer](./requirements-interviewer/AGENT.md) | H1         | 反馈层              | 接收一句话需求，主动反问以暴露模糊点，产出可评审的 `requirements.md` 草稿         |
+| [UISpecAuthor](./ui-spec-author/AGENT.md)                      | H1         | 反馈层              | 反问把 UI 细节逼出来，按 stages.md 4.5 节 10 项产出 `ui-spec` / `user-flow` / `acceptance-criteria` |
+| [PrototypeReviewer](./prototype-reviewer/AGENT.md)             | H1         | 质量门禁层          | 只读评审：读 UI 文档 + 原型截图，按 phase-gate H1 那 12 条 PASS/FAIL/UNKNOWN，不写文件 |
 | [RepoImpactMapper](./repo-impact-mapper/AGENT.md)              | H1↔H3 之间 | 约束层              | 在做计划前扫描真实代码，产出可审核的"仓库影响地图"，拦截"AI 凭空编 API"的失败模式 |
 | [ArchitectAdvisor](./architect-advisor/AGENT.md)               | H2         | 反馈层 + 约束层     | 反问补齐架构约束、对备选项机械化打分，产出 `architecture.md` / 选型 / 风险 / ADR  |
 | [DesignReviewer](./design-reviewer/AGENT.md)                   | H3         | 质量门禁层          | 机械化校验详细设计的完备性与一致性，挡住"设计没写清"流入 H4/H5                    |
@@ -27,23 +29,22 @@
 
 后续候选（仍按"避免缺乏真实样本时过早设计"原则保留）：
 
-- PrototypeReviewer（H1 UI / 原型评审辅助）
 - IncidentResponder（H6 之后的故障复盘辅助）
 
 ## 3. 协作拓扑
 
 ```text
-H1: RequirementsInterviewer ──► RepoImpactMapper
-                                        │
-H2:                              ArchitectAdvisor
-                                        │
-H3:                              DesignReviewer
-                                        │
-H4:                              TestCaseAuthor
-                                        │
-H5:                              CodingExecutor ──► CommitAuditor ──► CI 钩子 / 项目专属 Linter
-                                                                                │
-H6:                                                                             └──► ReleaseNoteWriter
+H1: RequirementsInterviewer ──► UISpecAuthor ──► PrototypeReviewer ──► RepoImpactMapper
+                                                                              │
+H2:                                                                    ArchitectAdvisor
+                                                                              │
+H3:                                                                    DesignReviewer
+                                                                              │
+H4:                                                                    TestCaseAuthor
+                                                                              │
+H5:                                                                    CodingExecutor ──► CommitAuditor ──► CI 钩子 / 项目专属 Linter
+                                                                                                                  │
+H6:                                                                                                               └──► ReleaseNoteWriter
 
 横切（定时 / Webhook 触发）：DocGardener
 ```
