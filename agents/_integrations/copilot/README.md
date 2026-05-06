@@ -17,7 +17,7 @@
 | ------------------------------------------------- | ---------------------------------------- | -------------------------------------------------- |
 | `copilot-instructions.template.md`                | `.github/copilot-instructions.md`        | Copilot 全会话自动加载                             |
 | `instructions/*.instructions.template.md`         | `.github/instructions/*.instructions.md` | 按 `applyTo` 自动加载                              |
-| `custom-agents/*.agent.template.md` (× 9)         | `.github/agents/*.agent.md`              | Chat 顶部下拉手动切换                              |
+| `custom-agents/*.agent.template.md` (× 11)        | `.github/agents/*.agent.md`              | Chat 输入框下方的 Agent 下拉手动切换               |
 | `prompts/*.prompt.md` (× 4)                       | `.github/prompts/*.prompt.md`            | `/<name>` 显式触发                                 |
 | `../../_skills/*/SKILL.md`                        | `.github/skills/*/SKILL.md`              | 模型按 description 语义命中后自动调用              |
 | `../../templates/*.md` (× 4)                      | `.github/templates/*.md`                 | 给 Skills / Prompts / 人手共用的产物模板           |

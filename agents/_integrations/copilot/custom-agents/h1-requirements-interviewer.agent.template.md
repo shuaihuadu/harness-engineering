@@ -56,7 +56,7 @@ tools:
 
 # RequirementsInterviewer（GitHub Copilot Chat Custom Agent）
 
-下方是该 Agent 的角色定义与工作流系统提示，已从 Harness Engineering 源仓库 inline 进来。Copilot 会在 Chat 顶部下拉菜单里把它列为 `H1-RequirementsInterviewer`；切到该 Agent 后，整段内容作为 system prompt 生效。
+下方是该 Agent 的角色定义与工作流系统提示，已从 Harness Engineering 源仓库 inline 进来。Copilot 会在 Chat 输入框下方的 Agent 下拉菜单里把它列为 `H1-RequirementsInterviewer`；切到该 Agent 后，整段内容作为 system prompt 生效。
 
 ---
 

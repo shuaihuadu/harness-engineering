@@ -15,7 +15,7 @@
 
 ## 2. 何时切换到专用 Custom Agent
 
-当前项目已装的 Custom Agent（在 VS Code Copilot Chat 顶部下拉菜单中选择）。Agent 名以 `h<阶段号>-` 开头，对应 [Harness 阶段]({{HARNESS_REPO_REF_FROM_GITHUB}}/docs/stages.md) H1–H6，横切阶段用 `hx-`：
+当前项目已装的 Custom Agent（在 VS Code Copilot Chat 输入框下方的 Agent 下拉菜单中选择）。Agent 名以 `h<阶段号>-` 开头，对应 [Harness 阶段]({{HARNESS_REPO_REF_FROM_GITHUB}}/docs/stages.md) H1–H6，横切阶段用 `hx-`：
 
 | 场景                             | 使用 Agent                    |
 | -------------------------------- | ----------------------------- |

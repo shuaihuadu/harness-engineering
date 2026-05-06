@@ -32,7 +32,7 @@
 
 依次切 Agent 跑下去，每一步的产出会成为下一步的输入；不要跳级，跳级会让追溯链断在你身上。
 
-1. **H1 上半段 · 需求文本**：Copilot Chat 顶部 Agent 下拉切到 `h1-requirements-interviewer`，用一段大白话描述目标用户、核心场景、必做与可选——它会反问、追问、把回答落成 `docs/01-requirements/requirements.md` 草稿，分配 `REQ-001`、`REQ-002`…，没答清的进 `open-questions.md`，**不会自动用 `<TBD>` 占位**。
+1. **H1 上半段 · 需求文本**：Copilot Chat 输入框下方的 Agent 下拉切到 `h1-requirements-interviewer`，用一段大白话描述目标用户、核心场景、必做与可选——它会反问、追问、把回答落成 `docs/01-requirements/requirements.md` 草稿，分配 `REQ-001`、`REQ-002`…，没答清的进 `open-questions.md`，**不会自动用 `<TBD>` 占位**。
 2. **H1 下半段 · UI 说明 + 原型 + 评审 + 留档**：H1 不是只写 `requirements.md` 就结束了。完整 H1 还包含「UI 说明、可交互原型、评审、留档」四件事，按顺序切两个专属 Agent + 一个外部工具走完：
    - **UI 说明**：切到 `h1-ui-spec-author`，给它 `requirements.md` + 你手头的截图或参考页面，它会按 [stages.md 第 4.5 节](../../docs/stages.md#45-ui-说明必须包含) 那 10 项反问一轮，然后产出 `docs/01-requirements/ui-spec.md` / `user-flow.md` / `acceptance-criteria.md`，没答清的**追加**到同一份 `open-questions.md`。
    - **可交互原型**：你自己挑工具做（HTML/CSS 静态页面、Figma 导出、V0、Lovable、手绘扫描都行），落到 `prototypes/<feature>/` 目录，关键屏幕被截图在 `prototypes/<feature>/screenshots/` 下。
@@ -54,7 +54,7 @@
 
 1. **起一个最小任务**：在 Copilot Chat 输入 `/new-task` 加你想做的小事；首次运行它会按模板自动建 `docs/06-tasks/task-board.md`，并起草 `docs/06-tasks/T-001-xxx.md`、同时登记一行到看板。
 2. **人工审任务说明**：核对 `允许修改的文件` 与 `Verify 命令` 是否合理；OK 之后把 `docs/06-tasks/task-board.md` 里这一行的 `status` 改成 `ready`。
-3. **切到 `H5-CodingExecutor`**：在 Copilot Chat 顶部的 Agent 下拉里选它，让它按任务说明执行。
+3. **切到 `H5-CodingExecutor`**：在 Copilot Chat 输入框下方的 Agent 下拉里选它，让它按任务说明执行。
 4. **提交前切到 `H5-CommitAuditor`**：让它逐字段校验 commit message（Design / Tests / Verify / Docs / Risk / Task）。
 
 > 中小变更允许跳过 H1–H4 直接从 H5 起跳，但底线是：**每个 commit 至少要能映射到一条 `REQ-NNN`**。如果这次改动连 REQ 都对不上，先回 1.1 节第 1 步把 requirements 补齐再来——`H5-CommitAuditor` 不会替你豁免这条。
@@ -231,30 +231,30 @@ Copy-Item .github\templates\ai-task-brief.md docs\06-tasks\T-001-<slug>.md
 | `/log-review` | 把会议 / PR 评审誊到 `docs/07-reviews/YYYY-MM-DD-*.md` |
 | `/sync-board` | 审计 task-board 与代码 / commit 的对齐，列失同步       |
 
-### Agents（在Copilot对话窗口的Agent中下拉手动切）
+### Agents（在 Copilot Chat 输入框下方的 Agent 下拉手动切）
 
-| Agent                        | 阶段  | 用途                                       |
-| ---------------------------- | ----- | ------------------------------------------ |
-| `H1-RequirementsInterviewer` | H1    | 反问把模糊需求转成可评审 `requirements.md` |
+| Agent                        | 阶段  | 用途                                                                                        |
+| ---------------------------- | ----- | ------------------------------------------------------------------------------------------- |
+| `H1-RequirementsInterviewer` | H1    | 反问把模糊需求转成可评审 `requirements.md`                                                  |
 | `H1-UISpecAuthor`            | H1    | 反问把 UI 细节逼出，按 stages.md 4.5 节 10 项产出 ui-spec / user-flow / acceptance-criteria |
-| `H1-PrototypeReviewer`       | H1    | 只读评审：读原型 + UI 文档，按 phase-gate H1 12 条 PASS/FAIL，不写文件 |
-| `H1-RepoImpactMapper`        | H1↔H3 | 把已 reviewed 需求映射到真实仓库代码       |
-| `H2-ArchitectAdvisor`        | H2    | 起草架构选型 + ADR，每条选型留六字段       |
-| `H3-DesignReviewer`          | H3    | 评审详细设计是否可进 H4                    |
-| `H4-TestCaseAuthor`          | H4    | 从需求与设计反推测试用例矩阵               |
-| `H5-CodingExecutor`          | H5    | 严格按 ai-task-brief 执行编码 + Verify     |
-| `H5-CommitAuditor`           | H5    | 校验 commit 六字段，不合格拒合并           |
-| `H6-ReleaseNoteWriter`       | H6    | 从 commit-records 抽变更生成 release notes |
-| `Hx-DocGardener`             | Hx    | 周期巡检 docs/ 与代码偏离                  |
+| `H1-PrototypeReviewer`       | H1    | 只读评审：读原型 + UI 文档，按 phase-gate H1 12 条 PASS/FAIL，不写文件                      |
+| `H1-RepoImpactMapper`        | H1↔H3 | 把已 reviewed 需求映射到真实仓库代码                                                        |
+| `H2-ArchitectAdvisor`        | H2    | 起草架构选型 + ADR，每条选型留六字段                                                        |
+| `H3-DesignReviewer`          | H3    | 评审详细设计是否可进 H4                                                                     |
+| `H4-TestCaseAuthor`          | H4    | 从需求与设计反推测试用例矩阵                                                                |
+| `H5-CodingExecutor`          | H5    | 严格按 ai-task-brief 执行编码 + Verify                                                      |
+| `H5-CommitAuditor`           | H5    | 校验 commit 六字段，不合格拒合并                                                            |
+| `H6-ReleaseNoteWriter`       | H6    | 从 commit-records 抽变更生成 release notes                                                  |
+| `Hx-DocGardener`             | Hx    | 周期巡检 docs/ 与代码偏离                                                                   |
 
 ### 6.1 H1 下半段的两个专属 Agent：UISpecAuthor + PrototypeReviewer
 
 H1 完整定义见 [stages.md 第 4 节](../../docs/stages.md#4-h1需求ui-与交互原型阶段)，包含五件事：**需求文本 / UI 说明 / 用户流 / 可交互原型 / 评审留档**。最初版本只把"需求文本"做成了专属 Agent，下半段统一交给默认 Agent + 外部工具。**这一决策在采用方第一次跑 `/run-gate H1` 时被推翻了**：12 条门禁里下半段那 6 条经常 FAIL，原因是"默认 Agent 不会按 stages.md 4.5 节那 10 项主动反问"——同一组反问纪律已在上半段的 `H1-RequirementsInterviewer` 上证明有效，下半段当然也吃这套。从 v0.0.2 起，H1 下半段拆为两个专属 Agent：
 
-| Agent                  | 性质        | 干什么                                                                                  |
-| ---------------------- | ----------- | --------------------------------------------------------------------------------------- |
-| `H1-UISpecAuthor`      | 反问写文档  | 平移 RequirementsInterviewer 的纪律到 UI 维度，按 stages.md 4.5 节 10 项产出三份文档     |
-| `H1-PrototypeReviewer` | 只读评审员  | 读原型 + UI 文档，按 phase-gate H1 12 条 PASS/FAIL/UNKNOWN，**不写文件**——评审纪要由人写 |
+| Agent                  | 性质       | 干什么                                                                                   |
+| ---------------------- | ---------- | ---------------------------------------------------------------------------------------- |
+| `H1-UISpecAuthor`      | 反问写文档 | 平移 RequirementsInterviewer 的纪律到 UI 维度，按 stages.md 4.5 节 10 项产出三份文档     |
+| `H1-PrototypeReviewer` | 只读评审员 | 读原型 + UI 文档，按 phase-gate H1 12 条 PASS/FAIL/UNKNOWN，**不写文件**——评审纪要由人写 |
 
 设计取舍：
 
