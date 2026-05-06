@@ -32,15 +32,21 @@
 
 依次切 Agent 跑下去，每一步的产出会成为下一步的输入；不要跳级，跳级会让追溯链断在你身上。
 
-1. **H1 需求**：Copilot Chat 顶部 Agent 下拉切到 `h1-requirements-interviewer`，用一段大白话描述目标用户、核心场景、必做与可选——它会反问、追问、把回答落成 `docs/01-requirements/requirements.md` 草稿，分配 `REQ-001`、`REQ-002`…，没答清的进 `open-questions.md`，**不会自动用 `<TBD>` 占位**。
-2. **（可选）H1 影响图**：切 `h1-repo-impact-mapper`。全新空仓基本是全部新建，可跳过；老仓改造时它会列出受影响的模块 / 文件 / 接口 / 测试。
-3. **H2 架构 / ADR**：切 `h2-architect-advisor`。它基于上一步的 requirements 给一份初版架构（项目划分、技术栈、依赖关系）+ 关键 `ADR-NNN`（每条含"选择 / 为什么 / 替代 / 放弃理由 / 维护成本 / 性能-安全-交付影响"六字段）。这一步决定源码树长什么样、用什么栈。
-4. **H3 详细设计**：人手起草 `docs/04-detailed-design/<feature>/HD-NNN.md`（接口、数据模型、错误码、并发与失败语义）。写完切 `h3-design-reviewer` 让它逐项核对完备性，挡住"设计还没写清"流入下一阶段。
-5. **H4 测试用例**：切 `h4-test-case-author`。它从 REQ + HD 反推 `docs/05-test-design/test-cases.md`（每条 `TC-NNN`），保证每个 `REQ-NNN` 都有至少一条机械可判断的覆盖。
-6. **H5 起任务 → 编码 → 审提交**：上游凭证齐全后，就可以走 [1.2 节](#12-已有项目从-h5-起跳) 那四步把每条任务跑完。
-7. **H6 发版说明**：版本切出来时切 `h6-release-note-writer`，从 commit 抽取生成 `docs/07-release/release-notes.md`，回写追溯矩阵。
+1. **H1 上半段 · 需求文本**：Copilot Chat 顶部 Agent 下拉切到 `h1-requirements-interviewer`，用一段大白话描述目标用户、核心场景、必做与可选——它会反问、追问、把回答落成 `docs/01-requirements/requirements.md` 草稿，分配 `REQ-001`、`REQ-002`…，没答清的进 `open-questions.md`，**不会自动用 `<TBD>` 占位**。
+2. **H1 下半段 · UI 说明 + 原型 + 评审 + 留档**：H1 不是只写 `requirements.md` 就结束了。完整 H1 还包含「UI 说明、可交互原型、评审、留档」四件事——这部分**没有专属 Custom Agent**（详见第 6 节末尾的设计取舍），用默认 Agent 跟着清单做即可：
+   - **UI 说明**：在默认 Agent 下让它对照 `requirements.md` 的核心场景，按 [stages.md 第 4.5 节](../../docs/stages.md#45-ui-说明必须包含)清单产出 `docs/01-requirements/ui-spec.md`、`user-flow.md`、`acceptance-criteria.md`
+   - **可交互原型**：你自己挑工具做（HTML/CSS 静态页面、Figma 导出、V0、Lovable、手绘扫描都行），落到 `prototypes/<feature>/` 目录
+   - **拉一次评审**：哪怕只有你一个人，也对照 [phase-gate-checklist 第 1 节 H1](../templates/phase-gate-checklist.md#h1需求ui-与交互原型) 那 12 条逐项 PASS / FAIL，会议或自审纪要用 `/log-review` 落到 `docs/07-reviews/YYYY-MM-DD-h1-review.md`
+   - **结论留档**：把评审结论摘要回写到 `docs/02-prototype/prototype-review.md`（这份是 H2 架构选型的输入凭证之一，不能省）
+3. **跑一次 `/run-gate H1`**：在 Copilot Chat 输入 `/run-gate`，它会按上面那 12 条机械核对，给出 PASS / FAIL / UNKNOWN。**只有全 PASS 才能进 H2**——这是设计上的硬卡口，绕过去后面的 commit 审计会让你在 H5 阶段重新偿还。
+4. **（可选）H1 影响图**：切 `h1-repo-impact-mapper`。全新空仓基本是全部新建，可跳过；老仓改造时它会列出受影响的模块 / 文件 / 接口 / 测试。
+5. **H2 架构 / ADR**：切 `h2-architect-advisor`。它基于上一步的 requirements + ui-spec 给一份初版架构（项目划分、技术栈、依赖关系）+ 关键 `ADR-NNN`（每条含"选择 / 为什么 / 替代 / 放弃理由 / 维护成本 / 性能-安全-交付影响"六字段）。这一步决定源码树长什么样、用什么栈。
+6. **H3 详细设计**：人手起草 `docs/04-detailed-design/<feature>/HD-NNN.md`（接口、数据模型、错误码、并发与失败语义）。写完切 `h3-design-reviewer` 让它逐项核对完备性，挡住"设计还没写清"流入下一阶段。
+7. **H4 测试用例**：切 `h4-test-case-author`。它从 REQ + HD 反推 `docs/05-test-design/test-cases.md`（每条 `TC-NNN`），保证每个 `REQ-NNN` 都有至少一条机械可判断的覆盖。
+8. **H5 起任务 → 编码 → 审提交**：上游凭证齐全后，就可以走 [1.2 节](#12-已有项目从-h5-起跳) 那四步把每条任务跑完。
+9. **H6 发版说明**：版本切出来时切 `h6-release-note-writer`，从 commit 抽取生成 `docs/07-release/release-notes.md`，回写追溯矩阵。
 
-> 第 1 步产出的 `requirements.md` 是后面所有阶段的"上游凭证"——commit message 里的 `Design: REQ-001` / `Tests: TC-NNN` / `Task: TASK-NNN` 都是顺着它往下挂的。**没有这一步，提交格式校验会一路把你打回来**。
+> 第 1+2 步产出的 `requirements.md` 和 `ui-spec.md` 是后面所有阶段的"上游凭证"——commit message 里的 `Design: REQ-001` / `Tests: TC-NNN` / `Task: TASK-NNN` 都是顺着它们往下挂的。**没有这两步，提交格式校验会一路把你打回来**。
 
 ### 1.2 已有项目从 H5 起跳
 
@@ -60,8 +66,11 @@
 ```
 ┌─────────────────────── 一个特性 / 一次发版的生命周期 ───────────────────────┐
 │                                                                              │
-│  H1 需求          → H1-RequirementsInterviewer  → docs/01-requirements/      │
-│  H1 影响图        → H1-RepoImpactMapper         → docs/01-requirements/      │
+│  H1 需求文本      → H1-RequirementsInterviewer  → docs/01-requirements/      │
+│  H1 UI / 原型     → 默认 Agent + 你选的原型工具 → docs/01-requirements/      │
+│                                                   docs/02-prototype/         │
+│                                                   prototypes/<feature>/      │
+│  H1 影响图（可选）→ H1-RepoImpactMapper         → docs/01-requirements/      │
 │  H2 架构 / ADR    → H2-ArchitectAdvisor         → docs/03-architecture/      │
 │  H3 详细设计评审  → H3-DesignReviewer           → docs/04-detailed-design/   │
 │  H4 测试用例      → H4-TestCaseAuthor           → docs/05-test-design/       │
@@ -76,6 +85,8 @@
 │  对账       → /sync-board 把板和实际 commit 对一遍                           │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
+
+> H1 是双段：**上半段**（需求文本）由 `H1-RequirementsInterviewer` 主导，**下半段**（UI 说明 / 用户流 / 验收标准 / 可交互原型 / 评审 / 留档）用默认 Agent + 你选的原型工具，参见 [1.1 节第 2 步](#11-全新项目从-h1-起步)。`/run-gate H1` 会把两段一起核对，只过上半段不算 H1 完成。
 
 并不强制把 H1 → H6 全走完才能动手——分流规则见 [第 1 节](#1-装完后该干啥按项目状态分流)：全新项目按 1.1 节老老实实从 H1 起步；老仓加小功能按 1.2 节从 H5 起跳，事后补 `requirements.md` 链路。
 
@@ -229,6 +240,30 @@ Copy-Item .github\templates\ai-task-brief.md docs\06-tasks\T-001-<slug>.md
 | `H5-CommitAuditor`           | H5    | 校验 commit 六字段，不合格拒合并           |
 | `H6-ReleaseNoteWriter`       | H6    | 从 commit-records 抽变更生成 release notes |
 | `Hx-DocGardener`             | Hx    | 周期巡检 docs/ 与代码偏离                  |
+
+### 6.1 为什么 H1 下半段没有专属 Agent
+
+H1 完整定义见 [stages.md 第 4 节](../../docs/stages.md#4-h1需求ui-与交互原型阶段)，包含五件事：**需求文本 / UI 说明 / 用户流 / 可交互原型 / 评审留档**。其中只有"需求文本"做成了专属 Agent（`H1-RequirementsInterviewer`），下半段四件事统一**用默认 Agent + 外部工具**完成。这是设计决策，不是疏漏：
+
+- **UI 说明 / 用户流 / 验收标准是结构化文本**，但需要你看着原型边写边调整——把它们关进固化 Agent 反而限制了你跨场景的灵活引用（默认 Agent 同时能读 stages.md / 已写好的 requirements.md / 你打开的 Figma 截图）
+- **可交互原型本身不是 markdown**——HTML/CSS、Figma、V0、Lovable、手绘扫描都行，工具选择五花八门，做一个"原型生成 Agent"等于把工具选择钉死，反而妨碍迭代
+- **评审是人的活**——评审 Agent 容易自我满足（参见 [run-gate 设计](#73-唯一的例外run-gate-是只读的)），所以 H1 评审走 `/log-review` 把人工纪要落档，而不是让 Agent 替你拍板
+
+实操上，H1 下半段的工作流是：
+
+```
+默认 Agent (写 ui-spec.md / user-flow.md / acceptance-criteria.md)
+    ↓
+外部工具 (做 prototypes/<feature>/ 可交互原型)
+    ↓
+人工评审 + /log-review (把纪要落到 docs/07-reviews/)
+    ↓
+回写 docs/02-prototype/prototype-review.md
+    ↓
+/run-gate H1 (机械核对 12 条)
+```
+
+如果将来你确实想把这一段也做成 Agent，思路是：拆成一个 `h1-ui-spec-author`（按 stages.md 第 4.5 节清单产出 ui-spec）+ 一个 `h1-prototype-reviewer`（读 HTML/React 原型 + ui-spec，按 phase-gate H1 那 12 条逐项 PASS/FAIL）。**但目前阶段，默认 Agent 够用。**
 
 ---
 
