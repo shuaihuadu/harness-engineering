@@ -1,0 +1,7 @@
+# 个人创作工作区，不随框架分发
+.articles/
+
+# VS Code Copilot Chat 私人自用的 Agent / Skill / Prompt
+# （本仓库的"对外可分发 Agent"放在 agents/ 与 agents/_integrations/，
+#   .github/ 这一份是仓主在源仓里写公众号 / 起草内部资料时的私人配置）
+.github/
