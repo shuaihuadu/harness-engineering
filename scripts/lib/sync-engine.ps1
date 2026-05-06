@@ -115,6 +115,39 @@ function Write-FileUtf8NoBomInternal {
     [System.IO.File]::WriteAllText($Path, $Content, [System.Text.UTF8Encoding]::new($false))
 }
 
+# 按目标文件扩展名选 UTF-8 编码：
+#   .ps1 / .psm1 / .psd1 → 带 BOM（Windows PowerShell 5.1 默认用系统代码页读无 BOM 文件，
+#                           含中文的脚本会被按 GBK 误读导致语法错误）。
+#   其他（md/json/yaml/...）→ 不带 BOM，以免给下游工具链路制造噪声。
+function Get-Utf8EncodingForPathInternal {
+    param([string]$Path)
+    $ext = [System.IO.Path]::GetExtension($Path).ToLowerInvariant()
+    $needsBom = $ext -in @('.ps1', '.psm1', '.psd1')
+    return [System.Text.UTF8Encoding]::new($needsBom)
+}
+
+function Write-FileTextInternal {
+    param([string]$Path, [string]$Content)
+    $dir = Split-Path -Parent $Path
+    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    [System.IO.File]::WriteAllText($Path, $Content, (Get-Utf8EncodingForPathInternal $Path))
+}
+
+# 计算“写入磁盘后的真实字节”：UTF8Encoding.GetBytes() 不含 preamble，
+# 但 WriteAllText 会在文件头写 BOM（如果 encoding 包含 preamble）。
+# 这里手动补上 preamble，以便与现存文件字节严格对比、也以便 manifest sha256 跟磁盘一致。
+function Get-EncodedBytesForPathInternal {
+    param([string]$Path, [string]$Content)
+    $enc = Get-Utf8EncodingForPathInternal $Path
+    $preamble = $enc.GetPreamble()
+    $contentBytes = $enc.GetBytes($Content)
+    if ($preamble.Length -eq 0) { return $contentBytes }
+    $combined = New-Object byte[] ($preamble.Length + $contentBytes.Length)
+    [Array]::Copy($preamble, 0, $combined, 0, $preamble.Length)
+    [Array]::Copy($contentBytes, 0, $combined, $preamble.Length, $contentBytes.Length)
+    return $combined
+}
+
 function Write-FileBytesInternal {
     param([string]$Path, [byte[]]$Bytes)
     $dir = Split-Path -Parent $Path
@@ -233,7 +266,7 @@ function Sync-RenderedFile {
     }
 
     $newContent = Invoke-Placeholders -Content $rawText -Replacements $perFileReplacements
-    $newBytes = [System.Text.UTF8Encoding]::new($false).GetBytes($newContent)
+    $newBytes = Get-EncodedBytesForPathInternal -Path $Destination -Content $newContent
 
     if (Test-Path $Destination) {
         $oldBytes = Get-FileBytesInternal $Destination
@@ -257,7 +290,7 @@ function Sync-RenderedFile {
         Write-Host "   dryrun $Destination" -ForegroundColor DarkGray
     }
     else {
-        Write-FileUtf8NoBomInternal -Path $Destination -Content $newContent
+        Write-FileTextInternal -Path $Destination -Content $newContent
         Write-Host "   write  $Destination" -ForegroundColor Green
     }
     Add-ManifestEntryInternal -Context $Context -AbsPath $Destination -CanonicalBytes $newBytes -Kind 'rendered'
@@ -452,7 +485,7 @@ function Sync-TreeOrphans {
     # 删完文件后清空目录（自下而上）
     if (-not $Context.DryRun) {
         $allDirs = @(Get-ChildItem -LiteralPath $DestinationDir -Recurse -Directory) |
-            Sort-Object -Property FullName -Descending
+        Sort-Object -Property FullName -Descending
         foreach ($d in $allDirs) {
             if (-not (Get-ChildItem -LiteralPath $d.FullName -Force | Select-Object -First 1)) {
                 Remove-Item -LiteralPath $d.FullName -Force
