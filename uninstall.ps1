@@ -72,6 +72,15 @@ $TargetRepo = (Resolve-Path $TargetRepo).Path
 $manifestDir = Join-Path $TargetRepo '.harness-engineering'
 $manifestPath = Join-Path $manifestDir 'manifest.json'
 
+# 如果脚本是在 .harness-engineering\ 里被启动的，这个目录会被记录为进程的
+# 当前工作目录，最后一步删自身会被 Windows 拒以 "文件正在被使用"。
+# 提前切出去（同时同步进程级 cwd）。
+$startCwd = (Get-Location).ProviderPath
+if ($startCwd -like "$manifestDir*") {
+    Set-Location -LiteralPath $TargetRepo
+    [System.Environment]::CurrentDirectory = $TargetRepo
+}
+
 # ----------------------------------------------------------------------------
 # 公共：sha256 / 残留清理（manifest 缺失时的兜底）
 # ----------------------------------------------------------------------------
@@ -325,8 +334,17 @@ else {
             Write-Host "   delete .harness-engineering/install.log" -ForegroundColor Magenta
         }
         if ((Test-Path $manifestDir) -and -not @(Get-ChildItem -LiteralPath $manifestDir -Force)) {
-            Remove-Item -LiteralPath $manifestDir -Force
-            Write-Host "   rmdir  .harness-engineering" -ForegroundColor DarkMagenta
+            try {
+                Remove-Item -LiteralPath $manifestDir -Force -ErrorAction Stop
+                Write-Host "   rmdir  .harness-engineering" -ForegroundColor DarkMagenta
+            }
+            catch {
+                # 例如脚本是从 .harness-engineering\ 内部被启动的，进程仍持有该 cwd 句柄，
+                # 内核会拒绝删除。此时不报错退出，只提示手动收尾。
+                Write-Host "   [!] .harness-engineering/ 仍被本脚本进程占用，无法自动删除" -ForegroundColor Yellow
+                Write-Host "       退出后手动执行：" -ForegroundColor Yellow
+                Write-Host "         cd '$TargetRepo'; Remove-Item .harness-engineering -Force" -ForegroundColor Yellow
+            }
         }
     }
     else {
