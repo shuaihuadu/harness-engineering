@@ -352,8 +352,8 @@ function Sync-VendoredTree {
         }
         else {
             Get-ChildItem -Path $itemPath -Recurse -File | Where-Object {
-                # 排除 sync-engine 的输入产物（仅供渲染，不应进 vendor）
-                $_.Name -notlike '*.template.md' -and $_.Name -notlike '*.md.template' -and $_.Name -ne 'target.json'
+                # 排除 sync-engine 的输入产物（仅供渲染）与人手骨架（仅供作者抷贝），不应进 vendor
+                $_.Name -notlike '*.template.md' -and $_.Name -notlike '*.skeleton.md' -and $_.Name -ne 'target.json'
             } | ForEach-Object {
                 $rel = (Get-RelativePathInternal -Base $SourceRoot -Path $_.FullName).Replace('\', '/')
                 $sourceFiles[$rel] = $_.FullName

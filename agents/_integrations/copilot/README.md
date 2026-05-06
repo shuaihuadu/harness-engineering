@@ -4,7 +4,10 @@
 
 > **重要**：本目录下的所有文件都**不是**本仓库自身在用的 Copilot 配置——它们是被 [`install.ps1`](../../../install.ps1) / [`install.sh`](../../../install.sh) 渲染并落到**采用方仓库**的样板源。Copilot 只识别仓库根 `.github/`，不会自动加载本目录。
 >
-> **后缀约定**：名字带 `.template.md` 的文件含占位符（`{{KEY}}`）或正文拼装指令（`{{INCLUDE_BODY:}}` / `{{INCLUDE:}}`），装时需要走 sync-engine 渲染；名字不带 `.template` 的 `.md` 是 verbatim 源，照原样拷贝。
+> **后缀约定**：
+> - `*.template.md`：含占位符（`{{KEY}}`）或正文拼装指令（`{{INCLUDE_BODY:}}` / `{{INCLUDE:}}`），装时由 sync-engine 渲染。
+> - `*.md`（不带 `.template`）：verbatim 源，照原样字节拷贝。
+> - `*.skeleton.md`：人手抄写的骨架（如 `custom-agent.skeleton.md`），用 `<占位>` 而非 `{{KEY}}`，不进 sync-engine、不落到采用方仓库。
 
 ## 1. 渲染规则（target.json）
 

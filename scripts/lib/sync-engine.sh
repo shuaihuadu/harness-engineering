@@ -203,7 +203,7 @@ sync_vendored_tree() {
                 # 排除 sync-engine 的输入产物（仅供渲染，不应进 vendor）
                 local base; base=$(basename "$f")
                 case "$base" in
-                    *.template.md|*.md.template|target.json) continue ;;
+                    *.template.md|*.skeleton.md|target.json) continue ;;
                 esac
                 src_map["$rel"]="$f"
             done < <(find "$sp" -type f)
