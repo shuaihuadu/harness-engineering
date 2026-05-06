@@ -86,7 +86,7 @@ harness-engineering/
     ├── ai-task-brief.md            # AI 任务简报（H5 入口）
     ├── phase-gate-checklist.md     # 阶段门禁清单
     ├── review-record.md            # 评审记录
-    └── task-board.md               # 项目任务看板（需求侧"从哪进门"索引）
+    └── task-board.md               # 项目任务看板模板（采用方运行时实例位于 docs/06-tasks/task-board.md）
 ```
 
 每个 Agent 目录均包含：`AGENT.md`（角色定位、输入输出、工作约束）+ `prompt.md`（可直接投喂给 LLM 的系统提示词）。

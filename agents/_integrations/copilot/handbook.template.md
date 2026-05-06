@@ -18,13 +18,12 @@
 
 ## 1. 5 分钟速通：装完后该干啥
 
-跟着这五步，把最小闭环跑一遍：
+跟着这四步，把最小闭环跑一遍：
 
-1. **建一块任务板**：仓库根还没有 `task-board.md`？把 `.github/templates/task-board.md` 复制过去，删掉示例行。
-2. **起一个最小任务**：在 Copilot Chat 输入 `/new-task` 加你想做的小事；它会反问、起草 `docs/06-tasks/T-001-xxx.md`、并登记到 `task-board.md`。
-3. **人工审任务说明**：核对 `允许修改的文件` 与 `Verify 命令` 是否合理；OK 之后把 `task-board.md` 里这一行的 `status` 改成 `ready`。
-4. **切到 `H5-CodingExecutor`**：在 Copilot Chat 顶部的 Agent 下拉里选它，让它按任务说明执行。
-5. **提交前切到 `H5-CommitAuditor`**：让它逐字段校验 commit message（Design / Tests / Verify / Docs / Risk / Task）。
+1. **起一个最小任务**：在 Copilot Chat 输入 `/new-task` 加你想做的小事；首次运行它会按模板自动建 `docs/06-tasks/task-board.md`，并起草 `docs/06-tasks/T-001-xxx.md`、同时登记一行到看板。
+2. **人工审任务说明**：核对 `允许修改的文件` 与 `Verify 命令` 是否合理；OK 之后把 `docs/06-tasks/task-board.md` 里这一行的 `status` 改成 `ready`。
+3. **切到 `H5-CodingExecutor`**：在 Copilot Chat 顶部的 Agent 下拉里选它，让它按任务说明执行。
+4. **提交前切到 `H5-CommitAuditor`**：让它逐字段校验 commit message（Design / Tests / Verify / Docs / Risk / Task）。
 
 跑通这一圈，剩下的环节（H1 反问需求 → H2 ADR → H3 设计评审 → H4 测试用例 → H6 release notes → Hx 文档巡检）都是同一套手势的复制。
 
@@ -52,7 +51,7 @@
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
-并不强制把 H1 → H6 全走完才能动手；中小变更可以从 H5 起跳，但记得回头补上 `requirements.md` 与 `task-board.md` 的链路。
+并不强制把 H1 → H6 全走完才能动手；中小变更可以从 H5 起跳，但记得回头补上 `requirements.md` 与 `docs/06-tasks/task-board.md` 的链路。
 
 ---
 
@@ -126,14 +125,17 @@
 
 ### 5.1 直接复制使用
 
-需要在仓库里建一个新文档（比如要起任务板）：
+需要在仓库里建一个新文档（比如手工起草一份任务简报）：
 
 ```powershell
-# 例：从模板初始化任务板
-Copy-Item .github/templates/task-board.md task-board.md
+# 例：从模板初始化任务简报
+New-Item -ItemType Directory -Path docs\06-tasks -Force | Out-Null
+Copy-Item .github\templates\ai-task-brief.md docs\06-tasks\T-001-<slug>.md
 ```
 
 然后按里面的注释自己填。
+
+> 任务看板 `task-board.md` 不需要手工复制——`/new-task` 首次运行会自动建到 `docs/06-tasks/task-board.md`。
 
 ### 5.2 让 Agent / Prompt 引用
 
@@ -141,7 +143,7 @@ Copy-Item .github/templates/task-board.md task-board.md
 
 | Slash 命令    | 读取的模板                                            |
 | ------------- | ----------------------------------------------------- |
-| `/new-task`   | `ai-task-brief.md`，并把任务登记到 `task-board.md`    |
+| `/new-task`   | `ai-task-brief.md`；首次运行同时按 `task-board.md` 模板自动建 `docs/06-tasks/task-board.md` |
 | `/run-gate`   | `phase-gate-checklist.md`                             |
 | `/log-review` | `review-record.md`                                    |
 
@@ -255,7 +257,7 @@ Get-Content .\.harness-engineering\install.log
 
 每次 install / uninstall 追加一行：时间戳 / harness commit / 目标列表 / 文件计数。可作为变更审计来源。
 
-### Q6: 模板更新后，已经写好的产物文档（比如现有的 `task-board.md`）会被覆盖吗？
+### Q6: 模板更新后，已经写好的产物文档（比如现有的 `docs/06-tasks/task-board.md`）会被覆盖吗？
 
 不会。**模板只是新文档的起点**。已存在的产物文档完全归你管，install 与模板更新都不会动它们；想用上新模板的字段，需要自己手动 backport。
 

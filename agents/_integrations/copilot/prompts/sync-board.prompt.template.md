@@ -29,7 +29,7 @@ tools: ['codebase', 'search', 'changes']
 
 ## 输入
 
-- 仓库根 `task-board.md`
+- `docs/06-tasks/task-board.md`（如不存在，提示用户先起一条 `/new-task`）
 - 仓库 git 历史（用 `changes` 工具看最近 N 天的 commit）
 - 可选参数：`--stale-days=N`、`--zombie-days=M`、`--branch=main`（默认看当前分支与 `main`）
 
@@ -78,7 +78,7 @@ tools: ['codebase', 'search', 'changes']
 
 ## 流程
 
-1. 解析 `task-board.md`，列出所有 `T-NNN` 行与状态
+1. 解析 `docs/06-tasks/task-board.md`，列出所有 `T-NNN` 行与状态
 2. 列出近 `--stale-days` 天的 commit，提取每条 commit message 中的 `Task: T-NNN`
 3. 全仓 grep `T-NNN` 字符串，确认每个板上任务是否在代码 / 文档 / commit 中出现
 4. 按四类分组失同步项

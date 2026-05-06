@@ -485,9 +485,8 @@ else {
     Write-Host '        notepad .\.harness-engineering\HANDBOOK.md'
     Write-Host '   2. 起一个最小任务试手 / Try a smallest task:'
     Write-Host '        在 Copilot Chat 输入 / In Copilot Chat type:  /new-task'
-    Write-Host '   3. 仓库根登记任务板 / Bootstrap your task board:'
-    Write-Host '        Copy-Item .github\templates\task-board.md task-board.md'
-    Write-Host '   4. 可选 / Optional: 把 .harness-engineering/ 加入 .gitignore'
+    Write-Host '        (首次运行会按模板自动建 docs\06-tasks\task-board.md，无需手动复制)'
+    Write-Host '   3. 可选 / Optional: 把 .harness-engineering/ 加入 .gitignore'
     Write-Host '        说明见 / See:  .\.harness-engineering\README.md'
     Write-Host ''
     Write-Host '卸载 / Uninstall:' -ForegroundColor DarkGray
