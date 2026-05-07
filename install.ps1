@@ -484,10 +484,15 @@ else {
     Write-Host '下一步 / Next steps:' -ForegroundColor Cyan
     Write-Host '   1. 读 10 分钟操作手册 / Read the 10-min handbook:'
     Write-Host '        notepad .\.harness-engineering\HANDBOOK.md'
-    Write-Host '   2. 起一个最小任务试手 / Try a smallest task:'
+    Write-Host '   2. 跑一遍空跑演练 / Run a dry-run rehearsal (强烈推荐 / strongly recommended):'
+    Write-Host '        New-Item -ItemType Directory -Path .\docs\00-dry-run -Force | Out-Null'
+    Write-Host '        Copy-Item .\.github\templates\dry-run-demo.md .\docs\00-dry-run\'
+    Write-Host '        然后按文档清单走一遍 H1->H6，30~60 分钟'
+    Write-Host '        目的: 在拿真实需求前发现 Harness 在你项目里的不适配点，比真实需求踩坑便宜得多'
+    Write-Host '   3. 起一个最小任务试手 / Try a smallest task:'
     Write-Host '        在 Copilot Chat 输入 / In Copilot Chat type:  /new-task'
     Write-Host '        (首次运行会按模板自动建 docs\06-tasks\task-board.md，无需手动复制)'
-    Write-Host '   3. 可选 / Optional: 把 .harness-engineering/ 加入 .gitignore'
+    Write-Host '   4. 可选 / Optional: 把 .harness-engineering/ 加入 .gitignore'
     Write-Host '        说明见 / See:  .\.harness-engineering\README.md'
     Write-Host ''
     Write-Host '卸载 / Uninstall:' -ForegroundColor DarkGray
