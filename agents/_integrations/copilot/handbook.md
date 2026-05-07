@@ -773,7 +773,7 @@ H1-RepoImpactMapper、H3-DesignReviewer、H5-CodingExecutor 都依赖本节做�
 | --- | --- |
 | 操作手册 | `.he/HANDBOOK.md` |
 | 当前需求 | `docs/01-requirements/requirements.md` |
-| 件影响图 | `docs/01-requirements/repo-impact-map.md` |
+| 仓库影响图 | `docs/01-requirements/repo-impact-map.md` |
 | H1 评审纪要 | `docs/07-reviews/` |
 | 任务看板 | `docs/06-tasks/task-board.md` |
 

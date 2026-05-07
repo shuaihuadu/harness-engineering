@@ -9,7 +9,6 @@
 #
 # 公开函数：
 #   sync_rendered_file <source> <destination>
-#   sync_vendored_tree <source_root> <target_root> <items...>
 #   sync_render_orphans <source_dir> <destination_dir> <source_glob> <target_glob>
 
 set -euo pipefail
@@ -180,107 +179,6 @@ sync_rendered_file() {
         add_manifest_entry "$destination" "$tmp" 'rendered'
     fi
     rm -f "$tmp"
-}
-
-# ----------------------------------------------------------------------------
-# 同步 vendor 目录树
-# ----------------------------------------------------------------------------
-sync_vendored_tree() {
-    local source_root="$1"; shift
-    local target_root="$1"; shift
-    local items=( "$@" )
-
-    declare -A src_map
-    declare -A tgt_map
-
-    for item in "${items[@]}"; do
-        local sp="$source_root/$item"
-        if [[ -f "$sp" ]]; then
-            src_map["$item"]="$sp"
-        elif [[ -d "$sp" ]]; then
-            while IFS= read -r f; do
-                local rel="${f#$source_root/}"
-                # 排除 sync-engine 的输入产物（仅供渲染，不应进 vendor）
-                local base; base=$(basename "$f")
-                case "$base" in
-                    *.template.md|*.skeleton.md|target.json) continue ;;
-                esac
-                src_map["$rel"]="$f"
-            done < <(find "$sp" -type f)
-        fi
-        local tp="$target_root/$item"
-        if [[ -f "$tp" ]]; then
-            tgt_map["$item"]="$tp"
-        elif [[ -d "$tp" ]]; then
-            while IFS= read -r f; do
-                local rel="${f#$target_root/}"
-                tgt_map["$rel"]="$f"
-            done < <(find "$tp" -type f)
-        fi
-    done
-
-    # 孤儿
-    local orphans=()
-    for rel in "${!tgt_map[@]}"; do
-        [[ -z "${src_map[$rel]+x}" ]] && orphans+=( "$rel" )
-    done
-
-    echo "   分类：源 ${#src_map[@]} 个文件 / 目标 ${#tgt_map[@]} 个文件 / 孤儿 ${#orphans[@]} 个"
-
-    # 同步
-    for rel in $(printf '%s\n' "${!src_map[@]}" | sort); do
-        local src="${src_map[$rel]}"
-        local dst="$target_root/$rel"
-
-        if [[ -f "$dst" ]] && cmp -s "$src" "$dst"; then
-            add_manifest_entry "$dst" "$src" 'vendored'
-            continue
-        fi
-
-        if [[ -f "$dst" ]]; then
-            set +e; ask_conflict "$dst" 'vendor'; local d=$?; set -e
-            case $d in
-                1) echo "   keep   $dst"; add_manifest_entry "$dst" "$src" 'vendored'; continue ;;
-                2) echo "用户中止" >&2; exit 1 ;;
-            esac
-        fi
-
-        if [[ $DRY_RUN -eq 1 ]]; then
-            echo "   dryrun $dst"
-        else
-            mkdir -p "$(dirname "$dst")"
-            cp "$src" "$dst"
-            echo "   sync   $dst"
-        fi
-        add_manifest_entry "$dst" "$src" 'vendored'
-    done
-
-    # 删除孤儿
-    for rel in $(printf '%s\n' "${orphans[@]:-}" | sort); do
-        [[ -z "$rel" ]] && continue
-        local dst="${tgt_map[$rel]}"
-        set +e; ask_delete "$dst"; local d=$?; set -e
-        case $d in
-            0)
-                if [[ $DRY_RUN -eq 1 ]]; then
-                    echo "   dryrun-delete $dst"
-                else
-                    rm -f "$dst"
-                    echo "   delete $dst"
-                fi
-                ;;
-            1) echo "   keep   $dst (orphan)" ;;
-            2) echo "用户中止" >&2; exit 1 ;;
-        esac
-    done
-
-    # 清空目录
-    if [[ $DRY_RUN -eq 0 ]]; then
-        for item in "${items[@]}"; do
-            local p="$target_root/$item"
-            [[ -d "$p" ]] && find "$p" -type d -empty -delete 2>/dev/null || true
-        done
-    fi
 }
 
 # ----------------------------------------------------------------------------

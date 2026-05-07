@@ -251,7 +251,9 @@ if [[ -n "$DETECTED_TEST_COMMAND$DETECTED_LINT_COMMAND" ]]; then
     [[ -n "$DETECTED_TEST_COMMAND" ]] && echo "      TestCommand = $DETECTED_TEST_COMMAND"
     [[ -n "$DETECTED_LINT_COMMAND" ]] && echo "      LintCommand = $DETECTED_LINT_COMMAND"
 fi
-if [[ ${#PRIOR[@]} -gt 0 ]]; then
+prior_count=0
+set +u; prior_count=${#PRIOR[@]}; set -u
+if [[ $prior_count -gt 0 ]]; then
     echo
     echo "    检测到上次 manifest（v$PRIOR_VERSION），将作为默认值预填 / Detected previous manifest, prefilling defaults"
 fi
@@ -337,20 +339,7 @@ if [[ $NON_INTERACTIVE -eq 0 ]]; then
 fi
 
 # ----------------------------------------------------------------------------
-# Vendor
-# ----------------------------------------------------------------------------
-if [[ -n "$VENDOR_HARNESS_TO" ]]; then
-    vendor_abs="$TARGET_REPO/$VENDOR_HARNESS_TO"
-    echo
-    echo "==> Vendor 规范文档 / Vendor harness docs -> $vendor_abs"
-    sync_vendored_tree "$REPO_ROOT" "$vendor_abs" agents docs templates README.md
-else
-    echo
-    echo "==> 跳过 vendor / Skipping vendor (--no-vendor)"
-fi
-
-# ----------------------------------------------------------------------------
-# 逐个执行 target
+# 逐个执行 target（vendor 由 target.json 中的 single/tree render 自行处理）
 # ----------------------------------------------------------------------------
 for t in "${TARGETS_ARR[@]}"; do
     invoke_target "$INTEGRATIONS_ROOT/$t" "$TARGET_REPO"
@@ -407,6 +396,23 @@ if [[ $DRY_RUN -eq 0 ]]; then
 
     echo
     echo "==> 已写入 manifest / Manifest written: $manifest_path"
+
+    # ----------------------------------------------------------------------------
+    # install.log（每次 install / uninstall 追加一行，作为变更审计来源）
+    # ----------------------------------------------------------------------------
+    rendered_count=0; vendored_count=0; total_count=0
+    if [[ -f "$MANIFEST_TMP" ]]; then
+        rendered_count=$(awk -F'\t' '$1=="rendered"{c++} END{print c+0}' "$MANIFEST_TMP")
+        vendored_count=$(awk -F'\t' '$1=="vendored"{c++} END{print c+0}' "$MANIFEST_TMP")
+        total_count=$(awk 'END{print NR+0}' "$MANIFEST_TMP")
+    fi
+    log_path="$manifest_dir/install.log"
+    ts_iso=$(date '+%Y-%m-%dT%H:%M:%S%z')
+    commit_tag=${harness_commit:-unknown}
+    targets_tag=$(IFS=,; echo "${TARGETS_ARR[*]}")
+    printf '[%s] install · harness@%s · targets=%s · files=%d (rendered=%d, vendored=%d)\n' \
+        "$ts_iso" "$commit_tag" "$targets_tag" "$total_count" "$rendered_count" "$vendored_count" \
+        >>"$log_path"
 fi
 [[ -n "$MANIFEST_TMP" && -f "$MANIFEST_TMP" ]] && rm -f "$MANIFEST_TMP"
 

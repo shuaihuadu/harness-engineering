@@ -37,6 +37,7 @@ invoke_target() {
         case "$kind" in
             single)    invoke_render_single "$render" "$target_dir" "$target_repo" ;;
             directory) invoke_render_directory "$render" "$target_dir" "$target_repo" "$name" ;;
+            tree)      invoke_render_tree "$render" "$target_dir" "$target_repo" ;;
             *) echo "不支持的 render kind：$kind" >&2; exit 1 ;;
         esac
     done < <(jq -c '.renders[]' <<<"$spec")
@@ -227,5 +228,65 @@ invoke_render_directory() {
     # 孤儿检测
     if [[ "$orphan_check" == "true" ]] && { [[ "$orphan_only_all" != "true" ]] || [[ $use_all -eq 1 ]]; }; then
         sync_render_orphans "$src_dir" "$dst_dir" "$source_glob" "$target_glob"
+    fi
+}
+
+# ----------------------------------------------------------------------------
+# tree render：递归拷贝 source_dir 下每个一级子目录中的全部文件到 target_dir
+# 顶层文件（如 README.md）不拷入目标，只拷 "一个子目录 = 一个业务单位" 这种结构化产物
+# 主要服务 GitHub Copilot Skills（.github/skills/<name>/SKILL.md）这类需要保留一层名字子目录的场景
+# ----------------------------------------------------------------------------
+invoke_render_tree() {
+    local render="$1" target_dir="$2" target_repo="$3"
+
+    local source_dir; source_dir=$(jq -r '.source_dir' <<<"$render")
+    local target_subdir; target_subdir=$(jq -r '.target_dir' <<<"$render")
+    local orphan_check; orphan_check=$(jq -r '.orphan_check // false' <<<"$render")
+
+    local src_dir="$target_dir/$source_dir"
+    local dst_dir="$target_repo/$target_subdir"
+
+    if [[ ! -d "$src_dir" ]]; then
+        echo "   skip   $src_dir 不存在"
+        return 0
+    fi
+
+    # 解析为绝对路径，便于拼相对路径
+    local src_abs; src_abs="$(cd "$src_dir" && pwd)"
+
+    # 拷贝每个一级子目录下的所有文件，记录每个文件的相对路径
+    declare -A expected_rel
+    while IFS= read -r -d '' subdir; do
+        while IFS= read -r -d '' f; do
+            local rel="${f#$src_abs/}"
+            sync_rendered_file "$f" "$dst_dir/$rel"
+            expected_rel["$rel"]=1
+        done < <(find "$subdir" -type f -print0)
+    done < <(find "$src_abs" -mindepth 1 -maxdepth 1 -type d -print0)
+
+    # 孤儿检测
+    if [[ "$orphan_check" == "true" ]] && [[ -d "$dst_dir" ]]; then
+        while IFS= read -r -d '' f; do
+            local rel="${f#$dst_dir/}"
+            [[ -n "${expected_rel[$rel]+x}" ]] && continue
+            set +e; ask_delete "$f"; local d=$?; set -e
+            case $d in
+                0)
+                    if [[ $DRY_RUN -eq 1 ]]; then
+                        echo "   dryrun-delete $f"
+                    else
+                        rm -f "$f"
+                        echo "   delete $f"
+                    fi
+                    ;;
+                1) echo "   keep   $f (orphan)" ;;
+                2) echo "用户中止" >&2; exit 1 ;;
+            esac
+        done < <(find "$dst_dir" -type f -print0)
+
+        # 清空空目录
+        if [[ $DRY_RUN -eq 0 ]]; then
+            find "$dst_dir" -type d -empty -delete 2>/dev/null || true
+        fi
     fi
 }

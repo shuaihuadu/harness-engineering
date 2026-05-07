@@ -28,7 +28,7 @@
 
 .PARAMETER VendorHarnessTo
     Vendor 目标子目录（相对于 TargetRepo），默认 '.he'。
-    会把规范文档（agents/、docs/、templates/、README.md）同步进去，让模板里的链接开箱即可点。
+    会把规范文档（HANDBOOK、docs/{stages,repo-layout,tech-debt-gc}.md、README、uninstall.ps1）同步进去，让模板里的链接开箱即可点。
     默认与安装清单（manifest.json）合住一个隐藏目录，语义清晰、便于一键卸载。
     在交互模式下未显式传入时，会弹 prompt 让你确认或自定义路径（回车采纳默认）。
 

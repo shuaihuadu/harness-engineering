@@ -40,9 +40,9 @@ cd harness-engineering
 
 默认会做四件事：
 
-1. **Vendor 规范文档**到 `<your-repo>/.he/`
-2. **渲染 Copilot 配置**到 `.github/copilot-instructions.md` + `.github/instructions/*`
-3. **不默认安装 Custom Agent**：必须显式 `-CopilotAgents commit-auditor,...` 或 `-CopilotAgents all`
+1. **Vendor 规范文档**到 `<your-repo>/.he/`（HANDBOOK + 设计文档 + README + uninstall.ps1）
+2. **渲染 Copilot 配置**到 `.github/`（copilot-instructions / instructions / templates / skills / prompts / agents）
+3. **Custom Agent 默认全装**：当前 Copilot target 的 `default_select=all`，省略 `-CopilotAgents` 即全装；交互模式可现场按编号 / `none` 自选
 4. **写入安装清单**到 `<your-repo>/.he/manifest.json`，供 `uninstall` 使用并在重装时自动预填
 
 完整选项（占位符策略、Vendor / NoVendor 模式、卸载方式、多 target）见 [`docs/install.md`](docs/install.md)。

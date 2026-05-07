@@ -5,7 +5,7 @@ tools: {{TOOL_LIST}}
 
 # {{AGENT_NAME}}
 
-本文件是 [Harness Engineering 配套 Agent](../../harness-engineering/agents/README.md) 在 GitHub Copilot Chat 中的 **Custom Agent** 包装。系统提示与契约保持单点维护：
+本文件是 [Harness Engineering 配套 Agent](https://github.com/shuaihuadu/harness-engineering/blob/main/agents/README.md) 在 GitHub Copilot Chat 中的 **Custom Agent** 包装。系统提示与契约保持单点维护：
 
 - 系统提示：见 `{{AGENT_DIR}}/prompt.md`
 - 输入输出契约：见 `{{AGENT_DIR}}/AGENT.md`
