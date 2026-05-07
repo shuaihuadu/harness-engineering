@@ -42,11 +42,12 @@
 
 ### 4.2 待澄清清单
 
-`docs/01-requirements/open-questions.md`，记录所有未在访谈中得到答复、但又会影响后续阶段的问题。每条包含：
+`docs/01-requirements/open-questions.md`，记录所有未在访谈中得到答复、但又会影响后续阶段的问题。结构严格遵循 [`templates/open-questions.md`](../../templates/open-questions.md)，每条包含：
 
-- 问题描述
+- 问题描述 + 为什么需要答
 - 影响范围（哪些 REQ / UI / 架构方向会受影响）
-- 建议的默认值（如有）
+- 候选答（A/B/C/D，每条带"选这条会带来什么后果"）——**不代用户拍默认值**
+- 三个人工输入位（回答 / 决策日期 / 决策人），格式为 `> **[ 待填 ]**：...`，详见 [`io-contracts.md` 第 7 节](../_shared/io-contracts.md)
 - 卡点等级：`blocking` / `non-blocking`
 
 ### 4.3 阻塞返回

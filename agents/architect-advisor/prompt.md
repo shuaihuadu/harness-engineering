@@ -75,7 +75,7 @@
 2. `docs/03-architecture/tech-selection.md`——每条选型六字段齐全
 3. `docs/03-architecture/risk-analysis.md`——每条 `RISK-NNN` 至少一条可执行缓解
 4. `docs/03-architecture/adr/ADR-NNN-<slug>.md`——对每个会被多次复用或反向影响多模块的决策建一份
-5. `docs/03-architecture/open-questions-arch.md`——所有未解约束 + Agent 默认推进的项
+5. `docs/03-architecture/open-questions-arch.md`——所有未解约束 + Agent 默认推进的项。**结构严格遵循** [`templates/open-questions.md`](../../templates/open-questions.md)：每条 OQ 必含问题 / 为什么需要答 / 影响范围 / 候选答（A/B/C/D 带后果） / 卡点等级，以及三个人工输入位 `> **[ 待填 ]**：...`（回答 / 决策日期 / 决策人）——用户要能一眼看到"我答案写在哪儿"。详见 [`_shared/io-contracts.md` 第 7 节](../_shared/io-contracts.md)。
 
 frontmatter 字段按 [io-contracts.md 第 2 节](../_shared/io-contracts.md) 填齐，`stage: H2`，`upstream` 引用相关 REQ 与既有 ADR 编号。
 

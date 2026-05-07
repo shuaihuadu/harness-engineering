@@ -14,6 +14,17 @@ maintainer: <人或调度 Agent>
 > **运行时位置**：本模板在采用方仓库的运行时实例位于 `docs/06-tasks/task-board.md`。`/new-task` 第一次运行时会自动按本模板创建到该路径，**不要把它复制到仓库根**。
 > 阶段定义见 `.harness-engineering/docs/stages.md`，仓库结构入口见 `.harness-engineering/docs/repo-layout.md`。
 
+## 0. 维护本看板的常见动作
+
+| 你想做的事 | 去哪里做 | 看板上同步改哪一节 |
+| --- | --- | --- |
+| 新增一条任务 | Copilot Chat 输入 `/new-task <一句话需求>` | 自动追加到第 1 节"在跑任务"，状态 `draft` |
+| 任务卡草稿评审过了，可以开工 | 手动改本看板对应行的 `状态` 列 `draft → ready` | 第 1 节 |
+| 任务被 `H5-CodingExecutor` 阻塞返回 / 卡上游 / 缺凭证 | 把阻塞登记进第 2 节 | 第 2 节"等待人工决策" |
+| 任务编码完且 commit 过 CommitAuditor | 把对应行迁出第 1 节、迁入第 3 节 | 第 1 节 → 第 3 节 |
+| 任务暂缓 / 取消 | 把对应行迁入第 4 节 | 第 4 节 |
+| 跑一次"看板与代码 / commit 是否对齐"的体检 | Copilot Chat 输入 `/sync-board` | 由 sync-board 报告失同步项，按报告改 |
+
 ## 1. 在跑任务（H1–H5）
 
 | 任务编号 | 标题 | 当前阶段 | 文档目录 | 阻塞 / 风险 | 最近一次推进 |
