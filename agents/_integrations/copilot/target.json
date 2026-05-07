@@ -57,32 +57,32 @@
         {
             "kind": "single",
             "source": "handbook.md",
-            "target": ".harness-engineering/HANDBOOK.md"
+            "target": ".he/HANDBOOK.md"
         },
         {
             "kind": "single",
             "source": "vendor-readme.template.md",
-            "target": ".harness-engineering/README.md"
+            "target": ".he/README.md"
         },
         {
             "kind": "single",
             "source": "../../../docs/stages.md",
-            "target": ".harness-engineering/docs/stages.md"
+            "target": ".he/docs/stages.md"
         },
         {
             "kind": "single",
             "source": "../../../docs/repo-layout.md",
-            "target": ".harness-engineering/docs/repo-layout.md"
+            "target": ".he/docs/repo-layout.md"
         },
         {
             "kind": "single",
             "source": "../../../docs/tech-debt-gc.md",
-            "target": ".harness-engineering/docs/tech-debt-gc.md"
+            "target": ".he/docs/tech-debt-gc.md"
         },
         {
             "kind": "single",
             "source": "../../../uninstall.ps1",
-            "target": ".harness-engineering/uninstall.ps1"
+            "target": ".he/uninstall.ps1"
         }
     ]
 }

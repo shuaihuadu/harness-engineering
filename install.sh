@@ -4,7 +4,7 @@
 # 用法：
 #   ./install.sh --target-repo /path/to/repo [--targets copilot,claude-code] \
 #                [--test-command 'dotnet test'] [--lint-command 'dotnet format --verify-no-changes'] \
-#                [--harness-repo-ref .harness-engineering] [--non-interactive]
+#                [--harness-repo-ref .he] [--non-interactive]
 #
 # 依赖：bash 4+，jq
 
@@ -18,7 +18,7 @@ TARGETS="copilot"
 TEST_COMMAND=""
 LINT_COMMAND=""
 HARNESS_REPO_REF=""
-VENDOR_HARNESS_TO=".harness-engineering"
+VENDOR_HARNESS_TO=".he"
 VENDOR_HARNESS_TO_EXPLICIT=0
 NO_VENDOR=0
 COPILOT_AGENTS=""
@@ -105,7 +105,7 @@ detect_project_defaults "$TARGET_REPO"
 
 # 2) 读取上次 manifest replacements
 declare -A PRIOR
-PRIOR_MANIFEST_PATH="$TARGET_REPO/.harness-engineering/manifest.json"
+PRIOR_MANIFEST_PATH="$TARGET_REPO/.he/manifest.json"
 PRIOR_VERSION=""
 if [[ -f "$PRIOR_MANIFEST_PATH" ]]; then
     while IFS=$'\t' read -r k v; do
@@ -260,7 +260,7 @@ echo
 resolve_command_with_menu TEST_COMMAND 'TEST_COMMAND' "$DETECTED_TEST_COMMAND" '测试命令 / Test command (TEST_COMMAND)'         TEST_OPTIONS
 resolve_command_with_menu LINT_COMMAND 'LINT_COMMAND' "$DETECTED_LINT_COMMAND" '代码风格检查命令 / Lint command (LINT_COMMAND)' LINT_OPTIONS
 
-# Vendor 目录：CLI 显式传入 > 上次 manifest.vendor_dir > 默认 .harness-engineering
+# Vendor 目录：CLI 显式传入 > 上次 manifest.vendor_dir > 默认 .he
 if [[ $NO_VENDOR -eq 0 && $VENDOR_HARNESS_TO_EXPLICIT -eq 0 ]]; then
     vendor_default="$VENDOR_HARNESS_TO"
     if [[ -f "$PRIOR_MANIFEST_PATH" ]]; then
@@ -360,7 +360,7 @@ done
 # 写 manifest
 # ----------------------------------------------------------------------------
 if [[ $DRY_RUN -eq 0 ]]; then
-    manifest_dir="$TARGET_REPO/.harness-engineering"
+    manifest_dir="$TARGET_REPO/.he"
     manifest_path="$manifest_dir/manifest.json"
     mkdir -p "$manifest_dir"
 

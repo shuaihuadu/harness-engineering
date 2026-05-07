@@ -9,7 +9,7 @@
 1. [装完后该干啥](#1-装完后该干啥按项目状态分流)
 2. [全流程一览：H1 → H6 + Hx](#2-全流程一览h1--h6--hx)
 3. [`.github/` 里都装了什么](#3-github-里都装了什么)
-4. [`.harness-engineering/` 里都装了什么](#4-harness-engineering-里都装了什么)
+4. [`.he/` 里都装了什么](#4-he-里都装了什么)
 5. [Templates 怎么用、怎么改](#5-templates-怎么用怎么改)
 6. [Skills / Prompts / Agents 速查](#6-skills--prompts--agents-速查)
 7. [给 Agent / Prompt 配置工具白名单](#7-给-agent--prompt-配置工具白名单)
@@ -373,10 +373,10 @@
 
 ---
 
-## 4. `.harness-engineering/` 里都装了什么
+## 4. `.he/` 里都装了什么
 
 ```
-.harness-engineering/
+.he/
 ├── HANDBOOK.md       ← 你正在读的这份手册
 ├── README.md         ← 解释这个目录的角色 + .gitignore 建议
 ├── docs/             ← 设计文档（stages.md / repo-layout.md / tech-debt-gc.md）
@@ -390,7 +390,7 @@
 如果觉得它和项目本身无关、不想入版本库，**推荐把它加进 `.gitignore`**：
 
 ```gitignore
-.harness-engineering/
+.he/
 ```
 
 代价：团队其他人 `git pull` 后看不到这份手册，需要自己再跑一次 `install.ps1`。如果想让所有人都能直接读，就保留入版本库。
@@ -645,7 +645,7 @@ tools:
 - 选 `A`：本次后续所有冲突一律覆盖
 - 选 `B`：中断本次 install
 
-只有传 `-Force` 才会全部静默覆盖。想长期 own 某个文件，每次升级时按 `K` 即可；想彻底脱钩、连询问都不要，从 `.harness-engineering/manifest.json` 里删掉对应那一行。
+只有传 `-Force` 才会全部静默覆盖。想长期 own 某个文件，每次升级时按 `K` 即可；想彻底脱钩、连询问都不要，从 `.he/manifest.json` 里删掉对应那一行。
 
 ### Q3: 升级到新版本
 
@@ -661,7 +661,7 @@ pwsh -File <harness-source-repo>/install.ps1 -TargetRepo .
 ### Q4: 一键卸载
 
 ```powershell
-pwsh -File .\.harness-engineering\uninstall.ps1
+pwsh -File .\.he\uninstall.ps1
 ```
 
 按 `manifest.json` 反向移除全部装过的文件。本地改过的文件默认**保留**并打 `keep` 标记，加 `-Force` 才会一并删除；不在 manifest 里的文件全程不动。
@@ -669,7 +669,7 @@ pwsh -File .\.harness-engineering\uninstall.ps1
 ### Q5: 我想看完整安装日志
 
 ```powershell
-Get-Content .\.harness-engineering\install.log
+Get-Content .\.he\install.log
 ```
 
 每次 install / uninstall 追加一行：时间戳 / harness commit / 目标列表 / 文件计数。可作为变更审计来源。
@@ -715,7 +715,7 @@ Get-Content .\.harness-engineering\install.log
 # <项目名>
 
 > AI 协作单一事实源——遵循 [AGENTS.md 跨工具开放约定](https://agents.md/)。
-> 本仓库采用 [Harness Engineering 规范](.harness-engineering/HANDBOOK.md) 作为工程骨架。
+> 本仓库采用 [Harness Engineering 规范](.he/HANDBOOK.md) 作为工程骨架。
 
 ## 1. 项目身份
 
@@ -742,7 +742,7 @@ Get-Content .\.harness-engineering\install.log
 本项目当前唯一启用 GitHub Copilot Chat。
 
 - 工具入口：`.github/copilot-instructions.md`（Copilot 自动加载）
-- Agent / Skill / Prompt 速查与白名单改法：`.harness-engineering/HANDBOOK.md` 第 6 节、第 7 节
+- Agent / Skill / Prompt 速查与白名单改法：`.he/HANDBOOK.md` 第 6 节、第 7 节
 
 > 切到 Codex / Claude Code / Cursor 时本文件作为跨工具事实源不变。
 
@@ -771,7 +771,7 @@ H1-RepoImpactMapper、H3-DesignReviewer、H5-CodingExecutor 都依赖本节做�
 
 | 内容 | 位置 |
 | --- | --- |
-| 操作手册 | `.harness-engineering/HANDBOOK.md` |
+| 操作手册 | `.he/HANDBOOK.md` |
 | 当前需求 | `docs/01-requirements/requirements.md` |
 | 件影响图 | `docs/01-requirements/repo-impact-map.md` |
 | H1 评审纪要 | `docs/07-reviews/` |

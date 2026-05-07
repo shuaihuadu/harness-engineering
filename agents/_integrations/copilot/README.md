@@ -21,14 +21,14 @@
 | `prompts/*.prompt.md` (× 4)                       | `.github/prompts/*.prompt.md`            | `/<name>` 显式触发                                 |
 | `../../_skills/*/SKILL.md`                        | `.github/skills/*/SKILL.md`              | 模型按 description 语义命中后自动调用              |
 | `../../templates/*.md` (× 4)                      | `.github/templates/*.md`                 | 给 Skills / Prompts / 人手共用的产物模板           |
-| `handbook.md`                                     | `.harness-engineering/HANDBOOK.md`       | 操作手册，10 分钟上手                              |
-| `vendor-readme.template.md`                       | `.harness-engineering/README.md`         | 解释 `.harness-engineering/` 角色 + gitignore 建议 |
-| `../../docs/{stages,repo-layout,tech-debt-gc}.md` | `.harness-engineering/docs/*.md`         | 设计文档（深度阅读）                               |
+| `handbook.md`                                     | `.he/HANDBOOK.md`       | 操作手册，10 分钟上手                              |
+| `vendor-readme.template.md`                       | `.he/README.md`         | 解释 `.he/` 角色 + gitignore 建议 |
+| `../../docs/{stages,repo-layout,tech-debt-gc}.md` | `.he/docs/*.md`         | 设计文档（深度阅读）                               |
 
 安装产物分两个目录：
 
 - **`.github/`**：Copilot 真正读的所有文件，开箱即用
-- **`.harness-engineering/`**：HANDBOOK + 设计文档 + 安装清单 (`manifest.json`) + 安装日志 (`install.log`) + 卸载脚本 (`uninstall.ps1`)
+- **`.he/`**：HANDBOOK + 设计文档 + 安装清单 (`manifest.json`) + 安装日志 (`install.log`) + 卸载脚本 (`uninstall.ps1`)
 
 ## 2. 关键设计：自包含的 .github/
 
@@ -36,8 +36,8 @@
 
 **收益**：
 
-- `.github/agents/*.agent.md` 自包含，不依赖 `.harness-engineering/agents/`（后者甚至不会被装到采用方）
-- 用户把 `.harness-engineering/` 加进 `.gitignore` 也不影响 Copilot Agent 工作
+- `.github/agents/*.agent.md` 自包含，不依赖 `.he/agents/`（后者甚至不会被装到采用方）
+- 用户把 `.he/` 加进 `.gitignore` 也不影响 Copilot Agent 工作
 - 模板源（`AGENT.md` / `prompt.md`）依然是单一事实来源；改了它，重跑 install 就同步
 
 INCLUDE 指令在渲染时同步做"安全降级"：把内嵌指向 `../_shared/`、`../../docs/`、`../../README.md`、`AGENT.md` 的相对链接外壳剥成纯文本，避免 `.github/` 下出现 broken link。
@@ -113,8 +113,8 @@ Select-String '\{\{' <your-repo>/.github -Recurse
 | ---------------------------------- | ------------------------------------------------------------ | ----------------------------------- |
 | `{{TEST_COMMAND}}`                 | 验收测试命令                                                 | `dotnet test`                       |
 | `{{LINT_COMMAND}}`                 | 代码风格检查命令                                             | `dotnet format --verify-no-changes` |
-| `{{HARNESS_REPO_REF}}`             | vendor 路径标识                                              | `.harness-engineering`（默认）      |
-| `{{HARNESS_REPO_REF_FROM_GITHUB}}` | 从 .github/ 回指 vendor 的相对路径（按文件深度自动算 `../`） | `../.harness-engineering`           |
+| `{{HARNESS_REPO_REF}}`             | vendor 路径标识                                              | `.he`（默认）      |
+| `{{HARNESS_REPO_REF_FROM_GITHUB}}` | 从 .github/ 回指 vendor 的相对路径（按文件深度自动算 `../`） | `../.he`           |
 
 ## 5. 不在范围内
 

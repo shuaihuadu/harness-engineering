@@ -12,10 +12,10 @@
 #   - 自下而上清理空目录；非空目录绝不递归删
 #
 # Manifest 缺失时的兜底（残留清理）：
-#   - 例如 install 中途按 Ctrl+C，manifest 还没写入但 .harness-engineering/
+#   - 例如 install 中途按 Ctrl+C，manifest 还没写入但 .he/
 #     或 .github/ 下已经有部分文件落地。
 #   - 此时脚本不报错退出，而是启动 best-effort 残留扫描：
-#     * 整体清理 <target-repo>/.harness-engineering/ 目录（纯属本工具产物）
+#     * 整体清理 <target-repo>/.he/ 目录（纯属本工具产物）
 #     * 对 .github/copilot-instructions.md / .github/instructions/*.instructions.md /
 #       .github/agents/*.agent.md，仅当文件内含 "Harness Engineering" 标记时才删
 #     * 交互模式下会列出候选并请求确认；非交互模式必须显式 --force 才执行删除
@@ -45,7 +45,7 @@ TARGET_REPO="$(cd "$TARGET_REPO" && pwd)"
 # 注意：jq 仅在 manifest 存在的精确卸载路径中需要；best-effort 兜底不依赖 jq。
 # 因此把 jq 检查推迟到 manifest 检查之后。
 
-manifest_dir="$TARGET_REPO/.harness-engineering"
+manifest_dir="$TARGET_REPO/.he"
 manifest_path="$manifest_dir/manifest.json"
 
 sha256_of() {
@@ -80,7 +80,7 @@ best_effort_cleanup() {
     if [[ -d "$manifest_dir" ]]; then
         cand_kinds+=( "dir" )
         cand_paths+=( "$manifest_dir" )
-        cand_rels+=( ".harness-engineering/" )
+        cand_rels+=( ".he/" )
         cand_safe+=( 1 )
     fi
 
@@ -280,10 +280,10 @@ if [[ $DRY_RUN -eq 1 ]]; then
     echo "DryRun 完成。删除 $deleted / 保留 $kept / 缺失 $missing"
 elif [[ ${#modified_kept[@]} -eq 0 ]]; then
     rm -f "$manifest_path"
-    echo "   delete .harness-engineering/manifest.json"
+    echo "   delete .he/manifest.json"
     [[ -d "$manifest_dir" && -z "$(ls -A "$manifest_dir" 2>/dev/null)" ]] && {
         rmdir "$manifest_dir"
-        echo "   rmdir  .harness-engineering"
+        echo "   rmdir  .he"
     }
     echo
     echo "完成。删除 $deleted / 保留 $kept / 缺失 $missing"

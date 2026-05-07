@@ -50,7 +50,7 @@
 
 ### 4.3 不做
 
-- 不直接修改 `harness-engineering/` 下的规范与 Agent 文件
+- 不直接修改 `.he/` 下的规范与 Agent 文件
 - 不删除 `docs/` 中的内容（只能标记 deprecated 或开 PR 让人工裁决）
 
 ## 5. 工具集
@@ -67,7 +67,7 @@
 | `write.file`       | 是   | 写 `doc-gc-report.md`                              |
 | `pr.create`        | 否   | `high` 项可自动开修复 PR / issue（按部署环境而定） |
 
-**禁用**：`exec.*`、`write.patch` 对源码 / 规范文件的写动作——本 Agent 不动源码、不动 `harness-engineering/` 自身。
+**禁用**：`exec.*`、`write.patch` 对源码 / 规范文件的写动作——本 Agent 不动源码、不动 `.he/` 自身。
 
 ## 6. 行为约束
 

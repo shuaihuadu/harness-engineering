@@ -128,7 +128,7 @@ Agent 起草产物时，凡是**需要人工填答 / 决策 / 签字**的位置�
 
 - 直接合并 PR（必须由人工或独立 CI 系统完成）
 - 直接发布制品（H6 之后的发布动作不在本规范的 Agent 体系内）
-- 修改本目录下的规范文件（`harness-engineering/README.md` 与本目录下任何 `AGENT.md` / `prompt.md`）
+- 修改本目录下的规范文件（`.he/README.md` 与本目录下任何 `AGENT.md` / `prompt.md`）
 
 ## 9. 循环与迭代上限
 

@@ -7,7 +7,7 @@
 1. 严格遵循 [Harness Engineering 规范](../../README.md) 第 10 节（熵与技术债务 GC）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md)。
 3. **不要**删除任何文档。可以建议 `mark-deprecated` 或开 PR 让人工裁决。
-4. **不要**修改 `harness-engineering/` 目录下任何文件。
+4. **不要**修改 `.he/` 目录下任何文件。
 5. 每一条不一致都必须附"证据"。没有证据不写。
 
 ## 工作流程
@@ -15,7 +15,7 @@
 ### 第一步：确定本轮扫描范围
 
 - 扫描 `docs/01-requirements/` 至 `docs/07-release/`
-- 排除：`docs/_generated/`（如有）、显式标记为自动生成的目录、`harness-engineering/` 自身
+- 排除：`docs/_generated/`（如有）、显式标记为自动生成的目录、`.he/` 自身
 
 如果 `docs/` 体量大，按子目录拆分多轮，每轮聚焦一段。
 

@@ -2,17 +2,17 @@
 
 ## Harness Engineering 配套 Agent
 
-本仓库采纳 [Harness Engineering 规范](harness-engineering/README.md) 的配套 Agent 套件。各 Agent 的输入输出契约与系统提示均在 `harness-engineering/agents/<name>/`，由工具按需加载。
+本仓库采纳 [Harness Engineering 规范](.he/README.md) 的配套 Agent 套件。各 Agent 的输入输出契约与系统提示均在 `.he/agents/<name>/`，由工具按需加载。
 
 | 阶段 | Agent | 入口 |
 | --- | --- | --- |
-| H1 | RequirementsInterviewer | `harness-engineering/agents/requirements-interviewer/AGENT.md` |
-| H1↔H3 | RepoImpactMapper | `harness-engineering/agents/repo-impact-mapper/AGENT.md` |
-| H3 | DesignReviewer | `harness-engineering/agents/design-reviewer/AGENT.md` |
-| H4 | TestCaseAuthor | `harness-engineering/agents/test-case-author/AGENT.md` |
-| H5 | CodingExecutor | `harness-engineering/agents/coding-executor/AGENT.md` |
-| H5/H6 | CommitAuditor | `harness-engineering/agents/commit-auditor/AGENT.md` |
-| H6 | ReleaseNoteWriter | `harness-engineering/agents/release-note-writer/AGENT.md` |
-| 跨阶段 | DocGardener | `harness-engineering/agents/doc-gardener/AGENT.md` |
+| H1 | RequirementsInterviewer | `.he/agents/requirements-interviewer/AGENT.md` |
+| H1↔H3 | RepoImpactMapper | `.he/agents/repo-impact-mapper/AGENT.md` |
+| H3 | DesignReviewer | `.he/agents/design-reviewer/AGENT.md` |
+| H4 | TestCaseAuthor | `.he/agents/test-case-author/AGENT.md` |
+| H5 | CodingExecutor | `.he/agents/coding-executor/AGENT.md` |
+| H5/H6 | CommitAuditor | `.he/agents/commit-auditor/AGENT.md` |
+| H6 | ReleaseNoteWriter | `.he/agents/release-note-writer/AGENT.md` |
+| 跨阶段 | DocGardener | `.he/agents/doc-gardener/AGENT.md` |
 
 > 不要把上述 `AGENT.md` 的正文复制进本文件——`AGENTS.md` 是目录而非百科。

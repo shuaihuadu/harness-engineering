@@ -27,7 +27,7 @@
     在不是 -NonInteractive / -Force 的情况下，未提供的字段会进入交互提示。
 
 .PARAMETER VendorHarnessTo
-    Vendor 目标子目录（相对于 TargetRepo），默认 '.harness-engineering'。
+    Vendor 目标子目录（相对于 TargetRepo），默认 '.he'。
     会把规范文档（agents/、docs/、templates/、README.md）同步进去，让模板里的链接开箱即可点。
     默认与安装清单（manifest.json）合住一个隐藏目录，语义清晰、便于一键卸载。
     在交互模式下未显式传入时，会弹 prompt 让你确认或自定义路径（回车采纳默认）。
@@ -75,7 +75,7 @@ param(
     [string]$LintCommand,
     [string]$HarnessRepoRef,
 
-    [string]$VendorHarnessTo = '.harness-engineering',
+    [string]$VendorHarnessTo = '.he',
     [switch]$NoVendor,
 
     [string[]]$CopilotAgents,
@@ -137,7 +137,7 @@ $detected = Get-ProjectDefaults -Root $TargetRepo
 # 2) 读取上次 manifest 中的 replacements（如有）
 $priorManifest = $null
 $priorReplacements = @{}
-$existingManifestPath = Join-Path (Join-Path $TargetRepo '.harness-engineering') 'manifest.json'
+$existingManifestPath = Join-Path (Join-Path $TargetRepo '.he') 'manifest.json'
 if (Test-Path $existingManifestPath) {
     try {
         $priorManifest = Get-Content -LiteralPath $existingManifestPath -Raw | ConvertFrom-Json
@@ -302,7 +302,7 @@ Write-Host ''
 $TestCommand = Resolve-CommandWithMenu -Cli $TestCommand -ManifestKey 'TEST_COMMAND' -Detected $detected.TestCommand -Title '测试命令 / Test command (TEST_COMMAND)'                  -Options $TestOptions -Interactive $interactive
 $LintCommand = Resolve-CommandWithMenu -Cli $LintCommand -ManifestKey 'LINT_COMMAND' -Detected $detected.LintCommand -Title '代码风格检查命令 / Lint command (LINT_COMMAND)'         -Options $LintOptions -Interactive $interactive
 
-# Vendor 目录：CLI 显式传入 > 上次 manifest.vendor_dir > 参数默认值（.harness-engineering）；
+# Vendor 目录：CLI 显式传入 > 上次 manifest.vendor_dir > 参数默认值（.he）；
 # 未显式传入且交互模式 → 弹 prompt，回车采纳默认。
 if (-not $NoVendor) {
     if (-not $PSBoundParameters.ContainsKey('VendorHarnessTo')) {
@@ -405,7 +405,7 @@ foreach ($t in $validTargets) {
 # ----------------------------------------------------------------------------
 # 3. 写 manifest（uninstall 依赖此文件）
 # ----------------------------------------------------------------------------
-$manifestDir = Join-Path $TargetRepo '.harness-engineering'
+$manifestDir = Join-Path $TargetRepo '.he'
 $manifestPath = Join-Path $manifestDir 'manifest.json'
 
 $harnessCommit = $null
@@ -475,15 +475,15 @@ if ($DryRun) {
 }
 else {
     $githubCount = @($Context.Manifest | Where-Object { $_.path -like '.github/*' }).Count
-    $harnessCount = @($Context.Manifest | Where-Object { $_.path -like '.harness-engineering/*' }).Count
+    $harnessCount = @($Context.Manifest | Where-Object { $_.path -like '.he/*' }).Count
 
     Write-Host '==> 安装完成 / Install complete' -ForegroundColor Green
     Write-Host ("    [+] 写入 {0} 个文件到 .github/                  Copilot 开箱即用" -f $githubCount)
-    Write-Host ("    [+] 写入 {0} 个文件到 .harness-engineering/    HANDBOOK + docs + manifest" -f $harnessCount)
+    Write-Host ("    [+] 写入 {0} 个文件到 .he/    HANDBOOK + docs + manifest" -f $harnessCount)
     Write-Host ''
     Write-Host '下一步 / Next steps:' -ForegroundColor Cyan
     Write-Host '   1. 读 10 分钟操作手册 / Read the 10-min handbook:'
-    Write-Host '        notepad .\.harness-engineering\HANDBOOK.md'
+    Write-Host '        notepad .\.he\HANDBOOK.md'
     Write-Host '   2. 跑一遍空跑演练 / Run a dry-run rehearsal (强烈推荐 / strongly recommended):'
     Write-Host '        New-Item -ItemType Directory -Path .\docs\00-dry-run -Force | Out-Null'
     Write-Host '        Copy-Item .\.github\templates\dry-run-demo.md .\docs\00-dry-run\'
@@ -492,10 +492,10 @@ else {
     Write-Host '   3. 起一个最小任务试手 / Try a smallest task:'
     Write-Host '        在 Copilot Chat 输入 / In Copilot Chat type:  /new-task'
     Write-Host '        (首次运行会按模板自动建 docs\06-tasks\task-board.md，无需手动复制)'
-    Write-Host '   4. 可选 / Optional: 把 .harness-engineering/ 加入 .gitignore'
-    Write-Host '        说明见 / See:  .\.harness-engineering\README.md'
+    Write-Host '   4. 可选 / Optional: 把 .he/ 加入 .gitignore'
+    Write-Host '        说明见 / See:  .\.he\README.md'
     Write-Host ''
     Write-Host '卸载 / Uninstall:' -ForegroundColor DarkGray
-    Write-Host '   pwsh -File .\.harness-engineering\uninstall.ps1'
+    Write-Host '   pwsh -File .\.he\uninstall.ps1'
 }
 Write-Host ''

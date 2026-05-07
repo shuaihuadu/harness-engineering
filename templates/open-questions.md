@@ -74,5 +74,5 @@ downstream: []
 >
 > 1. 把所有 `blocking` 项的"回答 / 决策日期 / 决策人"三行都换成实际内容（最少需要的一步）。
 > 2. 切到对应阶段的 Agent（H1 → `H1-RequirementsInterviewer` / `H1-UISpecAuthor`，H2 → `H2-ArchitectAdvisor`），让它把答案回写到上游产物（`requirements.md` / `architecture.md` 等），并把对应 OQ 的"卡点等级"改成 `closed YYYY-MM-DD`、"回写"行填上具体落点。
-> 3. 上游产物 status 维持 `draft`——评审纪要走 `/log-review` 之后由人工把 `status: draft → reviewed`（参见 `.harness-engineering/HANDBOOK.md` Q7）。
+> 3. 上游产物 status 维持 `draft`——评审纪要走 `/log-review` 之后由人工把 `status: draft → reviewed`（参见 `.he/HANDBOOK.md` Q7）。
 > 4. 仍有 `non-blocking` 项时不阻塞推进，但要在 `risk-analysis.md` 或下一阶段 `open-questions-<stage>.md` 里继续追踪。

@@ -27,10 +27,10 @@ cd harness-engineering
 
 默认会做四件事：
 
-1. **Vendor 规范文档**：把 `agents/` `docs/` `templates/` `README.md` 同步进 `<your-repo>/.harness-engineering/`（与安装清单同住，一个隐藏目录装下所有 harness 产物）
+1. **Vendor 规范文档**：把 `agents/` `docs/` `templates/` `README.md` 同步进 `<your-repo>/.he/`（与安装清单同住，一个隐藏目录装下所有 harness 产物）
 2. **渲染 Copilot 配置**：`.github/copilot-instructions.md` + `.github/instructions/*`，链接指向上一步的 vendor 目录
 3. **Custom Agent 默认全装**：交互模式下脚本会列出可选的 Custom Agent 模板，让你按编号 / stem / `all` / `none` 现场挑选，回车采纳默认（当前 Copilot target 默认 `all`，全装）；非交互模式（`-NonInteractive` / `-Force`）走 `target.json` 的 `default_select`，也可以始终用 `-CopilotAgents` / `--copilot-agents` 显式覆盖
-4. **写入安装清单**：`<your-repo>/.harness-engineering/manifest.json` 记录本次写入的所有文件（含 sha256）+ 本次填入的占位符（`replacements`），供 `uninstall` 使用，并在下次重装时自动预填
+4. **写入安装清单**：`<your-repo>/.he/manifest.json` 记录本次写入的所有文件（含 sha256）+ 本次填入的占位符（`replacements`），供 `uninstall` 使用，并在下次重装时自动预填
 
 ## 2. 占位符填入策略
 
@@ -58,7 +58,7 @@ CLI 参数  >  上次 manifest.replacements  >  自动探测  >  交互输入 / 
 
 ## 4. Vendor 模式
 
-默认行为是把 `agents/`、`docs/`、`templates/`、`README.md` **整份复制**到你的仓库 `.harness-engineering/` 下，这意味着：
+默认行为是把 `agents/`、`docs/`、`templates/`、`README.md` **整份复制**到你的仓库 `.he/` 下，这意味着：
 
 - ✅ 离线可用、链接在采用方仓库内可点
 - ✅ 规范副本与采用方仓库同步进入版本控制，可 diff、可回滚
@@ -66,7 +66,7 @@ CLI 参数  >  上次 manifest.replacements  >  自动探测  >  交互输入 / 
 - ⚠️ 采用方仓库会多 ~300KB Markdown
 - ⚠️ 规范升级 = 每个采用方仓库重跑一次 `install`（manifest 会自动 diff，已存在且未改的文件会 skip）
 
-> 想换个目录名？交互模式下 vendor 路径会有 prompt（回车用默认 `.harness-engineering`）；非交互可显式传 `-VendorHarnessTo <path>` / `--vendor-harness-to <path>`。
+> 想换个目录名？交互模式下 vendor 路径会有 prompt（回车用默认 `.he`）；非交互可显式传 `-VendorHarnessTo <path>` / `--vendor-harness-to <path>`。
 
 ## 5. NoVendor 模式
 

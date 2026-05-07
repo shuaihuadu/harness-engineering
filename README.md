@@ -17,7 +17,7 @@
 | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
 | 一份**团队 AI 工程规约**：文档结构 + 评审节奏 + Agent 角色定义                                 | AI Agent 框架 / SDK / 运行时（不替代 LangGraph、Agent Framework 等）  |
 | 一套**多工具分发器**：同一份角色定义可同步成 Copilot Custom Agent / Claude Code subagent / ... | 一键万能解（Custom Agent 是"打开才用"，没有团队文化基础时就是死代码） |
-| **可被采纳为 standard 的规范**：`.harness-engineering/` 目录直接提交进你的仓库                 | prompt 库（提供的是结构与契约，不是预制 prompt 的集合）               |
+| **可被采纳为 standard 的规范**：`.he/` 目录直接提交进你的仓库                 | prompt 库（提供的是结构与契约，不是预制 prompt 的集合）               |
 | 与 `AGENTS.md` / `copilot-instructions.md` / `CLAUDE.md` 等运行时机制**互补**                  | 自动化质量门禁（CI / Hooks / Lint 仍需各项目自行接入）                |
 
 > **设计取向**：业务规则集中在 [`agents/`](agents/README.md) 一份维护，Copilot、Codex、Claude Code 等工具仅在 [`agents/_integrations/`](agents/_integrations/README.md) 下各自占据一个入口子目录，对同一份公共核心做格式包装。完整设计思路见 [`agents/_integrations/README.md` 第 0 节](agents/_integrations/README.md#0-设计思路)。
@@ -40,10 +40,10 @@ cd harness-engineering
 
 默认会做四件事：
 
-1. **Vendor 规范文档**到 `<your-repo>/.harness-engineering/`
+1. **Vendor 规范文档**到 `<your-repo>/.he/`
 2. **渲染 Copilot 配置**到 `.github/copilot-instructions.md` + `.github/instructions/*`
 3. **不默认安装 Custom Agent**：必须显式 `-CopilotAgents commit-auditor,...` 或 `-CopilotAgents all`
-4. **写入安装清单**到 `<your-repo>/.harness-engineering/manifest.json`，供 `uninstall` 使用并在重装时自动预填
+4. **写入安装清单**到 `<your-repo>/.he/manifest.json`，供 `uninstall` 使用并在重装时自动预填
 
 完整选项（占位符策略、Vendor / NoVendor 模式、卸载方式、多 target）见 [`docs/install.md`](docs/install.md)。
 
