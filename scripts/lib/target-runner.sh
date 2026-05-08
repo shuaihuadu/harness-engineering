@@ -191,7 +191,7 @@ invoke_render_directory() {
         fi
 
         if [[ -z "$picked" ]]; then
-            echo "   skip   $source_dir：未选择任何项 / nothing selected"
+            echo "   skip   ${source_dir}：未选择任何项 / nothing selected"
             return 0
         fi
 
@@ -217,7 +217,7 @@ invoke_render_directory() {
                 if [[ "$dest_name" == "$stem".* ]]; then matched="$f"; break; fi
             done
             if [[ -z "$matched" ]]; then
-                echo "警告：未找到模板 $stem（in $src_dir）" >&2
+                echo "警告：未找到模板 ${stem}（in ${src_dir}）" >&2
                 continue
             fi
             local name; name=$(basename "$matched"); local dest_name="${name/.template/}"

@@ -22,6 +22,34 @@
 #
 # 依赖：bash 4+，jq，sha256sum 或 shasum
 
+# ----------------------------------------------------------------------------
+# Bootstrap：若当前 bash < 4（典型为 macOS 自带的 /bin/bash 3.2），
+# 尝试重新执行到一个兼容的 bash 4+。
+# 注意：本段必须保持 bash 3.2 兼容，不能用 declare -A / ${var,,} 等特性。
+# ----------------------------------------------------------------------------
+if [ -z "${HARNESS_BASH_REEXEC:-}" ] && { [ -z "${BASH_VERSINFO[0]:-}" ] || [ "${BASH_VERSINFO[0]:-0}" -lt 4 ]; }; then
+    for _he_candidate in /opt/homebrew/bin/bash /usr/local/bin/bash /opt/local/bin/bash; do
+        if [ -x "$_he_candidate" ]; then
+            export HARNESS_BASH_REEXEC=1
+            exec "$_he_candidate" "$0" "$@"
+        fi
+    done
+    if command -v bash >/dev/null 2>&1; then
+        _he_found="$(command -v bash)"
+        _he_ver="$("$_he_found" -c 'echo "${BASH_VERSINFO[0]:-0}"' 2>/dev/null || echo 0)"
+        if [ "${_he_ver:-0}" -ge 4 ] 2>/dev/null; then
+            export HARNESS_BASH_REEXEC=1
+            exec "$_he_found" "$0" "$@"
+        fi
+    fi
+    echo "错误：本脚本需要 bash 4 及以上版本（当前: ${BASH_VERSION:-unknown}）。" >&2
+    echo "       Error: this script requires bash 4+ (current: ${BASH_VERSION:-unknown})." >&2
+    echo "       macOS 用户请安装 Homebrew bash 后重试：brew install bash" >&2
+    echo "       macOS users: install Homebrew bash and retry: brew install bash" >&2
+    exit 1
+fi
+unset HARNESS_BASH_REEXEC
+
 set -euo pipefail
 
 TARGET_REPO=""
@@ -222,7 +250,7 @@ total=$(jq '.files | length' "$manifest_path")
 echo
 echo "==> Harness Engineering · 卸载"
 echo "    目标仓库：$TARGET_REPO"
-echo "    manifest 版本：$version（commit: $commit）"
+echo "    manifest 版本：${version}（commit: ${commit}）"
 echo "    待处理文件数：$total"
 echo
 
