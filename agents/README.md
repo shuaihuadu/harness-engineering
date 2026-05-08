@@ -77,7 +77,12 @@ H6:                                                                             
 | [traceability-linker](./_skills/traceability-linker/SKILL.md)           | 校验并补全 `REQ ↔ HD/API/DB ↔ TC ↔ TASK ↔ Commit` 追溯链 |
 | [ai-task-brief-writer](./_skills/ai-task-brief-writer/SKILL.md)         | 把口头需求/Issue 转成合规 H5 任务卡                      |
 | [commit-message-formatter](./_skills/commit-message-formatter/SKILL.md) | 按六字段模板生成或校验提交信息                           |
-| [phase-gate-runner](./_skills/phase-gate-runner/SKILL.md)               | 按阶段门禁清单逐条核对                                   |
+| [phase-gate-runner](./_skills/phase-gate-runner/SKILL.md)               | 按阶段门禁清单逐条核对（"清单是否齐"）                   |
+| [architecture-reviewer](./_skills/architecture-reviewer/SKILL.md)       | H2 选型六字段 + 一致性 + 风险缓解的证据级核查            |
+| [test-plan-reviewer](./_skills/test-plan-reviewer/SKILL.md)             | H4 REQ × TC 矩阵 + TC 字段 + 文件级覆盖证据核查          |
+| [release-reviewer](./_skills/release-reviewer/SKILL.md)                 | H6 commit ↔ release-notes 双向对账 + 破坏性变更迁移指引  |
+| [effort-estimator](./_skills/effort-estimator/SKILL.md)                 | HD/file-structure → T-shirt 工程复杂度矩阵（不出工时 / 不出钱） |
+| [prd-exporter](./_skills/prd-exporter/SKILL.md)                         | H1 四件产物 → 只读 PRD 单文件（对外呈现视图，非新事实源） |
 
 新增 Skill 的判断标准与目录约定见 [`_skills/README.md`](./_skills/README.md)。
 
@@ -135,6 +140,18 @@ H6:                                                                             
 3. 是否已有至少一个真实项目跑出了"缺这个 Agent"的具体卡点？没有就是空想，押后
 
 通过以上三问后，再按 [`_skeletons/AGENT.skeleton.md`](./_skeletons/AGENT.skeleton.md) 与 [`_skeletons/prompt.skeleton.md`](./_skeletons/prompt.skeleton.md) 起草。
+
+#### 7.3.1 已被否决的 Agent 提案
+
+历史上提过、按 7.3 三问拒绝的提案集中登记于此，避免反复争论：
+
+| 提案                  | 否决理由                                                                                                       | 替代方案                                                                  |
+| --------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **PJM（工时 + 报价）** | 违反第 1 节"业务无关"原则（人天单价 / 合同形式 / 税点全是项目专属）；违反第 9 节"路由者不做专业判断"（中央工时估算 = 中央大脑） | Skill [`effort-estimator`](./_skills/effort-estimator/SKILL.md)：业务无关的工程复杂度矩阵，不出工时不出钱，由人在 Harness 外手工换算报价 |
+| **PM（写 PRD）**       | 7.3 第一问失败：H1 四件产物（`requirements` + `ui-spec` + `user-flow` + `acceptance-criteria`）合起来即 PRD，新增等于重复维护 | Skill [`prd-exporter`](./_skills/prd-exporter/SKILL.md)：把四件产物合并导出为只读 PRD，单一事实源仍是源文件 |
+| **H2/H4/H6 阶段 Reviewer Agent** | 7.3 第二问失败：评审动作高度机械化（清单/六字段/对账），不需要独立角色身份；做成 Skill 更轻量且不污染 Agent 矩阵 | Skill [`architecture-reviewer`](./_skills/architecture-reviewer/SKILL.md) / [`test-plan-reviewer`](./_skills/test-plan-reviewer/SKILL.md) / [`release-reviewer`](./_skills/release-reviewer/SKILL.md) |
+
+> 上表条目登记后，再次提出"是否要做成 Agent"前，必须给出**至少 3 条真实反例**证明现有 Skill 替代方案不可用，按 7.2 节反例采集要求处理。
 
 ### 7.4 退役
 

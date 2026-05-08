@@ -22,12 +22,29 @@ title: Harness Engineering 通用 Skills
 
 ## 1. 当前 Skill 清单
 
+通用类（跨阶段元动作）：
+
 | 名称                                                           | 解决的问题                                              | 主要消费者                                          |
 | -------------------------------------------------------------- | ------------------------------------------------------- | --------------------------------------------------- |
 | [traceability-linker](./traceability-linker/SKILL.md)          | 校验并补全 `REQ ↔ HD ↔ TC ↔ Task ↔ Commit` 追溯链       | DesignReviewer / CommitAuditor / RepoImpactMapper   |
 | [ai-task-brief-writer](./ai-task-brief-writer/SKILL.md)        | 把口头需求/Issue 转成符合 `templates/ai-task-brief.md` 的 H5 任务卡 | 默认会话 / CodingExecutor 启动前        |
 | [commit-message-formatter](./commit-message-formatter/SKILL.md) | 按 io-contracts.md 第 4 节的六字段模板生成或校验提交信息   | 任意阶段                                            |
 | [phase-gate-runner](./phase-gate-runner/SKILL.md)              | 按 `templates/phase-gate-checklist.md` 机械核对阶段门禁 | 阶段切换时                                          |
+
+阶段证据评审类（"清单项的证据是否在文件里"，与 phase-gate-runner 形成两层）：
+
+| 名称                                                            | 解决的问题                                              | 主要消费者                                       |
+| --------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------ |
+| [architecture-reviewer](./architecture-reviewer/SKILL.md)       | H2 选型六字段 + 一致性 + 风险缓解的证据级核查           | H2→H3 切换前；ArchitectAdvisor 自审后的二次复核 |
+| [test-plan-reviewer](./test-plan-reviewer/SKILL.md)             | H4 REQ × TC 矩阵 + TC 字段齐全 + 文件级覆盖证据核查     | H4→H5 切换前；TestCaseAuthor 自审后的二次复核   |
+| [release-reviewer](./release-reviewer/SKILL.md)                 | H6 commit ↔ release-notes 双向对账 + 破坏性变更迁移指引 | 打 tag / 发包前；ReleaseNoteWriter 自审后的二次复核 |
+
+商业 / 产品视图类（业务无关；不进追溯链）：
+
+| 名称                                                | 解决的问题                                          | 主要消费者                          |
+| --------------------------------------------------- | --------------------------------------------------- | ----------------------------------- |
+| [effort-estimator](./effort-estimator/SKILL.md)     | HD/file-structure → T-shirt 工程复杂度矩阵（不出工时、不出钱） | PM/PJM 报价前；H3 评审末尾拆条决策 |
+| [prd-exporter](./prd-exporter/SKILL.md)             | H1 四件产物合并导出为只读 PRD 单文件                | 对客户 / 老板 / 跨部门同事呈现需求时 |
 
 ## 2. Skill 的结构约定
 
