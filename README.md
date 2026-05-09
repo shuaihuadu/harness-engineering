@@ -86,7 +86,7 @@ harness-engineering/
 │   ├── requirements-interviewer/   # H1 需求访谈
 │   ├── ui-spec-author/             # H1 UI 说明撰写
 │   ├── prototype-author/           # H1 原型源码生成
-│   ├── prototype-reviewer/         # H1 原型只读评审
+│   ├── prototype-reviewer/         # H1 原型评审 + picker 收人工签字
 │   ├── repo-impact-mapper/         # H1 代码库影响分析
 │   ├── architect-advisor/          # H2 架构与技术选型
 │   ├── design-reviewer/            # H3 设计评审
@@ -98,6 +98,7 @@ harness-engineering/
 └── templates/                      # 可直接复制使用的工作产物模板
     ├── ai-task-brief.md            # AI 任务简报（H5 入口）
     ├── phase-gate-checklist.md     # 阶段门禁清单
+    ├── prototype-review.md         # H1 原型评审记录（H1-PrototypeReviewer 起草后人工签字）
     ├── review-record.md            # 评审记录
     └── task-board.md               # 项目任务看板模板（采用方运行时实例位于 docs/06-tasks/task-board.md）
 ```

@@ -70,7 +70,7 @@ frontmatter 字段齐全（`stage: H1`，`upstream: [ui-spec.md]`）。正文为
 ### 4.2 不写的东西
 
 - **不修改** `docs/01-requirements/` 下任何文件——发现 ui-spec 描述不一致 / 缺漏，要么阻塞返回让用户回 `UISpecAuthor`，要么追加到 `open-questions.md`，**绝不**自行补 ui-spec
-- **不写**评审纪要 / `prototype-review.md`——那是 `PrototypeReviewer` 跑完后由人写
+- **不写** `docs/02-prototype/prototype-review.md`——那是 `PrototypeReviewer` 起草 + 用 picker 收人工签字的事，本 Agent 不碰
 - **不发起** PR——产物提交由人决定时机
 
 ### 4.3 阻塞返回

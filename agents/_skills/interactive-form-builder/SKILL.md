@@ -10,7 +10,6 @@ when_to_use: |
   - Agent 拟写一条"请输入 XXX（A / B / C）"——这就是反模式信号
 when_not_to_use: |
   - 字段是真正的自由 prose（业务诉求复述 / 设计理由 / 风险描述 / 不做范围说明）→ 保持 chat 文本反问
-  - Agent 是只读评审型（当前为 prototype-reviewer）→ 禁止 ask.user，直接 UNKNOWN
   - 字段已经在文件里以 `> **[ 待填 ]**：...` 形式标好（人离线填）→ 走 io-contracts §7，不要在 chat 里再问一次
 ---
 
@@ -185,9 +184,52 @@ cat VERSION 2>/dev/null
   options: [HEAD, <tag 列表>, <commit 列表>, 自由输入]
 ```
 
-### 3.6 H1-PrototypeReviewer 结论（**例外**：不调用）
+### 3.6 H1-PrototypeReviewer 评审签字（一次问 5 项）
 
-`prototype-reviewer` 是只读评审型 Agent，[io-contracts.md §6.1](../../_shared/io-contracts.md#61-交互式输入约定pick-over-type) 例外条款明示**禁止**调用 `ask.user`。结论以纯文本输出 `PASS / FAIL / UNKNOWN` 即可，不走 picker。
+应用场景：`H1-PrototypeReviewer` 跑完 12 条机械化核对、起草完 `docs/02-prototype/prototype-review.md`（`status: draft`）后，**必须**通过 picker 收人工签字回写到第 5 节。
+
+> **关键：决议字段无 default、无 recommended**——AI 不替人下决心。这是 [io-contracts.md §6.1](../../_shared/io-contracts.md#61-交互式输入约定pick-over-type) 反模式列表里"对评审决议 / 阶段门通过与否 / status 翻转等'人工兜底'字段预填默认值或设 `recommended`"那条的实例。
+
+检测命令：
+
+```bash
+git config user.name                                   # 主审人候选
+git log --format='%an' | sort -u | head -10            # 历史 reviewer
+date +%Y-%m-%d                                          # 今天
+date -v-1d +%Y-%m-%d                                    # 昨天（macOS）
+```
+
+`ask.user` 调用结构（一次调用，5 个 questions）：
+
+```yaml
+- header: decision
+  question: H1 原型评审决议
+  # 关键：无 default、无 recommended，AI 不替人下决心
+  options:
+    - Approved                # 全 PASS（仅第 12 条因评审记录刚生成处于 UNKNOWN）
+    - Approved with Changes   # 有可在 §5 修改项里跟进的小问题
+    - Rejected                # 有 FAIL，需返工后重评
+    - Pending                 # 有 UNKNOWN（不止第 12 条），需补信息后重评
+- header: chair
+  question: 主审人
+  options: [<git config user.name>, <历史 reviewer...>, 自由输入]
+- header: date
+  question: 评审日期
+  options: [<今天>, <昨天>, 自由输入]
+- header: overrides
+  question: 要 override 的 Agent 结论（人工对 §2 表格中 Agent 给出 PASS 的项有不同意见时勾选）
+  multiSelect: true
+  options:
+    - 不 override
+    - <第 2 节 PASS 项 1>
+    - <第 2 节 PASS 项 2>
+    - <...>
+- header: modifications
+  question: 修改项 / 后续动作（自由 prose；无修改写"无"）
+  # 自由文本，不用 options
+```
+
+回写到 `docs/02-prototype/prototype-review.md` 第 5 节时，把 `> **[ 待填 ]**：...` 占位行**整行替换**为人工选定的内容；frontmatter `status` **保持 `draft`**——`draft → reviewed` 由人工在签字确认后另行翻转，参见 [io-contracts.md 第 7 节](../../_shared/io-contracts.md#7-人工输入位约定human-input)。
 
 ## 4. 合并规则（避免对话疲劳）
 

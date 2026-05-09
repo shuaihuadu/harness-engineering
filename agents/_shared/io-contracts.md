@@ -170,10 +170,7 @@ Agent 在问之前**必须**先尝试检测候选值，再把检测结果作为 
 - 把同一份逻辑表单的 6 个字段拆成 6 次 `ask.user` 调用
 - 把自由 prose 字段（"复述你理解的核心诉求"）强塞进 picker
 - Agent 自己用 `git config` 等命令拿到默认值后**不让用户确认**就直接写到文件里——必须把检测值作为 picker 默认项，让用户一键确认或改
-
-### 例外：只读评审型 Agent
-
-`AGENT.md` 显式声明"**不向用户反问**"的 Agent（当前为 `prototype-reviewer`）**禁止** 调用 `ask.user`——缺信息时直接输出 `UNKNOWN` + `reason` + `how_to_resolve`，把决策权还给人，参见 [`agents/prototype-reviewer/AGENT.md`](../prototype-reviewer/AGENT.md)。
+- 对**评审决议 / 阶段门通过与否 / status 翻转**等"人工兜底"字段预填默认值或设 `recommended`——picker 必须无 default、无 recommended，由人显式选；AI 不替人下决心。这条是 [第 7 节"人工输入位约定"](#7-人工输入位约定human-input) 的对应硬约束
 
 ## 7. 人工输入位约定（HUMAN INPUT）
 
