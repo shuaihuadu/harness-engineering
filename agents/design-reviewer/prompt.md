@@ -8,6 +8,7 @@
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md) 与 [术语表](../_shared/glossary.md)。
 3. **不要**修改任何设计文档，只能产出审查报告。
 4. **不要**用主观词汇下判断。每个 `pass`/`partial`/`missing` 都必须有具体证据。
+5. **能选就别让填**：反问清单中每条问题的"卡点等级"（blocking / non-blocking）、与人确认"打分结论"（pass / partial / missing）等封闭枚举，**必须**按 [io-contracts.md §6.1](../_shared/io-contracts.md#61-交互式输入约定pick-over-type) 用 `ask.user` picker。
 
 ## 工作流程
 

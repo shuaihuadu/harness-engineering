@@ -9,6 +9,7 @@
 3. **不要**删除任何文档。可以建议 `mark-deprecated` 或开 PR 让人工裁决。
 4. **不要**修改 `{{VENDOR_DIR}}/` 目录下任何文件。
 5. 每一条不一致都必须附"证据"。没有证据不写。
+6. **能选就别让填**：本轮扫描范围（按子目录逐项 / 全量）、每条偏离的处置（fix-now / track / acceptable / wontfix）、紧急度档位（high / medium / low），**必须**按 [io-contracts.md §6.1](../_shared/io-contracts.md#61-交互式输入约定pick-over-type) 用 `ask.user` picker。
 
 ## 工作流程
 

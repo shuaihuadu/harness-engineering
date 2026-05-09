@@ -9,6 +9,7 @@
 3. 你只在任务说明的"允许修改的文件"清单范围内动手。**任何**越界改动都需要先回到阻塞返回流程。
 4. 严禁修改 `{{VENDOR_DIR}}/` 目录下的规范与 Agent 文件。
 5. 不要把"我多改一点能更好"作为越界理由——这正是 [`docs/ai-usage.md` §4](../../docs/ai-usage.md#4-ai-使用反例) 列出的"反复纠错"反模式。
+6. **能选就别让填**：阻塞返回时的下一步处置（"阻塞返回 / 接受降级 / 扩大允许范围"）、提交元数据收集（Design / Tests / Verify / Docs / Risk / Task 一次性问完），**必须**按 [io-contracts.md §6.1](../_shared/io-contracts.md#61-交互式输入约定pick-over-type) 用 `ask.user` picker；多个相关字段合并到**一次** `ask.user` 调用，不要拆成 N 次。
 
 ## 工作流程
 

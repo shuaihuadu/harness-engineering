@@ -117,6 +117,64 @@ suggested_next_action:
 - **建议**：会话中"常驻加载"的规范类文件（AGENTS.md / 单个 AGENT.md / 当前阶段的 stages 节选）总行数尽量控制在 ~600 行以内。背景：Anthropic 的工程实践表明上下文窗口填充率超过 40% 后，模型输出质量（幻觉、循环、Tool Call 格式错误）快速衰退；项目级文档应做成"按需查阅"而非"一次喂饱"。
 - **建议**：`AGENTS.md` 是索引（Index & Map），不是百科全书。超过 100 行就考虑把内容拆到 `docs/` 下，由 `AGENTS.md` 提供跳转。
 
+## 6.1 交互式输入约定（PICK OVER TYPE）
+
+本节规定 **运行时**（会话进行中）Agent 向用户拿信息的形式约束。与 [第 7 节](#7-人工输入位约定human-input)（**离线时**写到文件里的占位行）互补：
+
+- §6.1：Agent 在 chat 里**当场问**用户 → "能选就别让填"
+- §7：Agent 把**留给人离线填**的位置标成 `> **[ 待填 ]**：...`
+
+> 工具能力维度上，本节规则全部归属 [`tool-vocabulary.md`](./tool-vocabulary.md) 第 1 节的 `ask.user`。在 Copilot / VS Code 集成层映射为 `vscode/askQuestions`；在其他集成层（Claude Code / Codex 等）映射为各自的等价交互能力。Agent 的 `AGENT.md` 一律只声明 `ask.user`，集成层负责落地。
+
+### 决策矩阵
+
+| 字段类型               | 例子                                                                                          | 形式约束                                                                |
+| ---------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **封闭枚举**           | `status` / `stage` / `卡点等级` / `priority` / `severity` / `结论`（PASS/FAIL/UNKNOWN） | **必须** picker（`ask.user` + `options[]`），**禁止** 自由文本通道       |
+| **半结构化**           | `reviewer` / `主持人` / `决策人` / `日期` / `version` / `tag` / `commit 区间` / 文件路径    | **必须** picker；候选项从下方"默认值检测"产出；末尾留 `自由输入` 兜底     |
+| **预枚举候选答**       | `open-questions.md` 里 OQ-NNN 的 A/B/C/D                                                    | **必须** picker（A/B/C/D + 自定义），不要在 chat 里让用户回复 "A"       |
+| **自由 prose**         | 业务诉求复述 / 设计理由 / 风险描述 / 不做范围说明 / 验收提示                                | **保持** chat 文本反问；**禁止** 强行做成 picker（picker 装不下长说明） |
+
+### 默认值检测规则（半结构化字段）
+
+Agent 在问之前**必须**先尝试检测候选值，再把检测结果作为 `options[]` 给出。"先猜、再让用户改"比"空白让用户从零写"快一个数量级。
+
+| 字段                            | 检测来源                                                                                |
+| ------------------------------- | --------------------------------------------------------------------------------------- |
+| reviewer / 主持人 / 决策人 / 记录人 | `git config user.name`；补充 `git log --format=%an \| sort -u \| head -10`                |
+| 日期（today / yesterday）       | 本地系统时钟                                                                            |
+| version / tag                   | 仓库根 `VERSION` 文件（若存在）；`git tag --sort=-creatordate \| head -3`                 |
+| commit 区间                     | `git log --oneline -20`，让用户分别选起 / 止                                              |
+| 文件路径                        | `read.search.text` / 项目内 file_search                                                 |
+| 关联编号（REQ-NNN / TASK-NNN） | `read.search.text` 全仓 grep frontmatter id                                              |
+
+检测到的值放进 `options[]`；末尾**始终**保留一项 `自由输入` 或 `其他（请显式给出）`，避免封死特殊场景。
+
+### 合并规则（避免对话疲劳）
+
+属于同一逻辑动作的多个字段，**必须**合并到 **一次** `ask.user` 调用（一次工具调用，多个 `questions[]`），**禁止**串成 N 个连续对话框。
+
+| 逻辑动作                      | 合并后字段                                                  |
+| ----------------------------- | ----------------------------------------------------------- |
+| 评审记录抬头                  | 项目 / 阶段 / 评审对象 / 时间 / 主持人 / 记录人 / 参与人员（≤ 7 项） |
+| OQ-NNN 关闭                   | 回答 / 决策日期 / 决策人（3 项）                              |
+| Commit metadata 收集          | Design / Tests / Verify / Docs / Risk / Task（6 项）          |
+| Status 翻转                   | 旧 status / 新 status / reviewer / decision / date（5 项）     |
+
+> 单次 `ask.user` 调用的总问题数受 [第 9 节"反问澄清单次问答上限 5 个"](#9-循环与迭代上限) 约束；超过时拆成两次调用，但**禁止**把同一逻辑动作的强相关字段拆开。
+
+### 反模式（出现即拒绝）
+
+- 把封闭枚举字段做成 `请输入 status（draft / reviewed / approved）`——这是文本通道，不是 picker
+- 在 chat 里列 `A. ... B. ... C. ...` 然后说"请回复 A 或 B"——应该用 picker 的 `options[]`
+- 把同一份逻辑表单的 6 个字段拆成 6 次 `ask.user` 调用
+- 把自由 prose 字段（"复述你理解的核心诉求"）强塞进 picker
+- Agent 自己用 `git config` 等命令拿到默认值后**不让用户确认**就直接写到文件里——必须把检测值作为 picker 默认项，让用户一键确认或改
+
+### 例外：只读评审型 Agent
+
+`AGENT.md` 显式声明"**不向用户反问**"的 Agent（当前为 `prototype-reviewer`）**禁止** 调用 `ask.user`——缺信息时直接输出 `UNKNOWN` + `reason` + `how_to_resolve`，把决策权还给人，参见 [`agents/prototype-reviewer/AGENT.md`](../prototype-reviewer/AGENT.md)。
+
 ## 7. 人工输入位约定（HUMAN INPUT）
 
 Agent 起草产物时，凡是**需要人工填答 / 决策 / 签字**的位置，**必须**显式标记为可视化占位行，不能默认空白或用 `<TBD>` 蒙混。统一格式：

@@ -8,7 +8,7 @@
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md) 与 [术语表](../_shared/glossary.md)。
 3. **不要**修改任何文件，只能产出对话框内的 markdown 报告。
 4. **不要**用主观词汇下判断——每个 `PASS` / `FAIL` / `UNKNOWN` 都必须有具体证据。
-5. **不要**向用户反问——缺信息直接标 `UNKNOWN`，附 `reason` 与 `how_to_resolve`，让用户回去补。
+5. **不要**向用户反问——缺信息直接标 `UNKNOWN`，附 `reason` 与 `how_to_resolve`，让用户回去补。本 Agent **禁止**调用 `ask.user`（属于 [io-contracts.md §6.1](../_shared/io-contracts.md#61-交互式输入约定pick-over-type) 例外条款列出的只读评审型 Agent）。
 
 ## 工作流程
 

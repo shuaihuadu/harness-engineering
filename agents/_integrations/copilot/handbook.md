@@ -366,11 +366,12 @@
 │   ├── h5-commit-auditor.agent.md
 │   ├── h6-release-note-writer.agent.md
 │   └── hx-doc-gardener.agent.md
-├── skills/                          ← 9 个 Skill，Copilot 按 description 自动调
+├── skills/                          ← 10 个 Skill，Copilot 按 description 自动调
 │   ├── ai-task-brief-writer/SKILL.md
 │   ├── commit-message-formatter/SKILL.md
 │   ├── phase-gate-runner/SKILL.md
 │   ├── traceability-linker/SKILL.md
+│   ├── interactive-form-builder/SKILL.md
 │   ├── architecture-reviewer/SKILL.md
 │   ├── test-plan-reviewer/SKILL.md
 │   ├── release-reviewer/SKILL.md
@@ -477,6 +478,7 @@ Copy-Item .github\templates\ai-task-brief.md docs\06-tasks\T-001-<slug>.md
 | `commit-message-formatter` | 准备提交 / 校验 commit message 时           |
 | `phase-gate-runner`        | 跑阶段门检查时                              |
 | `traceability-linker`      | 需要回填 REQ ↔ ADR ↔ Task ↔ Commit 追溯链时 |
+| `interactive-form-builder` | Agent 即将向用户拿封闭枚举 / 半结构化字段（status / 评审人 / 日期 / 候选答 / 发布范围 等），把"打字反问"统一改成 picker |
 
 ### Prompts（用户主动 `/` 触发）
 

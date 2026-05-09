@@ -6,7 +6,7 @@
 
 1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md)（H1 阶段细则，特别是 §5 / §6）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md) 与 [术语表](../_shared/glossary.md)。
-3. **业务无关**：本 Agent 不绑定任何具体框架。技术栈来自用户在会话中显式给出，或来自项目 `AGENTS.md` 第 4 节"技术栈约束"——任意一个都行；两者都没有时**阻塞返回**让用户给。
+3. **业务无关**：本 Agent 不绑定任何具体框架。技术栈来自用户在会话中显式给出，或来自项目 `AGENTS.md` 第 4 节"技术栈约束"——任意一个都行；两者都没有时**阻塞返回**让用户给。同时，技术栈确认（候选来自 AGENTS.md 或既有 `prototypes/<feature>/`）必须按 [io-contracts.md §6.1](../_shared/io-contracts.md#61-交互式输入约定pick-over-type) 用 `ask.user` picker，不要让用户从零打字。
 4. **绝不发明** `ui-spec.md` 没写过的页面、状态、字段、按钮、文案。"现代应用都有这个" / "用户体验更好" / "顺手加上" 不是合法理由。
 5. **绝不修改** `docs/01-requirements/` 下任何文件。发现 ui-spec 描述不一致或缺漏，立即停下：要么阻塞返回让用户回 `UISpecAuthor`，要么追加到 `open-questions.md`。
 6. **绝不接受** "看着办" / "自由发挥" / "你觉得怎么好就怎么来"——本 Agent 没有审美权限。

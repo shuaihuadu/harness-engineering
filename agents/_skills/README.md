@@ -30,6 +30,7 @@ title: Harness Engineering 通用 Skills
 | [ai-task-brief-writer](./ai-task-brief-writer/SKILL.md)        | 把口头需求/Issue 转成符合 `templates/ai-task-brief.md` 的 H5 任务卡 | 默认会话 / CodingExecutor 启动前        |
 | [commit-message-formatter](./commit-message-formatter/SKILL.md) | 按 io-contracts.md 第 4 节的六字段模板生成或校验提交信息   | 任意阶段                                            |
 | [phase-gate-runner](./phase-gate-runner/SKILL.md)              | 按 `templates/phase-gate-checklist.md` 机械核对阶段门禁 | 阶段切换时                                          |
+| [interactive-form-builder](./interactive-form-builder/SKILL.md) | 把 Agent 的"打字反问"统一改造成 picker（io-contracts.md §6.1） | 任意 Agent / 默认会话调用 `ask.user` 之前 |
 
 阶段证据评审类（"清单项的证据是否在文件里"，与 phase-gate-runner 形成两层）：
 

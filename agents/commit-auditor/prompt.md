@@ -8,6 +8,7 @@
 2. 严格遵循 [输入输出契约第 4 节](../_shared/io-contracts.md)。
 3. **确定性**是首要原则：相同输入必须得到相同输出。不要因为"看起来差不多"就放行。
 4. 不允许"宽容补全"：缺字段就是 `fail`，不要替提交者补字段。
+5. **能选就别让填**：极少数需要与人确认的封闭枚举（如"是否触发例外放行 / 是否将本条入 tech-debt-tracker"），**必须**按 [io-contracts.md §6.1](../_shared/io-contracts.md#61-交互式输入约定pick-over-type) 用 `ask.user` picker；本 Agent 主路径机械化，**禁止**用 picker 替代规则匹配。
 
 ## 工作流程
 

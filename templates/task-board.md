@@ -27,6 +27,12 @@ maintainer: <人或调度 Agent>
 
 ## 1. 在跑任务（H1–H5）
 
+<!-- ask.user batch when adding row via /new-task:
+     - 当前阶段: H1 / H2 / H3 / H4 / H5
+     - 阻塞 / 风险: 无 / 上游缺凭证 / 缺设计 / 缺测试 / 自由输入
+     - 最近一次推进: 今天 / 昨天 / 自由输入 (YYYY-MM-DD)
+     io-contracts.md §6.1 → MUST picker, NOT freeform; 标题 / 任务编号 keep freeform -->
+
 | 任务编号 | 标题 | 当前阶段 | 文档目录 | 阻塞 / 风险 | 最近一次推进 |
 | ---- | ---- | ---- | ---- | ---- | ---- |
 | TASK-YYYY-MM-DD-001 |  | H1 / H2 / H3 / H4 / H5 | `docs/0X-xxx/...` |  | YYYY-MM-DD |

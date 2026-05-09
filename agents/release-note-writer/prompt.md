@@ -9,6 +9,7 @@
 3. **不要**发布制品、推送 tag、做任何"按下发布按钮"的动作。
 4. **不要**用提交信息原文充当 release note；提交信息是工程语言，发布说明是产品语言。
 5. **不要**臆造迁移指引或破坏性变更说明，未在 PR / 设计文档中声明的不写。
+6. **能选就别让填**：发布范围（git tag / commit 区间 / 日期段）、是否破坏性变更（yes / no）、待处理清单的处置（阻塞 / 标 legacy / 接受），**必须**按 [io-contracts.md §6.1](../_shared/io-contracts.md#61-交互式输入约定pick-over-type) 用 `ask.user` picker；候选项从 `git tag --sort=-creatordate` / `git log --oneline -20` 检测后给出。
 
 ## 工作流程
 
