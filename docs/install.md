@@ -27,10 +27,10 @@ cd harness-engineering
 
 默认会做四件事：
 
-1. **Vendor 规范文档**：把 `HANDBOOK`、设计文档（`docs/{stages,repo-layout,tech-debt-gc}.md`）、`README` 与 `uninstall.ps1` 装进 `<your-repo>/.he/`（一个隐藏目录装下所有 harness 产物，含安装清单）
+1. **Vendor 规范文档**：把 `HANDBOOK`、设计文档（`docs/{concepts,ai-usage,repo-layout,tech-debt-gc}.md` + `docs/stages/*.md`）、`README` 与 `uninstall.ps1` 装进 `<your-repo>/.he/`（默认 vendor 目录，可用 `--vendor-harness-to <path>` 改名；一个隐藏目录装下所有 harness 产物，含安装清单）
 2. **渲染 Copilot 配置**：`.github/copilot-instructions.md` + `.github/instructions/*` + `.github/templates/*` + `.github/skills/*` + `.github/prompts/*` + `.github/agents/*`，链接指向上一步的 vendor 目录
-3. **Custom Agent 默认全装**：交互模式下脚本会列出可选的 Custom Agent 模板，让你按编号 / stem / `all` / `none` 现场挑选，回车采纳默认（当前 Copilot target 默认 `all`，全装）；非交互模式（`-NonInteractive` / `-Force`）走 `target.json` 的 `default_select`，也可以始终用 `-CopilotAgents` / `--copilot-agents` 显式覆盖
-4. **写入安装清单**：`<your-repo>/.he/manifest.json` 记录本次写入的所有文件（含 sha256）+ 本次填入的占位符（`replacements`），供 `uninstall` 使用，并在下次重装时自动预填
+3. **Custom Agent 默认全装**：交互模式下脚本会列出可选的 Custom Agent 模板，让你按编号 / stem / `all` / `none` 现场挑选，回车采纳默认（当前 Copilot target 默认 `all`，全装 12 个）；非交互模式（`-NonInteractive` / `-Force`）走 `target.json` 的 `default_select`，也可以始终用 `-CopilotAgents` / `--copilot-agents` 显式覆盖
+4. **写入安装清单**：`<your-repo>/<vendor-dir>/manifest.json` 记录本次写入的所有文件（含 sha256）+ 本次填入的占位符（`replacements`），供 `uninstall` 使用，并在下次重装时自动预填
 
 ## 2. 占位符填入策略
 
@@ -58,15 +58,15 @@ CLI 参数  >  上次 manifest.replacements  >  自动探测  >  交互输入 / 
 
 ## 4. Vendor 模式
 
-默认行为是把 `HANDBOOK`、`docs/{stages,repo-layout,tech-debt-gc}.md`、`README` 与 `uninstall.ps1` 装到你的仓库 `.he/` 下，同时把 Custom Agent / instructions / templates / skills / prompts 装到 `.github/`。这样设计的好处：
+默认行为是把 `HANDBOOK`、`docs/{concepts,ai-usage,repo-layout,tech-debt-gc}.md` + `docs/stages/*.md`、`README` 与 `uninstall.ps1` 装到你的仓库 `.he/` 下，同时把 Custom Agent / instructions / templates / skills / prompts 装到 `.github/`。这样设计的好处：
 
 - ✅ 离线可用、链接在采用方仓库内可点
 - ✅ 规范副本与采用方仓库同步进入版本控制，可 diff、可回滚
-- ✅ `.he/` 与 `manifest.json` 同住一个隐藏目录，整块卸载干净；`.github/` 部分也由 manifest 跟踪，每条都能精确移除
+- ✅ vendor 目录与 `manifest.json` 同住一个隐藏目录，整块卸载干净；`.github/` 部分也由 manifest 跟踪，每条都能精确移除
 - ⚠️ 采用方仓库会多 ~300KB Markdown
 - ⚠️ 规范升级 = 每个采用方仓库重跑一次 `install`（manifest 会自动 diff，已存在且未改的文件会 skip）
 
-> 想换个目录名？交互模式下 vendor 路径会有 prompt（回车用默认 `.he`）；非交互可显式传 `-VendorHarnessTo <path>` / `--vendor-harness-to <path>`。
+> 想换个目录名？交互模式下 vendor 路径会有 prompt（回车用默认 `.he`）；非交互可显式传 `-VendorHarnessTo <path>` / `--vendor-harness-to <path>`。脚本默认使用 `{{VENDOR_DIR}}` 占位符贯穿所有 vendor 文档，装下去后会被起为你的实际路径，所以哪怕你用 `--vendor-harness-to .abc`，也不会有文件里还写着 `.he/` 的遗留。
 
 ## 5. NoVendor 模式
 

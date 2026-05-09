@@ -17,27 +17,27 @@
 | ------------------------------------------------- | ---------------------------------------- | -------------------------------------------------- |
 | `copilot-instructions.template.md`                | `.github/copilot-instructions.md`        | Copilot 全会话自动加载                             |
 | `instructions/*.instructions.template.md`         | `.github/instructions/*.instructions.md` | 按 `applyTo` 自动加载                              |
-| `custom-agents/*.agent.template.md` (× 11)        | `.github/agents/*.agent.md`              | Chat 输入框下方的 Agent 下拉手动切换               |
+| `custom-agents/*.agent.template.md` (× 12)        | `.github/agents/*.agent.md`              | Chat 输入框下方的 Agent 下拉手动切换               |
 | `prompts/*.prompt.md` (× 4)                       | `.github/prompts/*.prompt.md`            | `/<name>` 显式触发                                 |
 | `../../_skills/*/SKILL.md`                        | `.github/skills/*/SKILL.md`              | 模型按 description 语义命中后自动调用              |
 | `../../templates/*.md` (× 4)                      | `.github/templates/*.md`                 | 给 Skills / Prompts / 人手共用的产物模板           |
-| `handbook.md`                                     | `.he/HANDBOOK.md`       | 操作手册，10 分钟上手                              |
-| `vendor-readme.template.md`                       | `.he/README.md`         | 解释 `.he/` 角色 + gitignore 建议 |
-| `../../docs/{stages,repo-layout,tech-debt-gc}.md` | `.he/docs/*.md`         | 设计文档（深度阅读）                               |
+| `handbook.md`                                     | `{{VENDOR_DIR}}/HANDBOOK.md`             | 操作手册，10 分钟上手                              |
+| `vendor-readme.template.md`                       | `{{VENDOR_DIR}}/README.md`               | 解释 vendor 目录角色 + gitignore 建议                  |
+| `../../docs/{concepts,ai-usage,repo-layout,tech-debt-gc}.md` + `../../docs/stages/*.md` | `{{VENDOR_DIR}}/docs/*.md` | 设计文档（深度阅读）                               |
 
 安装产物分两个目录：
 
 - **`.github/`**：Copilot 真正读的所有文件，开箱即用
-- **`.he/`**：HANDBOOK + 设计文档 + 安装清单 (`manifest.json`) + 安装日志 (`install.log`) + 卸载脚本 (`uninstall.ps1`)
+- **`{{VENDOR_DIR}}/`**（默认 `.he/`，可用 `--vendor-harness-to <path>` 改）：HANDBOOK + 设计文档 + 安装清单 (`manifest.json`) + 安装日志 (`install.log`) + 卸载脚本 (`uninstall.ps1`)
 
 ## 2. 关键设计：自包含的 .github/
 
-9 个 `.agent.template.md` 通过 [`{{INCLUDE_BODY: ...}}`](../../../scripts/lib/sync-engine.ps1) 指令把对应 `agents/<name>/AGENT.md` 与 `agents/<name>/prompt.md` 的正文 inline 进 `.github/agents/*.agent.md`。
+12 个 `.agent.template.md` 通过 [`{{INCLUDE_BODY: ...}}`](../../../scripts/lib/sync-engine.ps1) 指令把对应 `agents/<name>/AGENT.md` 与 `agents/<name>/prompt.md` 的正文 inline 进 `.github/agents/*.agent.md`。
 
 **收益**：
 
-- `.github/agents/*.agent.md` 自包含，不依赖 `.he/agents/`（后者甚至不会被装到采用方）
-- 用户把 `.he/` 加进 `.gitignore` 也不影响 Copilot Agent 工作
+- `.github/agents/*.agent.md` 自包含，不依赖 `{{VENDOR_DIR}}/agents/`（后者甚至不会被装到采用方）
+- 用户把 `{{VENDOR_DIR}}/` 加进 `.gitignore` 也不影响 Copilot Agent 工作
 - 模板源（`AGENT.md` / `prompt.md`）依然是单一事实来源；改了它，重跑 install 就同步
 
 INCLUDE 指令在渲染时同步做"安全降级"：把内嵌指向 `../_shared/`、`../../docs/`、`../../README.md`、`AGENT.md` 的相对链接外壳剥成纯文本，避免 `.github/` 下出现 broken link。
@@ -83,7 +83,7 @@ INCLUDE 指令在渲染时同步做"安全降级"：把内嵌指向 `../_shared/
 
 | 选项                                                | 说明                                                                                                                                                                                 |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `-CopilotAgents <list>` / `--copilot-agents <list>` | 选择安装哪些 Custom Agent；**默认 `all`**（全装 9 个，覆盖 H1–H6 + 横切，并启用孤儿检测）；填具体 stem（如 `h3-design-reviewer,h5-coding-executor`）只装指定项；填 `none` 一个都不装 |
+| `-CopilotAgents <list>` / `--copilot-agents <list>` | 选择安装哪些 Custom Agent；**默认 `all`**（全装 12 个，覆盖 H1–H6 + 横切，并启用孤儿检测）；填具体 stem（如 `h3-design-reviewer,h5-coding-executor`）只装指定项；填 `none` 一个都不装 |
 | `-Force` / `--force`                                | 全自动：所有冲突直接覆盖，所有孤儿直接删除；不弹任何提示                                                                                                                             |
 | `-NoDelete` / `--no-delete`                         | 一律不删除孤儿（即便 `-Force` 也不删）；CI 升级推荐配合此选项                                                                                                                        |
 | `-DryRun` / `--dry-run`                             | 只打印动作不写盘                                                                                                                                                                     |

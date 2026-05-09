@@ -48,7 +48,7 @@ cp agents/_skeletons/prompt.skeleton.md  agents/h7-incident-responder/prompt.md
 #    — 直接编辑 _integrations/copilot/custom-agents/h7-incident-responder.agent.template.md
 #    — 里面用 {{INCLUDE_BODY: agents/h7-incident-responder/AGENT.md}} 自动拼装
 #    — 这一步用的是 .template.md（机器渲染），不是 .skeleton.md（人手抄写）
-#    — 如果不知道 .agent.template.md 怎么写，参考已有 9 个 h*.agent.template.md 中任一份
+#    — 如果不知道 .agent.template.md 怎么写，参考已有 12 个 h*.agent.template.md 中任一份
 
 # 5. install.ps1 重新跑，新 Agent 自动出现在采用方的 .github/agents/ 下
 ```
@@ -58,7 +58,7 @@ cp agents/_skeletons/prompt.skeleton.md  agents/h7-incident-responder/prompt.md
 **不删**。理由：
 
 1. 总尺寸 ~5KB，零维护成本（不参与 lint / 不进 CI / 不影响安装）
-2. 当未来真要加 Agent 时，少了它就得现去翻 9 个 `h*` Agent 反推"AGENT.md 应该长啥样"——比直接 copy 一份骨架慢一个数量级
+2. 当未来真要加 Agent 时，少了它就得现去翻 12 个 `h*` Agent 反推"AGENT.md 应该长啥样"——比直接 copy 一份骨架慢一个数量级
 3. 它们携带了关键的"格式契约"——比如对 [`io-contracts.md`](../_shared/io-contracts.md) / [`glossary.md`](../_shared/glossary.md) / [`tool-vocabulary.md`](../_shared/tool-vocabulary.md) 的引用约定
 
 如果你在评审中怀疑它们腐化了（被现有 Agent 的实际写法甩开），处理方式是**回头同步骨架**而非删除——因为这恰好揭示了"H1-H6 沉淀下来的最佳实践还没回写到骨架里"。

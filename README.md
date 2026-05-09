@@ -9,7 +9,7 @@
 - **是什么**：一份将 Harness Engineering 思想落到团队 SDLC 的方法论 + 一组可直接使用的 Agent 提示词与文档模板 + 一套把它们一键铺到你仓库的脚本。
 - **为谁写**：在真实项目里和 AI 协作，并希望让交付保持可追溯、可评审、可维护的工程团队与个人开发者。
 - **解决什么**：把"AI 写得很快但难以验证 / 难以合并 / 难以维护"的现实问题，转化为一条由文档、评审、测试和提交记录组成的硬轨道。
-- **核心模型**：按 Agent **行动时序**划分的三层 Harness——约束层（行动前）/ 反馈层（行动中）/ 质量门禁层（行动后），配套 9 个职责单一的 Agent（H1–H6 + 横切 1 个）。
+- **核心模型**：按 Agent **行动时序**划分的三层 Harness——约束层（行动前）/ 反馈层（行动中）/ 质量门禁层（行动后），配套 12 个职责单一的 Agent（H1–H6 + 横切 1 个）。
 
 ### 这是什么 / 不是什么
 
@@ -52,7 +52,7 @@ cd harness-engineering
 本仓库是**规范型仓库**（specification repo），主体内容即 README 本身。常见使用方式有三种，可单独或组合使用：
 
 1. **作为方法论参考**：通读 README，按第 1–3 节把三层 Harness 与 H1–H6 流程映射到自己团队当前的 SDLC，识别缺口。
-2. **作为 Agent 提示词模板**：直接复用 [`agents/`](agents/) 下 11 个 Agent 的 `AGENT.md` + `prompt.md`，按需替换项目专属术语后接入到 Copilot Chat / Claude Code / Cursor / 自建工作流。
+2. **作为 Agent 提示词模板**：直接复用 [`agents/`](agents/) 下 12 个 Agent 的 `AGENT.md` + `prompt.md`，按需替换项目专属术语后接入到 Copilot Chat / Claude Code / Cursor / 自建工作流。
 3. **作为评审 / 门禁清单**：把 [`templates/phase-gate-checklist.md`](templates/phase-gate-checklist.md) 与 [`templates/review-record.md`](templates/review-record.md) 接入团队的 PR 模板与阶段评审，让规范从纸面落到流程。
 
 > 本规范不强制全部采用。建议从单一痛点切入（例如先落 H4 测试用例 + H5 编码约束），跑通再扩展。
@@ -78,15 +78,17 @@ harness-engineering/
 │   ├── repo-layout.md              # 目录规范与项目级索引（dev-map）
 │   ├── install.md                  # 安装、占位符、Vendor / NoVendor 模式
 │   └── tech-debt-gc.md             # 黄金原则、定期 GC、使用原则
-├── agents/                         # 11 个 Agent 的角色规格与提示词
+├── agents/                         # 12 个 Agent 的角色规格与提示词
 │   ├── README.md                   # Agent 协作拓扑、交接约定与调度纪律
 │   ├── _shared/                    # 跨 Agent 共享：术语表、I/O 契约、工具词表、模板
 │   ├── _skills/                    # 跨 Agent 复用的操作型 Skill
 │   ├── _integrations/              # 与 Copilot / Claude Code / Cursor / AGENTS.md 的对接说明
 │   ├── requirements-interviewer/   # H1 需求访谈
 │   ├── ui-spec-author/             # H1 UI 说明撰写
+│   ├── prototype-author/           # H1 原型源码生成
 │   ├── prototype-reviewer/         # H1 原型只读评审
 │   ├── repo-impact-mapper/         # H1 代码库影响分析
+│   ├── architect-advisor/          # H2 架构与技术选型
 │   ├── design-reviewer/            # H3 设计评审
 │   ├── test-case-author/           # H4 测试用例
 │   ├── coding-executor/            # H5 编码执行
@@ -173,7 +175,7 @@ H1–H6 各阶段的输入、输出物、必填章节与评审门禁，按阶段
 
 ## 5. 目录规范与 Agent 套件
 
-项目目录推荐结构、`AGENTS.md` 的使用约定、以及随规范附带的 11 个 Agent 套件说明，详见独立文件 [`docs/repo-layout.md`](docs/repo-layout.md)（该文件以第 10 节编号展开，可按 `第 10.1 节`、`第 10.2 节` 引用）。
+项目目录推荐结构、`AGENTS.md` 的使用约定、以及随规范附带的 12 个 Agent 套件说明，详见独立文件 [`docs/repo-layout.md`](docs/repo-layout.md)（该文件以第 10 节编号展开，可按 `第 10.1 节`、`第 10.2 节` 引用）。
 
 ## 6. AI 使用规范
 
