@@ -1,17 +1,32 @@
 ---
 name: prd-exporter
-description: 把 H1 已评审的四件产物（requirements.md / ui-spec.md / user-flow.md / acceptance-criteria.md）合并导出为单文件 PRD。当用户说"给我一份 PRD"、"客户/老板要看产品需求文档"、"把需求合并成对外版本"、"H1 输出能不能给非工程同学看"时主动调用。本 Skill 是**只读导出**：单一事实源仍是 H1 那四件产物，导出的 PRD 不能被独立编辑——发现 PRD 与四件产物有偏离，必须改源、再重导，绝不允许把 PRD 当作新事实源。
+description: 把 H1 已评审的四件产物（requirements.md / ui-spec.md / user-flow.md / acceptance-criteria.md）合并导出为单文件 PRD，**仅供人类受众阅读**（客户 / 老板 / 跨部门同事 / 评审会参与者），不进入任何 Agent / Skill 的输入链。当用户说“给我一份 PRD”、“客户/老板要看产品需求文档”、“把需求合并成对外版本”、“H1 输出能不能给非工程同学看”时主动调用。本 Skill 是**只读导出**：单一事实源仍是 H1 那四件产物，导出的 PRD 不能被独立编辑——发现 PRD 与四件产物有偏离，必须改源、再重导，绝不允许把 PRD 当作新事实源。
 when_to_use: |
-  - H1 四件产物已 reviewed，需要给客户 / 老板 / 跨部门同事一份合并文档
-  - 项目立项 / 评审会前，需要把分散的需求与 UI 信息凝练成一份可读 PRD
+  - 项目需要给**非工程受众**（客户 / 老板 / 跨部门同事 / 项目评审会参与者）一份可读的合并文档
+  - H1 四件产物已 reviewed，需要凝练成一份供人阅读的 PRD
   - 已有 PRD 文档落后于 H1 源文件，需要重新导出对齐
 when_not_to_use: |
+  - **你是下游 Agent / Skill，想读需求产物**——读同目录下的四件源文件。PRD.md 是**导出物不是事实源**，任何 Agent 读 PRD = 读过期快照 + 绕过评审门禁（详见 [`io-contracts.md § 1.1`](../../_shared/io-contracts.md)）
   - H1 还在 draft 阶段——导出会把未定稿信息扩散出去
-  - 用户想"修改 PRD"——直接改 PRD 等于背叛单一事实源原则；改源文件再重导
-  - 用户问的是"H1 怎么写"——那是 RequirementsInterviewer / UISpecAuthor 的事
+  - 用户想“修改 PRD”——直接改 PRD 等于背叛单一事实源原则；改源文件再重导
+  - 用户问的是“H1 怎么写”——那是 RequirementsInterviewer / UISpecAuthor 的事
 ---
 
 # Skill: PRD 导出器（PRD Exporter）
+
+## 0. 硬约束：PRD 是导出物，不是事实源
+
+读本 Skill 之前必须接受以下三条硬约束。它们不是“推荐”而是**定义**本 Skill 存在价值的生命线。
+
+1. **PRD 只服务人类受众**。面向的是客户 / 老板 / 跨部门同事 / 评审会参与者——这些人不会、也不应该为了看需求去拼 4 份 markdown。如果你的项目没有这类受众，**不需要**调用本 Skill，直接让大家读四件源文件即可。
+2. **PRD 不进任何 Agent / Skill 的输入链**。`H2-ArchitectAdvisor` / `PrototypeAuthor` / `PrototypeReviewer` / `DesignReviewer` / `TestCaseAuthor` 等所有下游角色都读四件源文件，不读 PRD。全局设计依据见 [`io-contracts.md § 1.1 事实源 vs 导出物`](../../_shared/io-contracts.md)。
+3. **PRD 不可被独立编辑**。发现 PRD 与四件产物偏离——改源、重导。任何在 PRD 里刚出现、但源文件里不存在的文字，都是反向污染事实源的漏洞，需优先反转。
+
+为什么这样设：
+
+- H1 四件产物是为了**评审与变更影响面控制**被拆开的。拆开评审、拆开修订。让 AI 读 PRD 是把这份评审粒度倒退成一件全集。
+- 导出物是某一个时刻的快照；源文件那边一旦 push 了一条修订、PRD 还没重导，任何读 PRD 的下游会静默拿到过期信息。
+- 单一事实源原则：同一条信息只从一个地方读。双路径读取 = 版本漂移的温床。
 
 ## 1. 目的与原理
 
@@ -22,9 +37,9 @@ H1 的产物在 Harness Engineering 里被刻意拆成四件，理由很硬：
 - `user-flow.md` 是流程事实（主流程、异常流）
 - `acceptance-criteria.md` 是验收事实（可机械判定的成功条件）
 
-四件分开维护，各自的评审与变更影响面更可控；但对**非工程读者**（客户、销售、新加入的产品同学）来说，分开读会丢上下文。所以需要一个**只读的合并视图** = PRD。
+四件分开维护，各自的评审与变更影响面更可控；但对**非工程读者**（客户、销售、新加入的产品同学、评审会参与者）来说，分开读会丢上下文。所以需要一个**只读的合并视图** = PRD。
 
-> **核心纪律**：PRD 是**导出视图**，不是**新事实源**。任何对 PRD 的编辑都必须回流到对应源文件，再重新导出。本 Skill 在生成的 PRD 顶部强制写一条提示："本文件由 prd-exporter 从 H1 源文件生成，请勿直接编辑。"
+> **核心纪律**：PRD 是**导出视图**，不是**新事实源**，也不是下游 Agent 的输入。任何对 PRD 的编辑都必须回流到对应源文件，再重新导出。本 Skill 在生成的 PRD 顶部强制写一条提示：“本文件仅供人类受众阅读，请勿直接编辑；下游 Agent 不得读取本文件。”
 
 为什么不做成 Agent：参见 [`agents/README.md` 第 7.3 节](../../README.md#73-何时新增-agent)三问测试——H1 现有 4 个 Agent 已经把 PRD 的全部章节都覆盖了，再加一个 PM Agent 就是重复维护。
 
@@ -63,9 +78,17 @@ PRD 模板（节序固定）：
 ```markdown
 # <项目名> · 产品需求文档（PRD）
 
-> 本文件由 prd-exporter 从 H1 源文件自动生成于 <YYYY-MM-DD HH:MM>。
-> 单一事实源：`docs/01-requirements/{requirements,ui-spec,user-flow,acceptance-criteria}.md`
-> 请勿直接编辑本文件——任何修改都应回到源文件再重新导出。
+> ⚠️ **本文件仅供人类受众阅读**（客户 / 老板 / 跨部门同事 / 评审会参与者）。
+>
+> 它是 H1 四件事实源的**只读合并快照**，不是新事实源：
+>
+> - **源文件**：`docs/01-requirements/{requirements,ui-spec,user-flow,acceptance-criteria}.md`
+> - **生成于**：<YYYY-MM-DD HH:MM>
+> - **来源快照**：<git commit sha>
+>
+> 请**勿直接编辑本文件**——任何修改都应回到上述源文件、重新导出。直接改本文件 = 架空事实源。
+>
+> **下游 Agent / Skill（如 PrototypeAuthor / ArchitectAdvisor / TestCaseAuthor 等）不得读取本文件**——他们只读上述源文件。读 PRD 会拿到导出时刻的过期快照 + 绕过 H1 评审门禁（全局设计依据见 [`agents/_shared/io-contracts.md § 1.1`](../../_shared/io-contracts.md)）。
 
 | 字段 | 内容 |
 | --- | --- |
@@ -189,9 +212,17 @@ PRD 模板（节序固定）：
 ```markdown
 # Inkwell · 产品需求文档（PRD）
 
-> 本文件由 prd-exporter 从 H1 源文件自动生成于 2026-05-08 14:30。
-> 单一事实源：`docs/01-requirements/{requirements,ui-spec,user-flow,acceptance-criteria}.md`
-> 请勿直接编辑本文件——任何修改都应回到源文件再重新导出。
+> ⚠️ **本文件仅供人类受众阅读**（客户 / 老板 / 跨部门同事 / 评审会参与者）。
+>
+> 它是 H1 四件事实源的**只读合并快照**，不是新事实源：
+>
+> - **源文件**：`docs/01-requirements/{requirements,ui-spec,user-flow,acceptance-criteria}.md`
+> - **生成于**：2026-05-08 14:30
+> - **来源快照**：`a1b2c3d`
+>
+> 请**勿直接编辑本文件**——任何修改都应回到上述源文件、重新导出。直接改本文件 = 架空事实源。
+>
+> **下游 Agent / Skill（如 PrototypeAuthor / ArchitectAdvisor / TestCaseAuthor 等）不得读取本文件**。
 
 | 字段 | 内容 |
 | --- | --- |
@@ -215,7 +246,8 @@ PRD 模板（节序固定）：
 
 ## 6. 与其它 Skill / Agent 的边界
 
+- **下游 Agent / Skill 不读本 Skill 产物**。`PrototypeAuthor` / `H2-ArchitectAdvisor` / `DesignReviewer` / `TestCaseAuthor` 等所有下游角色的输入契约均只列出事实源四件文件，不列也不允许读 `PRD.md`。这是全局约定，全文见 [`io-contracts.md § 1.1`](../../_shared/io-contracts.md)。
 - 想**写新需求**：用 `RequirementsInterviewer` Agent，不是本 Skill。
-- 想**评 PRD 内容好不好**：本 Skill 不评内容；评 H1 内容用 `PrototypeReviewer` Agent + `phase-gate-runner` Skill。
-- 想**生成给开发看的合并文档**：开发应该直接读四件源文件 + 详细设计 + 测试用例，不要从 PRD 读取。PRD 是对外视图，不是工程入口。
+- 想**评 PRD 内容好不好**：本 Skill 不评内容；评 H1 内容用 `PrototypeReviewer` Agent + `phase-gate-runner` Skill（两者都从四件源文件读，不读 PRD）。
+- 想**生成给开发看的合并文档**：不需要。开发者直接读四件源文件 + 详细设计 + 测试用例，不要从 PRD 读。**PRD 是对人类受众的视图，不是工程入口也不是 Agent 入口**。
 - 想**做版本对比 / changelog**：用 git diff，本 Skill 不做版本管理。

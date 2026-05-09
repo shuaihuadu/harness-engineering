@@ -53,6 +53,68 @@ render_placeholders() {
 }
 
 # ----------------------------------------------------------------------------
+# INCLUDE 指令展开（与 PS 端 Expand-Includes 行为对齐）
+# ----------------------------------------------------------------------------
+# 支持：
+#   {{INCLUDE: <path>}}      原样 inline 整个文件
+#   {{INCLUDE_BODY: <path>}} inline 时去掉 YAML frontmatter 与首个 H1 标题行
+# path 相对 ${HARNESS_ROOT}（默认回退到 ${REPO_ROOT}），由调用脚本设置。
+# 嵌套展开最多 16 轮；inline 完成后剥掉 4 类必然失效的跨文件相对链接。
+expand_includes() {
+    # stdin -> stdout
+    local content
+    content=$(cat; printf x)
+    content="${content%x}"
+    local iter=0
+    local max_iter=16
+    local re='\{\{INCLUDE(_BODY)?:[[:space:]]*([^}]+)\}\}'
+    local root="${HARNESS_ROOT:-${REPO_ROOT:-.}}"
+    while [[ "$content" =~ $re ]]; do
+        iter=$((iter + 1))
+        if (( iter > max_iter )); then
+            echo "错误：INCLUDE 嵌套深度超过 $max_iter 层（疑似循环引用）" >&2
+            exit 1
+        fi
+        local directive="${BASH_REMATCH[0]}"
+        local kind_suffix="${BASH_REMATCH[1]}"
+        local rel_path="${BASH_REMATCH[2]}"
+        # 去掉 path 末尾空白
+        rel_path="${rel_path%"${rel_path##*[![:space:]]}"}"
+        local abs_path="${root}/${rel_path}"
+        if [[ ! -f "$abs_path" ]]; then
+            echo "错误：INCLUDE 引用的源文件不存在：$abs_path" >&2
+            exit 1
+        fi
+        local body
+        body=$(cat "$abs_path"; printf x)
+        body="${body%x}"
+        if [[ "$kind_suffix" == "_BODY" ]]; then
+            body=$(printf '%s' "$body" | awk '
+                BEGIN { in_fm = 0; h1_done = 0 }
+                NR == 1 && $0 == "---" { in_fm = 1; next }
+                in_fm == 1 {
+                    if ($0 == "---") { in_fm = 0 }
+                    next
+                }
+                h1_done == 0 && /^[[:space:]]*#[[:space:]]+/ { h1_done = 1; next }
+                { print }
+            '; printf x)
+            body="${body%x}"
+        fi
+        # 安全降级：剥掉 inline 后必然失效的跨文件相对链接
+        body=$(printf '%s' "$body" | sed -E \
+            -e 's#\[([^]]+)\]\(\.\./_shared/[^)]+\)#\1#g' \
+            -e 's#\[([^]]+)\]\(\.\./\.\./docs/[^)]+\)#\1#g' \
+            -e 's#\[([^]]+)\]\(\.\./\.\./README\.md[^)]*\)#\1#g' \
+            -e 's#\[([^]]+)\]\(AGENT\.md[^)]*\)#\1#g'; printf x)
+        body="${body%x}"
+        # 单次替换 directive → body；directive 不含 glob 元字符
+        content="${content/"$directive"/$body}"
+    done
+    printf '%s' "$content"
+}
+
+# ----------------------------------------------------------------------------
 # 字节比较
 # ----------------------------------------------------------------------------
 files_equal() {
@@ -146,7 +208,7 @@ sync_rendered_file() {
     fi
 
     local tmp; tmp=$(mktemp)
-    render_placeholders <"$source" >"$tmp"
+    expand_includes <"$source" | render_placeholders >"$tmp"
 
     # 还原（避免泄露给后续 vendor 文件）
     if [[ -n "$_saved_link" ]]; then

@@ -9,7 +9,7 @@
 1. [装完后该干啥](#1-装完后该干啥按项目状态分流)
 2. [全流程一览：H1 → H6 + Hx](#2-全流程一览h1--h6--hx)
 3. [`.github/` 里都装了什么](#3-github-里都装了什么)
-4. [`.he/` 里都装了什么](#4-he-里都装了什么)
+4. [`{{VENDOR_DIR}}/` 里都装了什么](#4-he-里都装了什么)
 5. [Templates 怎么用、怎么改](#5-templates-怎么用怎么改)
 6. [Skills / Prompts / Agents 速查](#6-skills--prompts--agents-速查)
 7. [给 Agent / Prompt 配置工具白名单](#7-给-agent--prompt-配置工具白名单)
@@ -53,20 +53,33 @@
    ```
 
 2. **H1 下半段 · UI 说明 + 原型 + 评审 + 留档**：H1 不是只写 `requirements.md` 就结束了。完整 H1 还包含「UI 说明、可交互原型、评审、留档」四件事，按顺序切两个专属 Agent + 一个外部工具走完：
-   - **UI 说明**：切到 `h1-ui-spec-author`，给它 `requirements.md` + 你手头的截图或参考页面，它会按 [stages.md 第 4.5 节](../../docs/stages.md#45-ui-说明必须包含) 那 10 项反问一轮，然后产出 `docs/01-requirements/ui-spec.md` / `user-flow.md` / `acceptance-criteria.md`，没答清的**追加**到同一份 `open-questions.md`。
+   - **UI 说明**：切到 `h1-ui-spec-author`，给它 `requirements.md` + 你手头的截图或参考页面，它会按 [stages/h1-requirements-and-prototype.md §5](../../../docs/stages/h1-requirements-and-prototype.md) 那 10 项反问一轮，然后产出 `docs/01-requirements/ui-spec.md` / `user-flow.md` / `acceptance-criteria.md`，没答清的**追加**到同一份 `open-questions.md`。
 
      _示例输入_（明确上游凭证 + 手头素材 + 推不清的就丢回 open-questions）：
 
      ```text
      上游需求看 docs/01-requirements/requirements.md 里 REQ-001 到 REQ-005，
      我手上还有三张草图在 prototypes/ai-content-factory/screenshots/ 下。
-     按 stages.md 4.5 节那 10 个维度挨个问我，
+     按 stages/h1-requirements-and-prototype.md §5 那 10 个维度挨个问我，
      答得清的写进 ui-spec.md / user-flow.md / acceptance-criteria.md，
      答不清的全部追加到 open-questions.md——别给我用 <TBD> 占位，我会忘记回来补。
      ```
 
-   - **可交互原型**：你自己挑工具做（HTML/CSS 静态页面、Figma 导出、V0、Lovable、手绘扫描都行），落到 `prototypes/<feature>/` 目录，关键屏幕被截图在 `prototypes/<feature>/screenshots/` 下。
-   - **原型评审**：切到 `h1-prototype-reviewer`，它会只读 `ui-spec.md` + `prototypes/<feature>/` + `phase-gate-checklist.md`，按 H1 那 12 条逼出 `PASS / FAIL / UNKNOWN`与补救动作；**它只读不写，不会替你产出 `prototype-review.md`**（评审纪要由人写，避免 AI 给自己开绿灯）。
+   - **可交互原型**：切到 `h1-prototype-author`，给它上一步产出的 `ui-spec.md` / `user-flow.md` / `acceptance-criteria.md` + 你项目的技术栈（或者让它从 `AGENTS.md` 第 4 节“技术栈约束”读），它会严格按 ui-spec 一一对应生成 `prototypes/<feature>/` 下的可点原型源码、起本地 dev server、自截屏，最后产出 `coverage.md` 记录 “UI-NNN → 原型文件 / 截图” 映射。**它绝不发明 ui-spec 之外的页面/状态/字段**；发现 spec 缺漏会反问你或走 open-questions。不想让 Agent 写代码的，则跳过此 Agent，用 v0.dev / Cursor / 手写都行，但你必须亲手补上 `coverage.md`。
+
+     _示例输入_（明确技术栈与产出路径，由 Agent 最后提交原型 + coverage 映射）：
+
+     ```text
+     产出参考这几份：
+     - docs/01-requirements/ui-spec.md
+     - docs/01-requirements/user-flow.md
+     - docs/01-requirements/acceptance-criteria.md
+     本项目技术栈看 AGENTS.md 第 4 节（React 18 + Vite + Tailwind）。
+     请按 ui-spec 里的 UI-001…UI-007 逐个生成页面，起 dev server、自己截屏、最后输出 coverage.md。
+     ui-spec 没写过的东西一律不要加，有这种冲动就反问我。
+     ```
+
+   - **原型评审**：切到 `h1-prototype-reviewer`，它会只读 `ui-spec.md` + `prototypes/<feature>/`（含上一步产出的 `coverage.md` 与截图）+ `phase-gate-checklist.md`，按 H1 那 12 条逼出 `PASS / FAIL / UNKNOWN`与补救动作；**它只读不写，不会替你产出 `prototype-review.md`**（评审纪要由人写，避免 AI 给自己开绿灯）。
 
      _示例输入_（说清原型在哪、UI 文档在哪、按哪份清单打分，三件齐就行）：
 
@@ -191,7 +204,7 @@
 
    ```text
    帮我看一下 docs/04-detailed-design/ai-content-factory/HD-001.md。
-   按 stages.md 第 6 节那份章节列表对——
+   按 stages/h3-detailed-design.md 那份章节列表对——
    接口、数据模型、错误码、并发与失败语义、可观测性、发布回滚，每一项都看看写没写清。
    缺啥列出来告诉我下一步该补啥；这轮只评审，别动我的文档。
    ```
@@ -340,10 +353,11 @@
 │   ├── coding-style.instructions.md
 │   ├── commit-format.instructions.md
 │   └── docs-style.instructions.md
-├── agents/                          ← 11 个 Custom Agent，下拉菜单可选
+├── agents/                          ← 12 个 Custom Agent，下拉菜单可选
 │   ├── h1-repo-impact-mapper.agent.md
 │   ├── h1-requirements-interviewer.agent.md
 │   ├── h1-ui-spec-author.agent.md
+│   ├── h1-prototype-author.agent.md
 │   ├── h1-prototype-reviewer.agent.md
 │   ├── h2-architect-advisor.agent.md
 │   ├── h3-design-reviewer.agent.md
@@ -352,11 +366,16 @@
 │   ├── h5-commit-auditor.agent.md
 │   ├── h6-release-note-writer.agent.md
 │   └── hx-doc-gardener.agent.md
-├── skills/                          ← 4 个 Skill，Copilot 按 description 自动调
+├── skills/                          ← 9 个 Skill，Copilot 按 description 自动调
 │   ├── ai-task-brief-writer/SKILL.md
 │   ├── commit-message-formatter/SKILL.md
 │   ├── phase-gate-runner/SKILL.md
-│   └── traceability-linker/SKILL.md
+│   ├── traceability-linker/SKILL.md
+│   ├── architecture-reviewer/SKILL.md
+│   ├── test-plan-reviewer/SKILL.md
+│   ├── release-reviewer/SKILL.md
+│   ├── effort-estimator/SKILL.md
+│   └── prd-exporter/SKILL.md
 ├── prompts/                         ← 4 个 Slash Command
 │   ├── new-task.prompt.md
 │   ├── run-gate.prompt.md
@@ -373,13 +392,13 @@
 
 ---
 
-## 4. `.he/` 里都装了什么
+## 4. `{{VENDOR_DIR}}/` 里都装了什么
 
 ```
-.he/
+{{VENDOR_DIR}}/
 ├── HANDBOOK.md       ← 你正在读的这份手册
 ├── README.md         ← 解释这个目录的角色 + .gitignore 建议
-├── docs/             ← 设计文档（stages.md / repo-layout.md / tech-debt-gc.md）
+├── docs/             ← 设计文档（stages/ 阶段细则 / repo-layout.md / tech-debt-gc.md）
 ├── manifest.json     ← 安装清单，uninstall 用
 ├── install.log       ← 每次 install/uninstall 追加一行
 └── uninstall.ps1     ← 一键反向清理
@@ -390,7 +409,7 @@
 如果觉得它和项目本身无关、不想入版本库，**推荐把它加进 `.gitignore`**：
 
 ```gitignore
-.he/
+{{VENDOR_DIR}}/
 ```
 
 代价：团队其他人 `git pull` 后看不到这份手册，需要自己再跑一次 `install.ps1`。如果想让所有人都能直接读，就保留入版本库。
@@ -473,7 +492,7 @@ Copy-Item .github\templates\ai-task-brief.md docs\06-tasks\T-001-<slug>.md
 | Agent                        | 阶段  | 用途                                                                                        |
 | ---------------------------- | ----- | ------------------------------------------------------------------------------------------- |
 | `H1-RequirementsInterviewer` | H1    | 反问把模糊需求转成可评审 `requirements.md`                                                  |
-| `H1-UISpecAuthor`            | H1    | 反问把 UI 细节逼出，按 stages.md 4.5 节 10 项产出 ui-spec / user-flow / acceptance-criteria |
+| `H1-UISpecAuthor`            | H1    | 反问把 UI 细节逼出，按 stages/h1-requirements-and-prototype.md §5 10 项产出 ui-spec / user-flow / acceptance-criteria |
 | `H1-PrototypeReviewer`       | H1    | 只读评审：读原型 + UI 文档，按 phase-gate H1 12 条 PASS/FAIL，不写文件                      |
 | `H1-RepoImpactMapper`        | H1↔H3 | 产出“需求 ↔ 真实代码”对账单；H2 / H3 必需输入；H5 阶段用作 AI “允许修改文件”的边界              |
 | `H2-ArchitectAdvisor`        | H2    | 起草架构选型 + ADR，每条选型留六字段                                                        |
@@ -486,18 +505,18 @@ Copy-Item .github\templates\ai-task-brief.md docs\06-tasks\T-001-<slug>.md
 
 ### 6.1 H1 下半段的两个专属 Agent：UISpecAuthor + PrototypeReviewer
 
-H1 完整定义见 [stages.md 第 4 节](../../docs/stages.md#4-h1需求ui-与交互原型阶段)，包含五件事：**需求文本 / UI 说明 / 用户流 / 可交互原型 / 评审留档**。最初版本只把"需求文本"做成了专属 Agent，下半段统一交给默认 Agent + 外部工具。**这一决策在采用方第一次跑 `/run-gate H1` 时被推翻了**：12 条门禁里下半段那 6 条经常 FAIL，原因是"默认 Agent 不会按 stages.md 4.5 节那 10 项主动反问"——同一组反问纪律已在上半段的 `H1-RequirementsInterviewer` 上证明有效，下半段当然也吃这套。从 v0.0.2 起，H1 下半段拆为两个专属 Agent：
+H1 完整定义见 [stages/h1-requirements-and-prototype.md](../../../docs/stages/h1-requirements-and-prototype.md)，包含五件事：**需求文本 / UI 说明 / 用户流 / 可交互原型 / 评审留档**。最初版本只把"需求文本"做成了专属 Agent，下半段统一交给默认 Agent + 外部工具。**这一决策在采用方第一次跑 `/run-gate H1` 时被推翻了**：12 条门禁里下半段那 6 条经常 FAIL，原因是"默认 Agent 不会按 stages/h1-requirements-and-prototype.md §5 那 10 项主动反问"——同一组反问纪律已在上半段的 `H1-RequirementsInterviewer` 上证明有效，下半段当然也吃这套。从 v0.0.2 起，H1 下半段拆为两个专属 Agent：
 
 | Agent                  | 性质       | 干什么                                                                                   |
 | ---------------------- | ---------- | ---------------------------------------------------------------------------------------- |
-| `H1-UISpecAuthor`      | 反问写文档 | 平移 RequirementsInterviewer 的纪律到 UI 维度，按 stages.md 4.5 节 10 项产出三份文档     |
+| `H1-UISpecAuthor`      | 反问写文档 | 平移 RequirementsInterviewer 的纪律到 UI 维度，按 stages/h1-requirements-and-prototype.md §5 10 项产出三份文档     |
 | `H1-PrototypeReviewer` | 只读评审员 | 读原型 + UI 文档，按 phase-gate H1 12 条 PASS/FAIL/UNKNOWN，**不写文件**——评审纪要由人写 |
 
 设计取舍：
 
 - **PrototypeReviewer 为什么不能让 Agent 写评审纪要**：评审 Agent 容易自我满足（参见 [run-gate 设计](#73-两个只读例外run-gate-与-h1-prototype-reviewer)）。把它限制成"只读 + 不能写 prototype-review.md"，复用 run-gate 的同一招——用工具集物理隔离取代行为约束，让 AI 评审与人评审之间留出独立空间。
 - **可交互原型本身仍由你自选工具实现**：HTML/CSS、Figma、V0、Lovable、手绘扫描都行。`H1-UISpecAuthor` 写 ui-spec markdown，`H1-PrototypeReviewer` 读原型目录里的 markdown / 截图，原型工具的选择被严格隔离在两个 Agent 之外。
-- **v1 边界**：`H1-PrototypeReviewer` 当前只读 markdown 描述与本地截图。要让 Agent 真的去渲染 React / 点击按钮 / 截图比对，是 v2 的事——届时给它开 `browser/*`。
+- **v1 边界**：`H1-PrototypeReviewer` 仍然只读 markdown 描述与本地截图（上游 `H1-PrototypeAuthor` 产出的）。评审员不起 dev server / 不点击 / 不重新截图是有意设计——这里是质量门禁，不该跟作者走同一个工具栈；要让评审 Agent 亲自点页面、做交互误差比对，是 v2 的事。
 
 实操上，H1 下半段的工作流是：
 
@@ -541,7 +560,7 @@ VS Code Copilot Chat 把所有内置工具按"用途"分到 9 个命名空间下
 
 ### 7.2 默认配置：H1–H6 全套放开 49 个工具
 
-本仓库自带的 11 个 Custom Agent + 4 个 Prompt 中，**除了 `/run-gate` 与 `h1-prototype-reviewer` 之外的 13 个文件**默认把整套 49 个工具都放进白名单。原因是 H1–H6 阶段虽然角色分明，但每个角色都可能临时需要：起草文档（`edit/*`）、看代码上下文（`search/*` + `read/*`）、查官方 docs（`web/fetch`）、跑构建命令验证（`execute/runInTerminal`）、对前端改动做截图核对（`browser/*`）。预留满集合可以省掉用户每加一种工作就回头改 frontmatter 的麻烦。
+本仓库自带的 12 个 Custom Agent + 4 个 Prompt 中，**除了 `/run-gate` 与 `h1-prototype-reviewer` 之外的 14 个文件**默认把整套 49 个工具都放进白名单。原因是 H1–H6 阶段虽然角色分明，但每个角色都可能临时需要：起草文档（`edit/*`）、看代码上下文（`search/*` + `read/*`）、查官方 docs（`web/fetch`）、跑构建命令验证（`execute/runInTerminal`）、对前端改动做截图核对（`browser/*`）。预留满集合可以省掉用户每加一种工作就回头改 frontmatter 的麻烦。
 
 **真正的角色边界由 system prompt 文字（即 `agents/<role>/AGENT.md` 的指令章节）来约束**——比如 `H1-RequirementsInterviewer` 的指令明确写着"主动反问、不臆测、待澄清问题进 open-questions"，AI 不会因为有 `execute/runInTerminal` 就突然跑去执行 `dotnet test`，因为它的角色脚本没让它做这件事。换言之：**`tools` 是物理边界，prompt 是行为边界，两道闸门各司其职**。
 
@@ -584,7 +603,7 @@ tools:
   ]
 ```
 
-两个都只有 `search/*` 与 `read/*`，**没有任何 `edit/*` / `execute/*` / `web/*` / `browser/*`**。`h1-prototype-reviewer` 不开 `browser/*` 是 v1 的有意设计：v1 只消费人手走过原型后留下的 markdown 与截图，让 Agent 真的去渲染 React / 点击按钮 / 截图比对是 v2 的事。
+两个都只有 `search/*` 与 `read/*`，**没有任何 `edit/*` / `execute/*` / `web/*` / `browser/*`**。`h1-prototype-reviewer` 不开 `browser/*` 是有意设计：在 v0.0.2 之后，原型的渲染与截图交给 `H1-PrototypeAuthor` 负责。评审员只消费上游（或人手）留下的 markdown 描述与截图，作者与评审员的工具栈故意不重叠；让评审 Agent 亲自重新点页面 / 截图比对 / 跳转路由，是 v2 的事。
 
 ### 7.4 你想自定义时该怎么改
 
@@ -645,7 +664,7 @@ tools:
 - 选 `A`：本次后续所有冲突一律覆盖
 - 选 `B`：中断本次 install
 
-只有传 `-Force` 才会全部静默覆盖。想长期 own 某个文件，每次升级时按 `K` 即可；想彻底脱钩、连询问都不要，从 `.he/manifest.json` 里删掉对应那一行。
+只有传 `-Force` 才会全部静默覆盖。想长期 own 某个文件，每次升级时按 `K` 即可；想彻底脱钩、连询问都不要，从 `{{VENDOR_DIR}}/manifest.json` 里删掉对应那一行。
 
 ### Q3: 升级到新版本
 
@@ -715,7 +734,7 @@ Get-Content .\.he\install.log
 # <项目名>
 
 > AI 协作单一事实源——遵循 [AGENTS.md 跨工具开放约定](https://agents.md/)。
-> 本仓库采用 [Harness Engineering 规范](.he/HANDBOOK.md) 作为工程骨架。
+> 本仓库采用 [Harness Engineering 规范]({{VENDOR_DIR}}/HANDBOOK.md) 作为工程骨架。
 
 ## 1. 项目身份
 
@@ -742,7 +761,7 @@ Get-Content .\.he\install.log
 本项目当前唯一启用 GitHub Copilot Chat。
 
 - 工具入口：`.github/copilot-instructions.md`（Copilot 自动加载）
-- Agent / Skill / Prompt 速查与白名单改法：`.he/HANDBOOK.md` 第 6 节、第 7 节
+- Agent / Skill / Prompt 速查与白名单改法：`{{VENDOR_DIR}}/HANDBOOK.md` 第 6 节、第 7 节
 
 > 切到 Codex / Claude Code / Cursor 时本文件作为跨工具事实源不变。
 
@@ -771,7 +790,7 @@ H1-RepoImpactMapper、H3-DesignReviewer、H5-CodingExecutor 都依赖本节做�
 
 | 内容 | 位置 |
 | --- | --- |
-| 操作手册 | `.he/HANDBOOK.md` |
+| 操作手册 | `{{VENDOR_DIR}}/HANDBOOK.md` |
 | 当前需求 | `docs/01-requirements/requirements.md` |
 | 仓库影响图 | `docs/01-requirements/repo-impact-map.md` |
 | H1 评审纪要 | `docs/07-reviews/` |

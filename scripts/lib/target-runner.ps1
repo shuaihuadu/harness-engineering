@@ -42,6 +42,24 @@
 Set-StrictMode -Version Latest
 
 # ----------------------------------------------------------------------------
+# 在 target.json 的 target 路径上展开 {{KEY}} 占位符（支持 VENDOR_DIR 等）
+# Replace {{KEY}} placeholders inside JSON-declared target paths.
+# ----------------------------------------------------------------------------
+function Expand-TargetPlaceholders {
+    param(
+        [Parameter(Mandatory)] [hashtable] $Replacements,
+        [AllowEmptyString()] [string] $Value
+    )
+    if ([string]::IsNullOrEmpty($Value)) { return $Value }
+    $out = $Value
+    foreach ($key in $Replacements.Keys) {
+        $token = '{{' + $key + '}}'
+        $out = $out.Replace($token, [string]$Replacements[$key])
+    }
+    return $out
+}
+
+# ----------------------------------------------------------------------------
 # 加载 target.json
 # ----------------------------------------------------------------------------
 function Read-TargetSpec {
@@ -173,7 +191,8 @@ function Invoke-RenderSingle {
     param([hashtable]$Context, [object]$Spec, [string]$TargetDir, [string]$TargetRepoRoot)
 
     $src = Join-Path $TargetDir $Spec.source
-    $dst = Join-Path $TargetRepoRoot $Spec.target
+    $targetRel = Expand-TargetPlaceholders -Replacements $Context.Replacements -Value $Spec.target
+    $dst = Join-Path $TargetRepoRoot $targetRel
     if (-not (Test-Path $src)) { throw "source 不存在：$src" }
     Sync-RenderedFile -Context $Context -Source $src -Destination $dst
 }
@@ -182,7 +201,8 @@ function Invoke-RenderDirectory {
     param([hashtable]$Context, [object]$Spec, [string]$TargetDir, [string]$TargetRepoRoot, [hashtable]$Selections, [string]$TargetName)
 
     $srcDir = Join-Path $TargetDir $Spec.source_dir
-    $dstDir = Join-Path $TargetRepoRoot $Spec.target_dir
+    $targetSubdir = Expand-TargetPlaceholders -Replacements $Context.Replacements -Value $Spec.target_dir
+    $dstDir = Join-Path $TargetRepoRoot $targetSubdir
     $srcGlob = $Spec.source_glob
     $tgtGlob = $Spec.target_glob
 
@@ -284,7 +304,8 @@ function Invoke-RenderTree {
     param([hashtable]$Context, [object]$Spec, [string]$TargetDir, [string]$TargetRepoRoot)
 
     $srcDir = Join-Path $TargetDir $Spec.source_dir
-    $dstDir = Join-Path $TargetRepoRoot $Spec.target_dir
+    $targetSubdir = Expand-TargetPlaceholders -Replacements $Context.Replacements -Value $Spec.target_dir
+    $dstDir = Join-Path $TargetRepoRoot $targetSubdir
 
     if (-not (Test-Path $srcDir)) {
         Write-Host "   skip   $srcDir 不存在" -ForegroundColor DarkGray

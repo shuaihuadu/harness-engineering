@@ -33,7 +33,7 @@
 
 > **完成后下一步**：
 >
-> 1. **Approved / Approved with Changes**：人工去上游产物把 frontmatter `status: draft` 改成 `reviewed`、在 `reviewers:` 加一行（参见 `.he/HANDBOOK.md` Q7）；本节四类下一阶段动作见 `templates/phase-gate-checklist.md` 各 H 阶段末尾的"完成后下一步"。
+> 1. **Approved / Approved with Changes**：人工去上游产物把 frontmatter `status: draft` 改成 `reviewed`、在 `reviewers:` 加一行（参见 `{{VENDOR_DIR}}/HANDBOOK.md` Q7）；本节四类下一阶段动作见 `templates/phase-gate-checklist.md` 各 H 阶段末尾的"完成后下一步"。
 > 2. **Rejected**：上游 `status` 保留 `draft`，并把"返工方向"写到本表第 5 节"修改项"，每条都派负责人 + 截止时间；不要让上游产物被动跳过去。
 > 3. **Pending**：把"缺什么、问谁、什么时候补齐"登记到 `docs/06-tasks/task-board.md` 第 2 节"等待人工决策"——这是规范层的人工出口，避免阻塞悬空在某个会话里。
 

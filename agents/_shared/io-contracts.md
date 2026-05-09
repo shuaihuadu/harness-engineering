@@ -9,6 +9,27 @@
 - 路径一律使用相对仓库根的正斜杠形式，如 `docs/01-requirements/requirements.md`。
 - Agent 工具能力名一律取自 [`tool-vocabulary.md`](./tool-vocabulary.md)。
 
+## 1.1 事实源 vs 导出物
+
+Harness Engineering 中的文档分两类，谁可被下游 Agent 读取是硬约束：
+
+| 类别       | 定义                                                      | 下游 Agent / Skill 可读？                        |
+| ---------- | --------------------------------------------------------- | ------------------------------------------------ |
+| **事实源** | 由某个 Agent / 人工产出，有 `status` 字段可被评审扣上签名 | 可读（且需验证 `status ≥ reviewed`）             |
+| **导出物** | 从事实源机械合并而来，`status: generated`，不可独立编辑   | **不可读**——仅服务人类受众（对外、评审会、汇报） |
+
+全局禁令：任何 Agent / Skill **不得**在 `AGENT.md` 输入契约里列出以下路径，也不得在运行时主动 fetch：
+
+- `docs/01-requirements/PRD.md`（由 `prd-exporter` Skill 导出，源于同目录下四件事实源 `requirements.md` / `ui-spec.md` / `user-flow.md` / `acceptance-criteria.md`）
+
+未来新增导出类 Skill 时，需在本表追加一行，同时在该 Skill 的 `SKILL.md` 顶部带必要的 banner。
+
+为什么这样设：
+
+- 导出物是某一时刻的快照；让下游 Agent 读快照 = 绕过事实源的评审门禁、且一旦源文件更新而未重导会读到过期信息
+- 事实源拆成多件是有意设计（各自独立评审、变更影响面可控）；导出物是“为人类受众拼一下”，不应被机器反向消费
+- 单一事实源原则：同一条信息只能从一个入口被读到，避免版本漂移
+
 ## 2. Markdown frontmatter 约定
 
 需要被 Agent / 工具自动消费的 Markdown 文档应在文件首部加 YAML frontmatter：
@@ -84,7 +105,7 @@ suggested_next_action:
 `blocked` 不是死路。它是一份"现场报告"，告诉你下一步去哪儿补凭证。固定动作：
 
 1. 把 Agent 返回的 `suggested_next_action` 整段贴到 `docs/06-tasks/task-board.md` 第 2 节"等待人工决策（Pending）"，附本次会话的时间戳。这样不至于过几天再回来时忘了卡在哪。
-2. 按 `missing_inputs` 列出的 `path` / `expected_status` 反向去补——大多数情况落在 H1（status 没签）/ H3（设计没写完）/ H4（缺 TC）。需要切对应阶段的 Agent 时去 [`docs/stages.md`](../../docs/stages.md) 找入口。
+2. 按 `missing_inputs` 列出的 `path` / `expected_status` 反向去补——大多数情况落在 H1（status 没签）/ H3（设计没写完）/ H4（缺 TC）。需要切对应阶段的 Agent 时去 [`docs/stages/`](../../docs/stages/README.md) 找入口。
 3. 上游补完之后，**新开一个 chat 窗口**重跑原任务，**不要复用旧的会话上下文**——旧会话里残留的"我已经试过 X"会污染新会话的判断。
 4. 如果 `suggested_next_action` 看不懂或者你判断它有问题，去 [Harness Engineering 源仓库](https://github.com/shuaihuadu/harness-engineering) 提 Issue，**不要硬绕过去**——绕过 = 把架空凭证带进下游评审。
 
@@ -106,14 +127,14 @@ Agent 起草产物时，凡是**需要人工填答 / 决策 / 签字**的位置�
 
 适用场景：
 
-| 场景                                              | 谁产出                          | 人工要做什么                                                                                          |
-| ------------------------------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `open-questions.md` 每条 OQ 的 **回答 / 决策日期 / 决策人** 行 | 起草 Agent（H1 / H2 各阶段） | 把 `> **[ 待填 ]**：...` 整行替换成你的实际答案；模板见 [`templates/open-questions.md`](../../templates/open-questions.md) |
-| frontmatter `reviewers: []`                       | 起草 Agent                      | `/log-review` 后人工按本文件第 2 节示例追加一行（`name / role / decision / date`）                     |
-| frontmatter `status: draft`                       | 起草 Agent                      | 评审通过后人工改 `draft → reviewed`；本规范禁止 Agent 自行修改文档 frontmatter 的 `status` 字段（依据 [`tool-vocabulary.md`](./tool-vocabulary.md) 第 2 节"最小授权"原则——任何 Agent 的 `write.file` / `write.patch` 能力都不应覆盖此字段） |
-| `phase-gate-checklist.md` 表格"结论"列            | `/run-gate` Agent               | 全 PASS 之后人工把 `[ ]` 勾成 `[x]`，再切下一阶段                                                       |
-| `risk-analysis.md` 的"残余风险接受"列             | `H2-ArchitectAdvisor`           | 人工签字接受残余风险（无人签 = 不能进 H3）                                                              |
-| `AGENTS.md` 第 1 节"项目身份" / 第 4 节"模块边界 / 禁区" | 不由 Agent 起草             | 项目负责人亲手签字（任何 Agent 起草都视作越权）；具体填法由对应集成层手册说明                                 |
+| 场景                                                           | 谁产出                       | 人工要做什么                                                                                                                                                                                                                                |
+| -------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `open-questions.md` 每条 OQ 的 **回答 / 决策日期 / 决策人** 行 | 起草 Agent（H1 / H2 各阶段） | 把 `> **[ 待填 ]**：...` 整行替换成你的实际答案；模板见 [`templates/open-questions.md`](../../templates/open-questions.md)                                                                                                                  |
+| frontmatter `reviewers: []`                                    | 起草 Agent                   | `/log-review` 后人工按本文件第 2 节示例追加一行（`name / role / decision / date`）                                                                                                                                                          |
+| frontmatter `status: draft`                                    | 起草 Agent                   | 评审通过后人工改 `draft → reviewed`；本规范禁止 Agent 自行修改文档 frontmatter 的 `status` 字段（依据 [`tool-vocabulary.md`](./tool-vocabulary.md) 第 2 节"最小授权"原则——任何 Agent 的 `write.file` / `write.patch` 能力都不应覆盖此字段） |
+| `phase-gate-checklist.md` 表格"结论"列                         | `/run-gate` Agent            | 全 PASS 之后人工把 `[ ]` 勾成 `[x]`，再切下一阶段                                                                                                                                                                                           |
+| `risk-analysis.md` 的"残余风险接受"列                          | `H2-ArchitectAdvisor`        | 人工签字接受残余风险（无人签 = 不能进 H3）                                                                                                                                                                                                  |
+| `AGENTS.md` 第 1 节"项目身份" / 第 4 节"模块边界 / 禁区"       | 不由 Agent 起草              | 项目负责人亲手签字（任何 Agent 起草都视作越权）；具体填法由对应集成层手册说明                                                                                                                                                               |
 
 约束：
 
@@ -134,12 +155,12 @@ Agent 起草产物时，凡是**需要人工填答 / 决策 / 签字**的位置�
 
 Agent 的"反问 / 改稿 / 评审 / 自修复"循环必须有硬上限，超出后返回 `blocked`（第 5 节），不得继续。这是为了避免两类故障：Agent 陷入无限自我修改、用户在多轮拉扯中失去方向。
 
-| 场景                                          | 单次会话上限 | 超限后的处理                                                |
-| --------------------------------------------- | ------------ | ----------------------------------------------------------- |
-| Reviewer Agent 反复打回（H1 评审 / H3 评审）  | 3 轮         | 返回 `blocked`，`suggested_next_action` 写明"问题已收敛到 X 条但未达成共识，需人工裁决" |
-| 编码评审 / 测试评审打回（H5 范围内）          | 2 轮         | 返回 `blocked`，列出仍未通过的检查项                          |
-| Agent 同一文件的"自修复"重试（如测试失败重写）| 3 次         | 不再继续重试，返回真实失败输出，由人工裁决降级 / 改设计 / 接受失败 |
-| 反问澄清（H1-Interviewer 等问答型 Agent）      | 单次问答 5 个问题 | 一次性问完，等用户答完再继续；禁止"边问边猜"          |
+| 场景                                           | 单次会话上限      | 超限后的处理                                                                            |
+| ---------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------- |
+| Reviewer Agent 反复打回（H1 评审 / H3 评审）   | 3 轮              | 返回 `blocked`，`suggested_next_action` 写明"问题已收敛到 X 条但未达成共识，需人工裁决" |
+| 编码评审 / 测试评审打回（H5 范围内）           | 2 轮              | 返回 `blocked`，列出仍未通过的检查项                                                    |
+| Agent 同一文件的"自修复"重试（如测试失败重写） | 3 次              | 不再继续重试，返回真实失败输出，由人工裁决降级 / 改设计 / 接受失败                      |
+| 反问澄清（H1-Interviewer 等问答型 Agent）      | 单次问答 5 个问题 | 一次性问完，等用户答完再继续；禁止"边问边猜"                                            |
 
 约束：
 

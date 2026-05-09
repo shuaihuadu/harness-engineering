@@ -20,7 +20,7 @@
 
 > **完成后下一步**：
 >
-> 1. 把 `docs/01-requirements/requirements.md` / `ui-spec.md` / `user-flow.md` / `acceptance-criteria.md` 四份文档的 frontmatter `status` 改 `draft → reviewed`、`reviewers:` 加一行（参见 `.he/HANDBOOK.md` 1.1 节"签字位回写"）。
+> 1. 把 `docs/01-requirements/requirements.md` / `ui-spec.md` / `user-flow.md` / `acceptance-criteria.md` 四份文档的 frontmatter `status` 改 `draft → reviewed`、`reviewers:` 加一行（参见 `{{VENDOR_DIR}}/HANDBOOK.md` 1.1 节"签字位回写"）。
 > 2. 切到 `H1-RepoImpactMapper` 产出 `docs/01-requirements/repo-impact-map.md`——这是 H2 / H3 的硬性输入，不是可选。
 > 3. 切到 `H2-ArchitectAdvisor` 起草 `docs/03-architecture/`。
 

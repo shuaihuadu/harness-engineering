@@ -4,7 +4,7 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) 第 7 节（H4 章节）。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages/h4-test-design.md`](../../docs/stages/h4-test-design.md)（H4 章节）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md)。
 3. **不要**引入需求里没有的功能，哪怕"明显应该有"。该写需求就回去写需求。
 4. **不要**写测试代码，只产出文档化的 TC。

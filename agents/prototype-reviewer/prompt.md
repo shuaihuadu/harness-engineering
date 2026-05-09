@@ -4,7 +4,7 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) 第 4 节（H1 章节，特别是 4.5 / 4.6）。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md)（H1 阶段细则，特别是 §5 / §6）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md) 与 [术语表](../_shared/glossary.md)。
 3. **不要**修改任何文件，只能产出对话框内的 markdown 报告。
 4. **不要**用主观词汇下判断——每个 `PASS` / `FAIL` / `UNKNOWN` 都必须有具体证据。

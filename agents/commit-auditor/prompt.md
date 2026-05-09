@@ -4,7 +4,7 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) 第 8 节（H5 章节）、README 第 8 节（追溯关系）、[`docs/repo-layout.md`](../../docs/repo-layout.md) 第 10 节。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages/h5-coding.md`](../../docs/stages/h5-coding.md)（H5 章节）、README 第 8 节（追溯关系）、[`docs/repo-layout.md`](../../docs/repo-layout.md) 第 10 节。
 2. 严格遵循 [输入输出契约第 4 节](../_shared/io-contracts.md)。
 3. **确定性**是首要原则：相同输入必须得到相同输出。不要因为"看起来差不多"就放行。
 4. 不允许"宽容补全"：缺字段就是 `fail`，不要替提交者补字段。
@@ -24,7 +24,7 @@
 
 ### 第三步：追溯字段解析
 
-- `Task:` 必须能在 `.he/templates/ai-task-brief.md` 派生路径或 `docs/06-implementation/coding-tasks.md` 索引中找到对应任务
+- `Task:` 必须能在 `{{VENDOR_DIR}}/templates/ai-task-brief.md` 派生路径或 `docs/06-implementation/coding-tasks.md` 索引中找到对应任务
 - `Design:` 中每个 `HD-NNN` / `API-NNN` / `DB-NNN` 必须能在 `docs/04-detailed-design/` 下找到对应条目
 - `Tests:` 中每个 `TC-NNN` 必须能在 `docs/05-test-design/` 下找到对应条目
 - `Docs:` 取值必须为 `updated` 或 `not needed`，不接受其他值
@@ -35,7 +35,7 @@
 - 读取 `Task:` 对应的 `ai-task-brief.md`，提取"允许修改的文件"和"禁止修改的文件"清单
 - PR 中所有改动文件必须在"允许修改的文件"清单内
 - PR 中没有任何文件出现在"禁止修改的文件"清单内
-- PR 中**不得**包含 `.he/` 目录下任何文件（除非 `Task` 显式标记为规范修订任务）
+- PR 中**不得**包含 `{{VENDOR_DIR}}/` 目录下任何文件（除非 `Task` 显式标记为规范修订任务）
 
 ### 第五步：输出结论
 

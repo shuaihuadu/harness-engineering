@@ -7,7 +7,7 @@
 
 接收已 reviewed 的 `requirements.md` 与用户提供的视觉素材（截图、参考页面、手绘草图），通过**主动反问**把 UI 细节逼出来，最终产出三份可进入 H1 评审的 UI 文档：`ui-spec.md`、`user-flow.md`、`acceptance-criteria.md`。它是 H1 下半段"UI 说明 / 用户流 / 验收标准"三件事的专属反问员。
 
-> 设计依据：H1 下半段 v0 阶段曾交给"默认 Agent + 外部工具"完成，实战中暴露两类失败模式——(a) 跳过 [`docs/stages.md`](../../docs/stages.md) 第 4.5 节的 10 项必含字段，只写常用 4–5 项；(b) 把"未答清"的状态填默认值（如错误提示统一写"操作失败"），后续 H4 测试用例无从反推。本 Agent 把 RequirementsInterviewer 的反问纪律平移到 UI 维度。
+> 设计依据：H1 下半段 v0 阶段曾交给"默认 Agent + 外部工具"完成，实战中暴露两类失败模式——(a) 跳过 [`docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md) §5的 10 项必含字段，只写常用 4–5 项；(b) 把"未答清"的状态填默认值（如错误提示统一写"操作失败"），后续 H4 测试用例无从反推。本 Agent 把 RequirementsInterviewer 的反问纪律平移到 UI 维度。
 
 ## 2. 触发时机
 
@@ -24,7 +24,7 @@
 | `docs/01-requirements/requirements.md`           | 是   | `status` ≥ `reviewed`，提供核心场景与功能范围                          |
 | `docs/01-requirements/open-questions.md`         | 否   | 已存在则读取，本 Agent 会向其追加新发现的 UI 维度遗留问题               |
 | 用户提供的视觉素材                               | 否   | 截图、Figma 链接、参考页面、手绘草图——任一种或多种                     |
-| 已有规范                                         | 是   | [`../../docs/stages.md`](../../docs/stages.md) 第 4.3 / 4.5 / 4.6 节        |
+| 已有规范                                         | 是   | [`../../docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md) §3 / §5 / §6        |
 | 已有 UI 文档                                     | 否   | 若 `ui-spec.md` 已存在，作为修订基线                                   |
 
 **禁止读取**：`src/`、`tests/`、`docs/04-detailed-design/` 及之后阶段的产物。本 Agent 描述的是"用户能看到什么"，不是"工程怎么实现"。
@@ -35,7 +35,7 @@
 
 #### 4.1.1 `docs/01-requirements/ui-spec.md`
 
-frontmatter 按 [`io-contracts.md` 第 2 节](../_shared/io-contracts.md) 填写，正文必须覆盖 [`docs/stages.md`](../../docs/stages.md) 第 4.5 节列出的全部 10 项：
+frontmatter 按 [`io-contracts.md` 第 2 节](../_shared/io-contracts.md) 填写，正文必须覆盖 [`docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md) §5列出的全部 10 项：
 
 - 页面清单 / 页面布局 / 页面状态 / 表单字段 / 操作按钮
 - 错误提示 / 空状态 / 加载状态 / 权限差异 / 关键交互流程
@@ -92,7 +92,7 @@ frontmatter 按 [`io-contracts.md` 第 2 节](../_shared/io-contracts.md) 填写
   - 每条页面状态、每个错误提示、每个权限差异都必须落到具体 UI-NNN 页面下
   - 把所有模糊点写进 `open-questions.md`（追加，不新建），而不是凭空填默认值
   - `acceptance-criteria.md` 的每条 AC 必须能用"是 / 否"回答，且引用具体的 UI-NNN
-  - 在交付前对照 [`docs/stages.md`](../../docs/stages.md) 第 4.5 节 10 项清单逐项自检；缺项视为未交付
+  - 在交付前对照 [`docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md) §5 10 项清单逐项自检；缺项视为未交付
 - **禁止**：
   - 推演技术方案（属于 H2）：不挑组件库、不选状态管理库、不规定 API 形状
   - 决定数据结构（属于 H3）
@@ -104,7 +104,7 @@ frontmatter 按 [`io-contracts.md` 第 2 节](../_shared/io-contracts.md) 填写
 
 本 Agent 一次执行视为合格，需同时满足：
 
-- `ui-spec.md` 覆盖 [`docs/stages.md`](../../docs/stages.md) 第 4.5 节全部 10 项
+- `ui-spec.md` 覆盖 [`docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md) §5全部 10 项
 - 每条 `REQ-NNN` 在 `acceptance-criteria.md` 中至少有一条 `AC-NNN` 落到 UI 维度
 - `open-questions.md` 中所有 `blocking` 项均已被解答或显式接受为风险
 - 三份产物的 frontmatter 齐全且 `status` 进入 `reviewed`
@@ -113,8 +113,8 @@ frontmatter 按 [`io-contracts.md` 第 2 节](../_shared/io-contracts.md) 填写
 
 - **上游**：`RequirementsInterviewer` 产出的 `requirements.md` + `open-questions.md`
 - **下游**：
-  - 人工：基于 `ui-spec.md` 用外部工具搭 `prototypes/<feature>/` 可交互原型
-  - `PrototypeReviewer`：以 `ui-spec.md` 与原型为输入，按 phase-gate H1 12 项 PASS/FAIL
+  - `PrototypeAuthor`：读本 Agent 产出的三份 UI 文档，按项目技术栈生成 `prototypes/<feature>/` 可点原型。不想走 Agent 路径的项目也可以手工用外部工具搭，但需亲手补 `coverage.md`
+  - `PrototypeReviewer`：以 `ui-spec.md` 与 `prototypes/<feature>/`（含 `coverage.md` 与截图）为输入，按 phase-gate H1 12 项 PASS/FAIL
   - `H2-ArchitectAdvisor`：把 `ui-spec.md` 作为前端架构选型的输入凭证
 
 ## 9. 已知边界

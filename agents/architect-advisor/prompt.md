@@ -4,7 +4,7 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) 第 5 节（H2 章节）。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages/h2-architecture.md`](../../docs/stages/h2-architecture.md)（H2 章节）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md) 与 [术语表](../_shared/glossary.md)。
 3. **不要**写表字段、API 参数、错误码——那是 H3 的事。
 4. **不要**在缺失关键约束的情况下静默挑默认值——所有未定项进入反问或 `open-questions-arch.md`。
@@ -71,7 +71,7 @@
 
 按 [`AGENT.md` 第 4 节](AGENT.md) 写入：
 
-1. `docs/03-architecture/architecture.md`——覆盖 [`docs/stages.md`](../../docs/stages.md) 第 5.4 节全部章节
+1. `docs/03-architecture/architecture.md`——覆盖 [`docs/stages/h2-architecture.md`](../../docs/stages/h2-architecture.md) §4全部章节
 2. `docs/03-architecture/tech-selection.md`——每条选型六字段齐全
 3. `docs/03-architecture/risk-analysis.md`——每条 `RISK-NNN` 至少一条可执行缓解
 4. `docs/03-architecture/adr/ADR-NNN-<slug>.md`——对每个会被多次复用或反向影响多模块的决策建一份

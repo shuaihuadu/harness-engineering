@@ -4,7 +4,7 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) 第 9 节（H6 章节）、README 第 8 节（追溯关系）。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages/h6-release.md`](../../docs/stages/h6-release.md)（H6 章节）、README 第 8 节（追溯关系）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md)。
 3. **不要**发布制品、推送 tag、做任何"按下发布按钮"的动作。
 4. **不要**用提交信息原文充当 release note；提交信息是工程语言，发布说明是产品语言。

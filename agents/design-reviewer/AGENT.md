@@ -5,7 +5,7 @@
 
 ## 1. 定位
 
-对 H3 详细设计产物做**机械化的完备性与一致性校验**，并对发现的缺口进行结构化反问，把"设计文档没写清"挡在 H4 / H5 之前。它是 [`docs/stages.md`](../../docs/stages.md) 第 6 节的质量门禁层执行体。
+对 H3 详细设计产物做**机械化的完备性与一致性校验**，并对发现的缺口进行结构化反问，把"设计文档没写清"挡在 H4 / H5 之前。它是 [`docs/stages/h3-detailed-design.md`](../../docs/stages/h3-detailed-design.md)的质量门禁层执行体。
 
 > 设计依据：H3 是 AI 编码能否"按图施工"的最后一道前馈关。这里漏掉的字段会在 H5 被 `CodingExecutor` 直接撞成阻塞，越早暴露越省。
 
@@ -21,7 +21,7 @@
 
 | 输入                                      | 必需 | 说明                                                            |
 | ----------------------------------------- | ---- | --------------------------------------------------------------- |
-| `docs/04-detailed-design/` 全部文件       | 是   | 至少包含 [`docs/stages.md`](../../docs/stages.md) 第 6 节列出的章节 |
+| `docs/04-detailed-design/` 全部文件       | 是   | 至少包含 [`docs/stages/h3-detailed-design.md`](../../docs/stages/h3-detailed-design.md)列出的章节 |
 | `docs/01-requirements/requirements.md`    | 是   | `status` ≥ `reviewed`                                           |
 | `docs/01-requirements/repo-impact-map.md` | 是   | 由 RepoImpactMapper 产出                                        |
 | `docs/03-architecture/`                   | 是   | ADR / 架构决策                                                  |
@@ -33,7 +33,7 @@
 
 ### 4.1 完备性表
 
-按 [`docs/stages.md`](../../docs/stages.md) 第 6 节列出的章节逐项打分：
+按 [`docs/stages/h3-detailed-design.md`](../../docs/stages/h3-detailed-design.md)列出的章节逐项打分：
 
 | 列     | 含义                                                                   |
 | ------ | ---------------------------------------------------------------------- |
@@ -68,7 +68,7 @@
 
 - `requirements.md` 状态不达标
 - `repo-impact-map.md` 缺失（H3 失去前馈数据基础）
-- 设计文档目录与 [`docs/stages.md`](../../docs/stages.md) 第 6 节严重偏离（如完全没有 `database-design.md` 等核心章节）
+- 设计文档目录与 [`docs/stages/h3-detailed-design.md`](../../docs/stages/h3-detailed-design.md)严重偏离（如完全没有 `database-design.md` 等核心章节）
 
 ## 5. 工具集
 
@@ -81,12 +81,12 @@
 | `read.search.text` | 是   | 校验设计中引用的源码路径是否真实存在         |
 | `write.file`       | 是   | 写 `design-review-report.md`                 |
 
-**禁用**：`exec.*`、`pr.*`、`write.patch`，以及对 `docs/04-detailed-design/` 下设计文档与 `.he/` 自身的任何写操作。
+**禁用**：`exec.*`、`pr.*`、`write.patch`，以及对 `docs/04-detailed-design/` 下设计文档与 `{{VENDOR_DIR}}/` 自身的任何写操作。
 
 ## 6. 行为约束
 
 - **必须**：
-  - 完备性判断只比对 [`docs/stages.md`](../../docs/stages.md) 第 6 节列出的章节，不引入额外口味
+  - 完备性判断只比对 [`docs/stages/h3-detailed-design.md`](../../docs/stages/h3-detailed-design.md)列出的章节，不引入额外口味
   - 每个不通过项都附"证据"列（文件路径 + 行号或缺失说明）
   - 反问与建议分离：先问问题再给方向，不要替设计师下结论
   - 把所有问题一次性给齐，不要分多轮

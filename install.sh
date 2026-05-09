@@ -133,9 +133,30 @@ detect_project_defaults "$TARGET_REPO"
 
 # 2) 读取上次 manifest replacements
 declare -A PRIOR
-PRIOR_MANIFEST_PATH="$TARGET_REPO/.he/manifest.json"
+# 优先按 CLI 显式 vendor_dir 寻 manifest；否则尝试默认 .he/，再退化扫描顶层目录
+PRIOR_MANIFEST_PATH=""
+PRIOR_MANIFEST_VENDOR_DIR=""
+if [[ $VENDOR_HARNESS_TO_EXPLICIT -eq 1 && -n "$VENDOR_HARNESS_TO" ]]; then
+    candidate="$TARGET_REPO/$VENDOR_HARNESS_TO/manifest.json"
+    [[ -f "$candidate" ]] && PRIOR_MANIFEST_PATH="$candidate" && PRIOR_MANIFEST_VENDOR_DIR="$VENDOR_HARNESS_TO"
+fi
+if [[ -z "$PRIOR_MANIFEST_PATH" && -f "$TARGET_REPO/.he/manifest.json" ]]; then
+    PRIOR_MANIFEST_PATH="$TARGET_REPO/.he/manifest.json"
+    PRIOR_MANIFEST_VENDOR_DIR=".he"
+fi
+if [[ -z "$PRIOR_MANIFEST_PATH" ]]; then
+    # 顶层目录扫一圈：识别 schema=v1 + harness_version 的 manifest（自定义 vendor_dir 场景）
+    while IFS= read -r mf; do
+        if jq -e '(.schema=="v1") and (.harness_version != null)' "$mf" >/dev/null 2>&1; then
+            PRIOR_MANIFEST_PATH="$mf"
+            PRIOR_MANIFEST_VENDOR_DIR=$(jq -r '.vendor_dir // ""' "$mf" 2>/dev/null || echo "")
+            [[ -z "$PRIOR_MANIFEST_VENDOR_DIR" ]] && PRIOR_MANIFEST_VENDOR_DIR=$(basename "$(dirname "$mf")")
+            break
+        fi
+    done < <(find "$TARGET_REPO" -mindepth 2 -maxdepth 2 -name 'manifest.json' -print 2>/dev/null)
+fi
 PRIOR_VERSION=""
-if [[ -f "$PRIOR_MANIFEST_PATH" ]]; then
+if [[ -n "$PRIOR_MANIFEST_PATH" && -f "$PRIOR_MANIFEST_PATH" ]]; then
     while IFS=$'\t' read -r k v; do
         [[ -n "$k" ]] && PRIOR["$k"]="$v"
     done < <(jq -r '(.replacements // {}) | to_entries[]? | [.key, .value] | @tsv' "$PRIOR_MANIFEST_PATH" 2>/dev/null || true)
@@ -293,10 +314,7 @@ resolve_command_with_menu LINT_COMMAND 'LINT_COMMAND' "$DETECTED_LINT_COMMAND" '
 # Vendor 目录：CLI 显式传入 > 上次 manifest.vendor_dir > 默认 .he
 if [[ $NO_VENDOR -eq 0 && $VENDOR_HARNESS_TO_EXPLICIT -eq 0 ]]; then
     vendor_default="$VENDOR_HARNESS_TO"
-    if [[ -f "$PRIOR_MANIFEST_PATH" ]]; then
-        prior_vendor=$(jq -r '.vendor_dir // ""' "$PRIOR_MANIFEST_PATH" 2>/dev/null || echo "")
-        [[ -n "$prior_vendor" ]] && vendor_default="$prior_vendor"
-    fi
+    [[ -n "$PRIOR_MANIFEST_VENDOR_DIR" ]] && vendor_default="$PRIOR_MANIFEST_VENDOR_DIR"
     if [[ $NON_INTERACTIVE -eq 0 ]]; then
         read -r -p "Vendor 目录 / Vendor directory (relative to TargetRepo) [$vendor_default]: " vendor_input
         if [[ -z "$vendor_input" ]]; then
@@ -339,6 +357,12 @@ if [[ "$HARNESS_REPO_REF" =~ ^(https?://|/) ]]; then
 else
     REPLACEMENTS[HARNESS_REPO_REF_FROM_GITHUB]="../$HARNESS_REPO_REF"
 fi
+# VENDOR_DIR：被 vendor 文档与 .github/ 模板引用 vendor 目录时使用；NoVendor 模式下无意义但保持非空避免破坏路径结构
+if [[ -n "$VENDOR_HARNESS_TO" ]]; then
+    REPLACEMENTS[VENDOR_DIR]="$VENDOR_HARNESS_TO"
+else
+    REPLACEMENTS[VENDOR_DIR]=".he"
+fi
 
 declare -A SELECTIONS
 [[ -n "$COPILOT_AGENTS" ]] && SELECTIONS["copilot/custom-agents"]="$COPILOT_AGENTS"
@@ -377,7 +401,8 @@ done
 # 写 manifest
 # ----------------------------------------------------------------------------
 if [[ $DRY_RUN -eq 0 ]]; then
-    manifest_dir="$TARGET_REPO/.he"
+    # manifest 永远落 vendor 目录；NoVendor 模式下退回 .he/（仅放 manifest，不放文档）
+    manifest_dir="$TARGET_REPO/${VENDOR_HARNESS_TO:-.he}"
     manifest_path="$manifest_dir/manifest.json"
     mkdir -p "$manifest_dir"
 

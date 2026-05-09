@@ -15,7 +15,7 @@ when_not_to_use: |
 
 ## 1. 目的与原理
 
-H6 是闭环阶段：每条已合入的代码必须能反向追到一条已评审的 REQ，每条破坏性变更必须给客户迁移指引，每条 known-issue 必须有登记。`ReleaseNoteWriter` 已经按 [`docs/stages.md` §9](../../../docs/stages.md)产出 release notes，但它**自己写自己审**会自动开绿灯：
+H6 是闭环阶段：每条已合入的代码必须能反向追到一条已评审的 REQ，每条破坏性变更必须给客户迁移指引，每条 known-issue 必须有登记。`ReleaseNoteWriter` 已经按 [`docs/stages/h6-release.md`](../../../docs/stages/h6-release.md)产出 release notes，但它**自己写自己审**会自动开绿灯：
 
 - 漏写一条 PR / commit → release notes 缺条目 → 客户出问题时无法回溯
 - 破坏性变更没有迁移指引 → 客户升级踩坑 → 后续返工
@@ -111,7 +111,7 @@ H6 是闭环阶段：每条已合入的代码必须能反向追到一条已评�
 
 - 受审产物：docs/07-release/release-notes.md @ commit <sha>
 - 发布范围：v0.2.4..HEAD（共 N 条 commit）
-- 评审依据：docs/stages.md §9 + templates/phase-gate-checklist.md H6
+- 评审依据：docs/stages/ §9 + templates/phase-gate-checklist.md H6
 
 ## commit ↔ release-notes 对账
 

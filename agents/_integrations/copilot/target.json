@@ -57,32 +57,47 @@
         {
             "kind": "single",
             "source": "handbook.md",
-            "target": ".he/HANDBOOK.md"
+            "target": "{{VENDOR_DIR}}/HANDBOOK.md"
         },
         {
             "kind": "single",
             "source": "vendor-readme.template.md",
-            "target": ".he/README.md"
+            "target": "{{VENDOR_DIR}}/README.md"
         },
         {
             "kind": "single",
-            "source": "../../../docs/stages.md",
-            "target": ".he/docs/stages.md"
+            "source": "../../../docs/concepts.md",
+            "target": "{{VENDOR_DIR}}/docs/concepts.md"
+        },
+        {
+            "kind": "single",
+            "source": "../../../docs/ai-usage.md",
+            "target": "{{VENDOR_DIR}}/docs/ai-usage.md"
+        },
+        {
+            "kind": "directory",
+            "source_dir": "../../../docs/stages",
+            "target_dir": "{{VENDOR_DIR}}/docs/stages",
+            "source_glob": "*.md",
+            "target_glob": "*.md",
+            "selectable": false,
+            "orphan_check": true,
+            "orphan_check_only_when_all": false
         },
         {
             "kind": "single",
             "source": "../../../docs/repo-layout.md",
-            "target": ".he/docs/repo-layout.md"
+            "target": "{{VENDOR_DIR}}/docs/repo-layout.md"
         },
         {
             "kind": "single",
             "source": "../../../docs/tech-debt-gc.md",
-            "target": ".he/docs/tech-debt-gc.md"
+            "target": "{{VENDOR_DIR}}/docs/tech-debt-gc.md"
         },
         {
             "kind": "single",
             "source": "../../../uninstall.ps1",
-            "target": ".he/uninstall.ps1"
+            "target": "{{VENDOR_DIR}}/uninstall.ps1"
         }
     ]
 }

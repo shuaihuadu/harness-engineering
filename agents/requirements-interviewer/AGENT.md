@@ -22,7 +22,7 @@
 | 输入         | 必需 | 说明                                                           |
 | ------------ | ---- | -------------------------------------------------------------- |
 | 用户原始描述 | 是   | 一句话或一段文字，可包含截图、参考链接                         |
-| 已有规范     | 是   | [`../../docs/stages.md`](../../docs/stages.md) 第 4 节 H1 章节      |
+| 已有规范     | 是   | [`../../docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md)（H1 阶段细则）      |
 | 已有需求文件 | 否   | 若 `docs/01-requirements/requirements.md` 已存在，作为修订基线 |
 | 业务现状参考 | 否   | 用户提供的现有系统约束、合规要求、竞品资料                     |
 
@@ -32,7 +32,7 @@
 
 ### 4.1 主要产物
 
-`docs/01-requirements/requirements.md`，frontmatter 按 [`io-contracts.md` 第 2 节](../_shared/io-contracts.md) 填写，正文必须覆盖 [`docs/stages.md`](../../docs/stages.md) 第 4.4 节列出的全部章节：
+`docs/01-requirements/requirements.md`，frontmatter 按 [`io-contracts.md` 第 2 节](../_shared/io-contracts.md) 填写，正文必须覆盖 [`docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md) §4列出的全部章节：
 
 - 项目背景 / 目标用户 / 用户角色 / 核心场景 / 功能范围
 - 非功能需求 / 权限边界 / 数据边界 / 异常场景
@@ -85,7 +85,7 @@
 
 本 Agent 一次执行视为合格，需同时满足：
 
-- `requirements.md` 通过 [`docs/stages.md`](../../docs/stages.md) 第 4.6 节的人工评审门禁
+- `requirements.md` 通过 [`docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md) §6的人工评审门禁
 - `open-questions.md` 中所有 `blocking` 项均已被解答或显式接受为风险
 - frontmatter 字段齐全且 `status` 进入 `reviewed`
 

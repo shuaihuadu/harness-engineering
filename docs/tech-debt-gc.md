@@ -70,7 +70,7 @@ H1–H6 是开发期一次性走完的流程；交付后没人会再触发它们
 
 这些原则需写进 `docs/` 下的权威文档（如 `quality-grade.md`）并同步编码为可执行检查。
 
-> 与 [`../README.md` 第 6.5 节](../README.md#65-软约束的失败模式与处置阶梯) 软约束阶梯口径一致：能机械判定的原则一律下沉为 Scripts / Lint / CI；停在自然语言层的原则迟早会被解释性绕过。
+> 与 [`./ai-usage.md` §5](./ai-usage.md#5-软约束的失败模式与处置阶梯) 软约束阶梯口径一致：能机械判定的原则一律下沉为 Scripts / Lint / CI；停在自然语言层的原则迟早会被解释性绕过。
 
 ## 4. 定期 GC 任务
 
@@ -91,6 +91,6 @@ H1–H6 是开发期一次性走完的流程；交付后没人会再触发它们
 
 ## 6. 与其他章节的关系
 
-- 团队真相 vs 个人 Memory 的边界：见 [`../README.md` 第 6.6 节](../README.md#66-团队真相落仓库个人偏好留-memory)
-- 软约束 → 硬约束的下沉口径：见 [`../README.md` 第 6.5 节](../README.md#65-软约束的失败模式与处置阶梯)
+- 团队真相 vs 个人 Memory 的边界：见 [`./ai-usage.md` §6](./ai-usage.md#6-团队真相落仓库个人偏好留-memory)
+- 软约束 → 硬约束的下沉口径：见 [`./ai-usage.md` §5](./ai-usage.md#5-软约束的失败模式与处置阶梯)
 - DocGardener 的产物落点与触发条件：见 [`../agents/doc-gardener/AGENT.md`](../agents/doc-gardener/AGENT.md)

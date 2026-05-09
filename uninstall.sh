@@ -2,7 +2,7 @@
 # Harness Engineering · 卸载脚本（基于 manifest）
 #
 # 用法：
-#   ./uninstall.sh --target-repo /path/to/repo [--force] [--dry-run]
+#   ./uninstall.sh --target-repo /path/to/repo [--vendor-dir <name>] [--force] [--dry-run]
 #
 # 安全策略：
 #   - 优先用 manifest 精确卸载（按 sha256 比对）
@@ -11,11 +11,16 @@
 #   - 文件 sha256 不一致 → 默认保留并告警；--force 才删
 #   - 自下而上清理空目录；非空目录绝不递归删
 #
-# Manifest 缺失时的兜底（残留清理）：
-#   - 例如 install 中途按 Ctrl+C，manifest 还没写入但 .he/
+# Vendor 目录探测顺序（默认 .he/，也可被安装时改为任意名）：
+#   1. 显式 --vendor-dir <name>
+#   2. 默认 .he/manifest.json
+#   3. 掃描顶层一级目录下的 manifest.json（schema==v1）
+#
+# Manifest 缺失时的兑底（残留清理）：
+#   - 例如 install 中途按 Ctrl+C，manifest 还没写入但 vendor 目录
 #     或 .github/ 下已经有部分文件落地。
 #   - 此时脚本不报错退出，而是启动 best-effort 残留扫描：
-#     * 整体清理 <target-repo>/.he/ 目录（纯属本工具产物）
+#     * 整体清理 <target-repo>/<vendor-dir>/ 目录（纯属本工具产物）
 #     * 对 .github/copilot-instructions.md / .github/instructions/*.instructions.md /
 #       .github/agents/*.agent.md，仅当文件内含 "Harness Engineering" 标记时才删
 #     * 交互模式下会列出候选并请求确认；非交互模式必须显式 --force 才执行删除
@@ -55,10 +60,12 @@ set -euo pipefail
 TARGET_REPO=""
 FORCE=0
 DRY_RUN=0
+VENDOR_DIR_OVERRIDE=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --target-repo) TARGET_REPO="$2"; shift 2 ;;
+        --vendor-dir)  VENDOR_DIR_OVERRIDE="$2"; shift 2 ;;
         --force)       FORCE=1;          shift ;;
         --dry-run)     DRY_RUN=1;        shift ;;
         -h|--help)     sed -n '4,12p' "$0"; exit 0 ;;
@@ -73,8 +80,37 @@ TARGET_REPO="$(cd "$TARGET_REPO" && pwd)"
 # 注意：jq 仅在 manifest 存在的精确卸载路径中需要；best-effort 兜底不依赖 jq。
 # 因此把 jq 检查推迟到 manifest 检查之后。
 
-manifest_dir="$TARGET_REPO/.he"
-manifest_path="$manifest_dir/manifest.json"
+# 定位 vendor 目录：优先显式 --vendor-dir，其次默认 .he/，最后扫描顶层目录
+# Locate vendor dir: explicit --vendor-dir > default .he/ > scan top-level dirs
+manifest_path=""
+manifest_dir=""
+
+if [[ -n "$VENDOR_DIR_OVERRIDE" ]]; then
+    manifest_dir="$TARGET_REPO/$VENDOR_DIR_OVERRIDE"
+    manifest_path="$manifest_dir/manifest.json"
+elif [[ -f "$TARGET_REPO/.he/manifest.json" ]]; then
+    manifest_dir="$TARGET_REPO/.he"
+    manifest_path="$manifest_dir/manifest.json"
+else
+    while IFS= read -r -d '' candidate; do
+        if command -v jq >/dev/null 2>&1; then
+            schema=$(jq -r '.schema // empty' "$candidate" 2>/dev/null || true)
+            [[ "$schema" == "v1" ]] || continue
+        else
+            grep -q '"schema"[[:space:]]*:[[:space:]]*"v1"' "$candidate" 2>/dev/null || continue
+        fi
+        manifest_path="$candidate"
+        manifest_dir="$(dirname "$candidate")"
+        break
+    done < <(find "$TARGET_REPO" -mindepth 2 -maxdepth 2 -name 'manifest.json' -print0 2>/dev/null)
+    # 未找到任何 manifest 时仍以 .he/ 为默认提示路径，交给 best-effort 兜底
+    if [[ -z "$manifest_path" ]]; then
+        manifest_dir="$TARGET_REPO/.he"
+        manifest_path="$manifest_dir/manifest.json"
+    fi
+fi
+
+vendor_rel="${manifest_dir#$TARGET_REPO/}"
 
 sha256_of() {
     if command -v sha256sum >/dev/null 2>&1; then
@@ -108,7 +144,7 @@ best_effort_cleanup() {
     if [[ -d "$manifest_dir" ]]; then
         cand_kinds+=( "dir" )
         cand_paths+=( "$manifest_dir" )
-        cand_rels+=( ".he/" )
+        cand_rels+=( "$vendor_rel/" )
         cand_safe+=( 1 )
     fi
 
@@ -307,17 +343,40 @@ if [[ $DRY_RUN -eq 1 ]]; then
     echo
     echo "DryRun 完成。删除 $deleted / 保留 $kept / 缺失 $missing"
 elif [[ ${#modified_kept[@]} -eq 0 ]]; then
+    # 写一行 uninstall 记录到 install.log（与 install.sh 复用同一审计日志）
+    if [[ -d "$manifest_dir" ]]; then
+        log_path="$manifest_dir/install.log"
+        ts_iso=$(date '+%Y-%m-%dT%H:%M:%S%z')
+        commit_tag="${commit:-unknown}"
+        printf '[%s] uninstall · harness@%s · deleted=%d · kept=%d · missing=%d\n' \
+            "$ts_iso" "$commit_tag" "$deleted" "$kept" "$missing" >>"$log_path"
+    fi
+
     rm -f "$manifest_path"
-    echo "   delete .he/manifest.json"
+    echo "   delete $vendor_rel/manifest.json"
+    # install.log 是审计日志、不在 manifest 里；clean uninstall 时一并移除以让目录归零
+    if [[ -f "$log_path" ]]; then
+        rm -f "$log_path"
+        echo "   delete $vendor_rel/install.log"
+    fi
     [[ -d "$manifest_dir" && -z "$(ls -A "$manifest_dir" 2>/dev/null)" ]] && {
         rmdir "$manifest_dir"
-        echo "   rmdir  .he"
+        echo "   rmdir  $vendor_rel"
     }
     echo
     echo "完成。删除 $deleted / 保留 $kept / 缺失 $missing"
 else
+    # 写一行 uninstall 记录到 install.log（即便有保留项也要留审计）
+    if [[ -d "$manifest_dir" ]]; then
+        log_path="$manifest_dir/install.log"
+        ts_iso=$(date '+%Y-%m-%dT%H:%M:%S%z')
+        commit_tag="${commit:-unknown}"
+        printf '[%s] uninstall · harness@%s · deleted=%d · kept=%d · missing=%d\n' \
+            "$ts_iso" "$commit_tag" "$deleted" "$kept" "$missing" >>"$log_path"
+    fi
+
     echo
-    echo "[!] 以下文件被本地修改过，已保留；manifest 也保留："
+    echo "[!] 以下文件被本地修改过，已保留；manifest 与 install.log 也保留："
     for p in "${modified_kept[@]}"; do echo "    $p"; done
     echo "    若要强制删除：--force；若确认保留请手动删除 manifest 自身。"
     echo

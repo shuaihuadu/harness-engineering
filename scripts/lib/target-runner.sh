@@ -9,6 +9,17 @@ set -euo pipefail
 # 由顶层入口填充
 # ----------------------------------------------------------------------------
 
+# 在 target.json 的 target 路径上展开 {{KEY}} 占位符（支持 VENDOR_DIR 等）
+expand_target_placeholders() {
+    local s="$1"
+    for key in "${!REPLACEMENTS[@]}"; do
+        local value="${REPLACEMENTS[$key]}"
+        # 不转义路径中的 / —— 这里只对路径片段做简单字符串替换
+        s="${s//\{\{${key}\}\}/${value}}"
+    done
+    printf '%s' "$s"
+}
+
 read_target_spec() {
     local target_dir="$1"
     local json_path="$target_dir/target.json"
@@ -46,7 +57,7 @@ invoke_target() {
 invoke_render_single() {
     local render="$1" target_dir="$2" target_repo="$3"
     local source; source=$(jq -r '.source' <<<"$render")
-    local target; target=$(jq -r '.target' <<<"$render")
+    local target; target=$(expand_target_placeholders "$(jq -r '.target' <<<"$render")")
     sync_rendered_file "$target_dir/$source" "$target_repo/$target"
 }
 
@@ -146,7 +157,7 @@ invoke_render_directory() {
     local render="$1" target_dir="$2" target_repo="$3" target_name="$4"
 
     local source_dir; source_dir=$(jq -r '.source_dir' <<<"$render")
-    local target_subdir; target_subdir=$(jq -r '.target_dir' <<<"$render")
+    local target_subdir; target_subdir=$(expand_target_placeholders "$(jq -r '.target_dir' <<<"$render")")
     local source_glob; source_glob=$(jq -r '.source_glob' <<<"$render")
     local target_glob; target_glob=$(jq -r '.target_glob' <<<"$render")
     local selectable; selectable=$(jq -r '.selectable // false' <<<"$render")
@@ -240,7 +251,7 @@ invoke_render_tree() {
     local render="$1" target_dir="$2" target_repo="$3"
 
     local source_dir; source_dir=$(jq -r '.source_dir' <<<"$render")
-    local target_subdir; target_subdir=$(jq -r '.target_dir' <<<"$render")
+    local target_subdir; target_subdir=$(expand_target_placeholders "$(jq -r '.target_dir' <<<"$render")")
     local orphan_check; orphan_check=$(jq -r '.orphan_check // false' <<<"$render")
 
     local src_dir="$target_dir/$source_dir"

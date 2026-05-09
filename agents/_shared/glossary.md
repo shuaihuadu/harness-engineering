@@ -59,14 +59,14 @@
 
 ## 6. 角色与载体
 
-本规范区分四种"约束怎么落地"的载体，不可混用（详见 [`../../README.md` 第 6.5 节](../../README.md#65-软约束的失败模式与处置阶梯)）：
+本规范区分四种"约束怎么落地"的载体，不可混用（详见 [`../../docs/ai-usage.md` §5](../../docs/ai-usage.md#5-软约束的失败模式与处置阶梯)）：
 
 | 载体                 | 性质     | 适用约束                                                                                                                                    |
 | -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | Scripts / Hooks / CI | 硬约束   | 编译、测试、Lint、命名、文件大小、追溯字段等可机械判定项                                                                                    |
 | Rule                 | 软约束   | 设计取舍、架构原则等不能机械判定项；落在 `AGENTS.md` / `instructions/` / Agent prompt                                                       |
 | Skill                | 操作脚本 | 跨 Agent 复用的多步流程（追溯检查、任务卡生成、提交信息格式校验等）                                                                         |
-| Memory               | 个人偏好 | 工具侧"记忆层"（Claude Code Memory / Copilot User Memory / Cursor Rules-for-User），仅作单人会话偏好，不进入团队规范（见 README 第 6.6 节） |
+| Memory               | 个人偏好 | 工具侧"记忆层"（Claude Code Memory / Copilot User Memory / Cursor Rules-for-User），仅作单人会话偏好，不进入团队规范（见 [`docs/ai-usage.md` §6](../../docs/ai-usage.md)） |
 
 并列三个**实体概念**：
 

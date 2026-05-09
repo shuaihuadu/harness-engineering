@@ -5,7 +5,7 @@
 
 ## 1. 定位
 
-对 H1 下半段产出的可交互原型与 UI 文档做**机械化的 PASS / FAIL 评审**，按 [`templates/phase-gate-checklist.md`](../../templates/phase-gate-checklist.md) H1 那 12 条逐项核对，把"原型不能表达主要交互"挡在 H2 架构选型之前。它是 [`docs/stages.md`](../../docs/stages.md) 第 4.6 节"评审门禁"的执行体。
+对 H1 下半段产出的可交互原型与 UI 文档做**机械化的 PASS / FAIL 评审**，按 [`templates/phase-gate-checklist.md`](../../templates/phase-gate-checklist.md) H1 那 12 条逐项核对，把"原型不能表达主要交互"挡在 H2 架构选型之前。它是 [`docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md) §6"评审门禁"的执行体。
 
 > 设计依据：H1 评审是"AI 自我满足"的高发场景——同一个 Agent 既写 ui-spec 又判 PASS/FAIL，会自动给自己开绿灯。本 Agent 借鉴 `/run-gate` 的做法：**只读、不写、不动评审记录**——把"是否合格"判出来，把"评审纪要"留给人写。
 
@@ -117,7 +117,7 @@
 
 ## 8. 与其他 Agent 的协作
 
-- **上游**：`UISpecAuthor` 产出的三份 UI 文档 + 用户用外部工具产出的 `prototypes/<feature>/`
+- **上游**：`UISpecAuthor` 产出的三份 UI 文档 + `PrototypeAuthor`（或人工用外部工具）产出的 `prototypes/<feature>/`（必含 `coverage.md` + `screenshots/`）
 - **下游**：
   - 人工：基于本报告写 `docs/02-prototype/prototype-review.md`，触发 `/log-review` 归档评审纪要
   - `/run-gate H1`：本 Agent 给 PASS 后，再跑一次 `/run-gate H1` 做最终复核，覆盖"评审记录已保存"这条

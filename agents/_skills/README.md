@@ -87,7 +87,7 @@ when_not_to_use: |
 2. 是否是**操作流程**（how-to），而不是规则（rule）或角色（role）？规则归 `instructions/`，角色归 `agents/<name>/`。
 3. 是否业务无关？涉及具体技术栈的 SOP 应该放回消费仓库，而不是污染规范骨架。
 
-三条都点头再考虑动手。规模克制是 Harness Engineering 的反过量原则之一（见 README 第 6.4 节）。
+三条都点头再考虑动手。规模克制是 Harness Engineering 的反过量原则之一（见 [`../../docs/ai-usage.md` §4](../../docs/ai-usage.md#4-ai-使用反例)）。
 
 ## 5. 不要把 Skill 当 Memory 用
 
@@ -96,4 +96,4 @@ when_not_to_use: |
 - **Skill** 是**仓库里的可复用 SOP**，跟着仓库走、能被 diff 和 review、对所有协作者一致生效
 - **Memory** 是**单人偏好与一次性上下文**，跟着会话或个人账号走，团队看不到也对不齐
 
-判断口径：**这件事一旦换个人接手就该照样生效吗？** 是 → 写成 Skill / Rule / Scripts；只对自己生效 → 留在 Memory。错题集与故障复盘特别要警惕：如果只在私人 Memory 里堆"上次踩过的坑"，下次换人或换会话就重新踩。重要反例必须晋升一层——能机械判定的进 Scripts，不能机械判定的进 Rule，并且都要有 commit 记录。详见 [`../../README.md` 第 6.6 节](../../README.md#66-团队真相落仓库个人偏好留-memory)。
+判断口径：**这件事一旦换个人接手就该照样生效吗？** 是 → 写成 Skill / Rule / Scripts；只对自己生效 → 留在 Memory。错题集与故障复盘特别要警惕：如果只在私人 Memory 里堆"上次踩过的坑"，下次换人或换会话就重新踩。重要反例必须晋升一层——能机械判定的进 Scripts，不能机械判定的进 Rule，并且都要有 commit 记录。详见 [`../../docs/ai-usage.md` §6](../../docs/ai-usage.md#6-团队真相落仓库个人偏好留-memory)。

@@ -15,7 +15,7 @@ when_not_to_use: |
 
 ## 1. 目的与原理
 
-H4 是 Harness Engineering 反馈层的核心：测试用例不齐 / 不可执行，下游 H5 的"AI 自我修复"就失去对照基准。`TestCaseAuthor` 已经按 [`docs/stages.md` 第 7 节](../../../docs/stages.md)产出 TC，但它**自己写自己审**会自动开绿灯。本 Skill 提供独立的、机械化的证据核查表。
+H4 是 Harness Engineering 反馈层的核心：测试用例不齐 / 不可执行，下游 H5 的"AI 自我修复"就失去对照基准。`TestCaseAuthor` 已经按 [`docs/stages/h4-test-design.md`](../../../docs/stages/h4-test-design.md)产出 TC，但它**自己写自己审**会自动开绿灯。本 Skill 提供独立的、机械化的证据核查表。
 
 > 与 phase-gate-runner 的关系：phase-gate-runner 跑 H4 12 条勾选清单的"是否打勾"；本 Skill 答"REQ × TC 矩阵的具体哪一格缺、哪条 TC 字段不全、哪条通过标准是空话"。
 
@@ -45,14 +45,14 @@ H4 是 Harness Engineering 反馈层的核心：测试用例不齐 / 不可执�
 
 矩阵覆盖标准：
 
-- 每条 REQ 至少 1 条 TC（[`docs/stages.md` §7.4](../../../docs/stages.md)）
+- 每条 REQ 至少 1 条 TC（[`docs/stages/h4-test-design.md` §4](../../../docs/stages/h4-test-design.md)）
 - 涉及外部输入 / 边界值的 REQ → 至少 1 条正常 + 1 条异常
 - 涉及权限的 REQ → 至少 1 条权限边界 TC
 - 涉及并发 / 重试的 REQ → 至少 1 条并发 / 幂等 TC
 
 ### 3.2 对每条 TC 核查字段
 
-按 [`agents/test-case-author/AGENT.md`](../../test-case-author/AGENT.md) 与 [`docs/stages.md` §7.4](../../../docs/stages.md) 列出的字段逐项核对：
+按 [`agents/test-case-author/AGENT.md`](../../test-case-author/AGENT.md) 与 [`docs/stages/h4-test-design.md` §4](../../../docs/stages/h4-test-design.md) 列出的字段逐项核对：
 
 | 字段 | 通过标准 | 常见放水形态（→ FAIL） |
 | --- | --- | --- |
@@ -77,11 +77,11 @@ H4 是 Harness Engineering 反馈层的核心：测试用例不齐 / 不可执�
 | `src/Orders/InventoryService.cs` | -（空） | **未被覆盖** |
 | `src/Auth/JwtMiddleware.cs` | TC-022 | 仅正常路径，**缺 token 过期 / 篡改** |
 
-[`docs/stages.md` §7.4](../../../docs/stages.md) 要求每个关键程序文件都有定义。"关键"由 `file-structure.md` 决定；如果不写"关键"标记，本 Skill 默认所有列出的文件都需覆盖。
+[`docs/stages/h4-test-design.md` §4](../../../docs/stages/h4-test-design.md) 要求每个关键程序文件都有定义。"关键"由 `file-structure.md` 决定；如果不写"关键"标记，本 Skill 默认所有列出的文件都需覆盖。
 
 ### 3.4 测试矩阵的可追溯性核查
 
-`test-matrix.md` 必须维护以下追溯关系（[`docs/stages.md` §7.5](../../../docs/stages.md)）：
+`test-matrix.md` 必须维护以下追溯关系（[`docs/stages/h4-test-design.md` §5](../../../docs/stages/h4-test-design.md)）：
 
 ```text
 需求编号 → 设计编号 → 文件路径 → 测试用例编号 → 测试文件 → 提交记录
@@ -101,7 +101,7 @@ H4 是 Harness Engineering 反馈层的核心：测试用例不齐 / 不可执�
 # H4 Test Plan Review · <scope> · <YYYY-MM-DD>
 
 - 受审产物：docs/05-test-design/* @ commit <sha>
-- 评审依据：docs/stages.md §7 + templates/phase-gate-checklist.md H4
+- 评审依据：docs/stages/ §7 + templates/phase-gate-checklist.md H4
 
 ## REQ × TC 覆盖矩阵
 

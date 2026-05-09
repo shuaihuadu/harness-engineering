@@ -1,5 +1,5 @@
 ---
-description: '评审 H3 详细设计文档（docs/04-detailed-design/）、判断设计是否可进入 H4 测试用例编写阶段时使用：按 stages.md 第 6 节的章节列表逐项检查完备性与一致性，挡住"设计没写清"流入 H4 / H5'
+description: '评审 H3 详细设计文档（docs/04-detailed-design/）、判断设计是否可进入 H4 测试用例编写阶段时使用：按 stages/h3-detailed-design.md的章节列表逐项检查完备性与一致性，挡住"设计没写清"流入 H4 / H5'
 tools:
   [
     vscode/extensions,

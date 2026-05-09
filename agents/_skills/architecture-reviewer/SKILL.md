@@ -15,7 +15,7 @@ when_not_to_use: |
 
 ## 1. 目的与原理
 
-H2 是"少量决定下游大量代价"的阶段。一条选型的"为什么"如果写得糊弄，下游 H3/H5 撞到边界时无法回溯——只能再开一次会重选。`ArchitectAdvisor` 已经按 [`docs/stages.md` 第 5.5 节](../../../docs/stages.md)的六字段输出选型，但它**自己写自己审**会自动开绿灯。本 Skill 提供的是一份独立的、机械化的证据核查表。
+H2 是"少量决定下游大量代价"的阶段。一条选型的"为什么"如果写得糊弄，下游 H3/H5 撞到边界时无法回溯——只能再开一次会重选。`ArchitectAdvisor` 已经按 [`docs/stages/h2-architecture.md` §5](../../../docs/stages/h2-architecture.md)的六字段输出选型，但它**自己写自己审**会自动开绿灯。本 Skill 提供的是一份独立的、机械化的证据核查表。
 
 > 与现有 Reviewer Agent（PrototypeReviewer / DesignReviewer / CommitAuditor）的关系：本 Skill 故意做成轻量 SOP 而非 Agent，因为 H2 评审的硬要求高度机械化（六字段齐 / 替代方案有比较 / 风险有缓解），不需要独立角色身份。复杂的 H2 内容质量评审仍应由人主持。
 
@@ -54,7 +54,7 @@ H2 是"少量决定下游大量代价"的阶段。一条选型的"为什么"如�
 
 ### 3.2 对每条选型核查六字段
 
-按 [`docs/stages.md` 第 5.5 节](../../../docs/stages.md)六字段逐项打分。**不允许"看上去差不多"通过**——必须能在文件里指出对应文字：
+按 [`docs/stages/h2-architecture.md` §5](../../../docs/stages/h2-architecture.md)六字段逐项打分。**不允许"看上去差不多"通过**——必须能在文件里指出对应文字：
 
 | 字段 | 通过标准 | 常见放水形态（→ FAIL） |
 | --- | --- | --- |
@@ -98,7 +98,7 @@ H2 是"少量决定下游大量代价"的阶段。一条选型的"为什么"如�
 # H2 Architecture Review · <scope> · <YYYY-MM-DD>
 
 - 受审产物：docs/03-architecture/* @ commit <sha>
-- 评审依据：docs/stages.md §5.5 + templates/phase-gate-checklist.md H2
+- 评审依据：docs/stages/ §5.5 + templates/phase-gate-checklist.md H2
 
 ## 选型六字段核查
 
@@ -144,7 +144,7 @@ H2 是"少量决定下游大量代价"的阶段。一条选型的"为什么"如�
 
 ## 4. 失败模式与回退
 
-- **architecture.md 缺章节**（[`docs/stages.md` §5.4](../../../docs/stages.md) 列的章节有缺）：直接报阻塞，不要"自己脑补一下"。
+- **architecture.md 缺章节**（[`docs/stages/h2-architecture.md` §4](../../../docs/stages/h2-architecture.md) 列的章节有缺）：直接报阻塞，不要"自己脑补一下"。
 - **被要求评内容质量**（"这个选型对不对"）：拒绝。本 Skill 只查"理由是否齐"，不评"理由是否对"——评对错是架构师的工作，由人在评审会决定。
 - **跨阶段证据混入**（H3 详细设计已经开始落地，user 说"反正 HD 都写完了，H2 就别太较真"）：拒绝。H2 的事必须在 H2 关掉，否则下游 H3/H5 撞墙时无回溯证据。
 - **同一选型有多版本 ADR 共存**：报告 `ADR conflict`，要求用户先把废弃 ADR 显式标 `deprecated`。

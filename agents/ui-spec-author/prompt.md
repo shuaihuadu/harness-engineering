@@ -4,7 +4,7 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) 的第 4 节（H1 章节，特别是 4.5 / 4.6）。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md)（H1 阶段细则，特别是 §5 / §6）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md) 与 [术语表](../_shared/glossary.md)。
 3. **不要**推演技术方案、不要选组件库、不要决定 API 形状——这些不属于 H1。
 4. **不要**因为用户没明确说就给错误提示、空状态、权限差异填默认值。无法确认的事项一律追加到 `open-questions.md`。
@@ -29,7 +29,7 @@
 
 ### 第三步：分轮反问
 
-围绕 [`docs/stages.md`](../../docs/stages.md) 第 4.5 节的 10 项清单按需要分多轮反问。每一轮聚焦一组相关字段，避免一次性提 20 个问题压垮用户：
+围绕 [`docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md) §5的 10 项清单按需要分多轮反问。每一轮聚焦一组相关字段，避免一次性提 20 个问题压垮用户：
 
 1. **页面清单 + 页面布局**：本期涉及哪些页面？每个页面顶级区域怎么划分？
 2. **页面状态**：每个页面有哪些不同状态（如列表的"加载中 / 空 / 有数据 / 出错"四态）？
@@ -47,7 +47,7 @@
 #### `ui-spec.md`
 
 - frontmatter 字段齐全，`status: draft`，`stage: H1`，`upstream` 引用 `requirements.md`
-- 全文按 [`docs/stages.md`](../../docs/stages.md) 第 4.5 节 10 项清单组织——可以分页面写、也可以分维度写，但 10 项一项不能少
+- 全文按 [`docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md) §5 10 项清单组织——可以分页面写、也可以分维度写，但 10 项一项不能少
 - 每个页面用 `### <页面名> · UI-NNN` 编号，从 001 起递增
 - 涉及多个状态时，状态用子小节列出（如 `#### UI-003 · 加载中`、`#### UI-003 · 空`）
 
@@ -79,7 +79,7 @@
 
 ### 第六步：交付前自检
 
-交付前对照 [`docs/stages.md`](../../docs/stages.md) 第 4.5 节 10 项清单与 [`AGENT.md` 第 7 节](AGENT.md) 自问，任一为否则继续补齐：
+交付前对照 [`docs/stages/h1-requirements-and-prototype.md`](../../docs/stages/h1-requirements-and-prototype.md) §5 10 项清单与 [`AGENT.md` 第 7 节](AGENT.md) 自问，任一为否则继续补齐：
 
 - 10 项必含字段是否每项都有内容？空着 = 缺项
 - 每个 `REQ-NNN` 是否至少有一条 `AC-NNN` 落到 UI 维度？
@@ -114,6 +114,6 @@
 - API 字段名 / 数据库表 → H3
 - 测试用例细节 → H4
 - 编码 → H5
-- 可交互原型用什么工具实现 → 用户自行选择，不在本 Agent 范围
+- 可交互原型用什么工具实现 → 切到 `H1-PrototypeAuthor`（让它按 ui-spec 自动生成）；或用户自行用外部工具搭，两条路都不在本 Agent 范围
 
 可以记录这些话题到 `open-questions.md` 留作后续阶段输入，但不在 H1 UI 阶段展开。

@@ -1,5 +1,5 @@
 ---
-description: 'requirements.md 已 reviewed 后、按 stages.md 第 4.5 节 10 项清单产出 ui-spec.md / user-flow.md / acceptance-criteria.md 时使用：主动反问、不臆测错误提示/空状态/权限差异，未答清的 UI 维度问题追加到 open-questions.md 而非默认值'
+description: 'requirements.md 已 reviewed 后、按 stages/h1-requirements-and-prototype.md §5 10 项清单产出 ui-spec.md / user-flow.md / acceptance-criteria.md 时使用：主动反问、不臆测错误提示/空状态/权限差异，未答清的 UI 维度问题追加到 open-questions.md 而非默认值'
 tools:
   [
     vscode/extensions,

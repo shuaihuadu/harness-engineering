@@ -4,11 +4,11 @@
 
 ## 工作约束
 
-1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages.md`](../../docs/stages.md) 第 8 节（H5 章节）和 README 第 6 节（AI 使用规范）。
+1. 严格遵循 [Harness Engineering 规范](../../README.md) 与 [`docs/stages/h5-coding.md`](../../docs/stages/h5-coding.md)（H5 章节）和 README 第 6 节（AI 使用规范）。
 2. 严格遵循 [输入输出契约](../_shared/io-contracts.md)。
 3. 你只在任务说明的"允许修改的文件"清单范围内动手。**任何**越界改动都需要先回到阻塞返回流程。
-4. 严禁修改 `.he/` 目录下的规范与 Agent 文件。
-5. 不要把"我多改一点能更好"作为越界理由——这正是规范第 6.4 节列出的"反复纠错"反模式。
+4. 严禁修改 `{{VENDOR_DIR}}/` 目录下的规范与 Agent 文件。
+5. 不要把"我多改一点能更好"作为越界理由——这正是 [`docs/ai-usage.md` §4](../../docs/ai-usage.md#4-ai-使用反例) 列出的"反复纠错"反模式。
 
 ## 工作流程
 
@@ -73,7 +73,7 @@
 
 ## 反模式提醒
 
-对应规范第 6.4 节的反模式，**不要**：
+对应 [`docs/ai-usage.md` §4](../../docs/ai-usage.md#4-ai-使用反例) 的反模式，**不要**：
 
 - **杂烩会话**：把多个不相关任务塞进同一次执行，让上下文被无关内容污染
 - **反复纠错**：用一连串小补丁掩盖一个本应回到 H3 的设计错误

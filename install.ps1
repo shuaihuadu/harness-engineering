@@ -137,8 +137,34 @@ $detected = Get-ProjectDefaults -Root $TargetRepo
 # 2) 读取上次 manifest 中的 replacements（如有）
 $priorManifest = $null
 $priorReplacements = @{}
-$existingManifestPath = Join-Path (Join-Path $TargetRepo '.he') 'manifest.json'
-if (Test-Path $existingManifestPath) {
+$priorManifestVendorDir = $null
+$existingManifestPath = $null
+# 优先按 CLI 显式 VendorHarnessTo 寻 manifest；否则尝试默认 .he/，再退化扫描顶层目录
+if ($PSBoundParameters.ContainsKey('VendorHarnessTo') -and $VendorHarnessTo) {
+    $candidate = Join-Path (Join-Path $TargetRepo $VendorHarnessTo) 'manifest.json'
+    if (Test-Path $candidate) { $existingManifestPath = $candidate; $priorManifestVendorDir = $VendorHarnessTo }
+}
+if (-not $existingManifestPath) {
+    $candidate = Join-Path (Join-Path $TargetRepo '.he') 'manifest.json'
+    if (Test-Path $candidate) { $existingManifestPath = $candidate; $priorManifestVendorDir = '.he' }
+}
+if (-not $existingManifestPath) {
+    # 顶层目录扫一圈：识别 schema=v1 + harness_version 的 manifest（自定义 vendor_dir 场景）
+    Get-ChildItem -LiteralPath $TargetRepo -Directory -Force -ErrorAction SilentlyContinue | ForEach-Object {
+        $candidate = Join-Path $_.FullName 'manifest.json'
+        if (-not $existingManifestPath -and (Test-Path $candidate)) {
+            try {
+                $probe = Get-Content -LiteralPath $candidate -Raw | ConvertFrom-Json
+                if ($probe.schema -eq 'v1' -and $probe.harness_version) {
+                    $existingManifestPath = $candidate
+                    $priorManifestVendorDir = if ($probe.vendor_dir) { [string]$probe.vendor_dir } else { $_.Name }
+                }
+            }
+            catch {}
+        }
+    }
+}
+if ($existingManifestPath -and (Test-Path $existingManifestPath)) {
     try {
         $priorManifest = Get-Content -LiteralPath $existingManifestPath -Raw | ConvertFrom-Json
         if ($priorManifest.PSObject.Properties.Name -contains 'replacements' -and $priorManifest.replacements) {
@@ -307,10 +333,7 @@ $LintCommand = Resolve-CommandWithMenu -Cli $LintCommand -ManifestKey 'LINT_COMM
 if (-not $NoVendor) {
     if (-not $PSBoundParameters.ContainsKey('VendorHarnessTo')) {
         $vendorDefault = $VendorHarnessTo
-        if ($priorManifest -and $priorManifest.PSObject.Properties.Name -contains 'vendor_dir') {
-            $priorVendor = [string]$priorManifest.vendor_dir
-            if ($priorVendor) { $vendorDefault = $priorVendor }
-        }
+        if ($priorManifestVendorDir) { $vendorDefault = $priorManifestVendorDir }
         if ($interactive) {
             $hint = " [$vendorDefault]"
             $value = Read-Host "Vendor 目录 / Vendor directory (relative to TargetRepo)$hint"
@@ -347,6 +370,8 @@ $Replacements = [ordered]@{
     'HARNESS_VERSION'              = $HarnessVersion
     # 派生占位符：从 .github/ 子目录链接回 vendor 时需多一级 ../；URL 则保持原样
     'HARNESS_REPO_REF_FROM_GITHUB' = $(if ($HarnessRepoRef -match '^(https?://|/)') { $HarnessRepoRef } else { "../$HarnessRepoRef" })
+    # VENDOR_DIR：被 vendor 文档与 .github/ 模板引用 vendor 目录时使用；NoVendor 模式下退回 .he 占位
+    'VENDOR_DIR'                   = $(if ($VendorHarnessTo) { $VendorHarnessTo } else { '.he' })
 }
 
 # 4) 总结 + 确认
@@ -405,7 +430,9 @@ foreach ($t in $validTargets) {
 # ----------------------------------------------------------------------------
 # 3. 写 manifest（uninstall 依赖此文件）
 # ----------------------------------------------------------------------------
-$manifestDir = Join-Path $TargetRepo '.he'
+# manifest 永远落 vendor 目录；NoVendor 模式下退回 .he/（仅放 manifest，不放文档）
+$manifestVendorDir = if ($VendorHarnessTo) { $VendorHarnessTo } else { '.he' }
+$manifestDir = Join-Path $TargetRepo $manifestVendorDir
 $manifestPath = Join-Path $manifestDir 'manifest.json'
 
 $harnessCommit = $null
@@ -475,15 +502,15 @@ if ($DryRun) {
 }
 else {
     $githubCount = @($Context.Manifest | Where-Object { $_.path -like '.github/*' }).Count
-    $harnessCount = @($Context.Manifest | Where-Object { $_.path -like '.he/*' }).Count
+    $harnessCount = @($Context.Manifest | Where-Object { $_.path -like "$manifestVendorDir/*" }).Count
 
     Write-Host '==> 安装完成 / Install complete' -ForegroundColor Green
     Write-Host ("    [+] 写入 {0} 个文件到 .github/                  Copilot 开箱即用" -f $githubCount)
-    Write-Host ("    [+] 写入 {0} 个文件到 .he/    HANDBOOK + docs + manifest" -f $harnessCount)
+    Write-Host ("    [+] 写入 {0} 个文件到 $manifestVendorDir/    HANDBOOK + docs + manifest" -f $harnessCount)
     Write-Host ''
     Write-Host '下一步 / Next steps:' -ForegroundColor Cyan
     Write-Host '   1. 读 10 分钟操作手册 / Read the 10-min handbook:'
-    Write-Host '        notepad .\.he\HANDBOOK.md'
+    Write-Host "        notepad .\$manifestVendorDir\HANDBOOK.md"
     Write-Host '   2. 跑一遍空跑演练 / Run a dry-run rehearsal (强烈推荐 / strongly recommended):'
     Write-Host '        New-Item -ItemType Directory -Path .\docs\00-dry-run -Force | Out-Null'
     Write-Host '        Copy-Item .\.github\templates\dry-run-demo.md .\docs\00-dry-run\'
@@ -492,8 +519,8 @@ else {
     Write-Host '   3. 起一个最小任务试手 / Try a smallest task:'
     Write-Host '        在 Copilot Chat 输入 / In Copilot Chat type:  /new-task'
     Write-Host '        (首次运行会按模板自动建 docs\06-tasks\task-board.md，无需手动复制)'
-    Write-Host '   4. 可选 / Optional: 把 .he/ 加入 .gitignore'
-    Write-Host '        说明见 / See:  .\.he\README.md'
+    Write-Host '   4. 可选 / Optional: 把 vendor 目录加入 .gitignore'
+    Write-Host "        说明见 / See:  .\$manifestVendorDir\README.md"
     Write-Host ''
     Write-Host '卸载 / Uninstall:' -ForegroundColor DarkGray
     Write-Host '   pwsh -File .\.he\uninstall.ps1'

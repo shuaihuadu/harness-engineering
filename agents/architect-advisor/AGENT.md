@@ -7,7 +7,7 @@
 
 接收已评审通过的 H1 产物与仓库现实地图，通过**有限轮反问 + 结构化备选项打分**，产出一组可进入 H3 的架构说明、技术选型、风险分析与 ADR。它不替架构师拍板，而是把"凭直觉"的方案讨论强制变成"有依据的取舍记录"。
 
-> 设计依据：H2 是少量决定下游大量代价的阶段；按 [`docs/stages.md`](../../docs/stages.md) 第 5.5 节，每条选型必须留下"选择 / 为什么 / 替代方案 / 放弃理由 / 维护影响 / 成本性能安全交付影响"六字段，否则后续 H3/H5 一旦撞墙将无法回溯到决策证据。
+> 设计依据：H2 是少量决定下游大量代价的阶段；按 [`docs/stages/h2-architecture.md`](../../docs/stages/h2-architecture.md) §5，每条选型必须留下"选择 / 为什么 / 替代方案 / 放弃理由 / 维护影响 / 成本性能安全交付影响"六字段，否则后续 H3/H5 一旦撞墙将无法回溯到决策证据。
 
 ## 2. 触发时机
 
@@ -36,7 +36,7 @@
 
 ### 4.1 架构说明
 
-`docs/03-architecture/architecture.md`，frontmatter 字段齐全（`stage: H2`，`upstream` 引用相关 REQ 与既有 ADR）。正文必须覆盖 [`docs/stages.md`](../../docs/stages.md) 第 5.4 节列出的全部章节：
+`docs/03-architecture/architecture.md`，frontmatter 字段齐全（`stage: H2`，`upstream` 引用相关 REQ 与既有 ADR）。正文必须覆盖 [`docs/stages/h2-architecture.md`](../../docs/stages/h2-architecture.md) §4列出的全部章节：
 
 - 总体架构图或架构描述
 - 前端 / 后端 / 数据库 / 缓存 / 消息机制
@@ -48,7 +48,7 @@
 
 ### 4.2 技术选型
 
-`docs/03-architecture/tech-selection.md`，每个关键技术选择按 [`docs/stages.md`](../../docs/stages.md) 第 5.5 节六字段输出：
+`docs/03-architecture/tech-selection.md`，每个关键技术选择按 [`docs/stages/h2-architecture.md`](../../docs/stages/h2-architecture.md) §5六字段输出：
 
 | 字段 | 必填 | 说明 |
 | --- | --- | --- |
@@ -140,7 +140,7 @@ ADR 编号一旦发布不可改；废止只能通过新增 ADR 引用 `supersede
 
 本 Agent 一次执行视为合格，需同时满足：
 
-- `architecture.md` 通过 [`docs/stages.md`](../../docs/stages.md) 第 5.6 节人工评审门禁
+- `architecture.md` 通过 [`docs/stages/h2-architecture.md`](../../docs/stages/h2-architecture.md) §6人工评审门禁
 - `tech-selection.md` 中每条选型六字段齐全，置信度分布中 `low` 占比 ≤ 30%（超出时附说明）
 - 每条 `RISK-NNN` 都至少有一条**可执行**缓解动作（不是"加强测试"等口号）
 - 每个新增 ADR 状态字段为 `accepted`，且与既有 ADR 无静默冲突
