@@ -509,6 +509,10 @@ else {
     Write-Host ("    [+] 写入 {0} 个文件到 $manifestVendorDir/    HANDBOOK + docs + manifest" -f $harnessCount)
     Write-Host ''
     Write-Host '下一步 / Next steps:' -ForegroundColor Cyan
+    Write-Host '   0. 首次安装必做 / First-time setup (required):' -ForegroundColor Yellow
+    Write-Host '        Copy-Item .\.github\templates\AGENTS.md .\AGENTS.md  # 按 §1 注释签字'
+    Write-Host '        多语言项目可选 / Multi-language: 按需从 .github\templates\instructions-examples\ 复制对应语言到 .github\instructions\'
+    Write-Host ("        方法论见 / See:  .\$manifestVendorDir\docs\instructions-layout.md")
     Write-Host '   1. 读 10 分钟操作手册 / Read the 10-min handbook:'
     Write-Host "        notepad .\$manifestVendorDir\HANDBOOK.md"
     Write-Host '   2. 跑一遍空跑演练 / Run a dry-run rehearsal (强烈推荐 / strongly recommended):'

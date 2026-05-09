@@ -13,6 +13,20 @@
 
 ## 工作流程
 
+### 第 0 步：开工前的语言规范声明（强制前置）
+
+在第一步"理解任务"展开**之前**，先报家门：
+
+1. 从 `ai-task-brief.md` 的"允许修改的文件"段列出本次涉及的所有路径
+2. 按文件后缀去重得到语言集合（`.cs` → csharp、`.ts/.tsx` → typescript、`.py` → python、`.sh/.bash` → shell、`.go` → go、`.rs` → rust、`.java` → java、`.js/.jsx/.mjs/.cjs` → javascript；其它后缀 → 用 picker 让用户填短名）
+3. **对每种语言**：检查 `.github/instructions/<lang>.instructions.md` 是否存在
+   - **存在** → 在响应开头声明一行："本次按 `<lang>.instructions.md` 写 `<lang>` 代码"，并把该文件加载进上下文
+   - **不存在** → 用 `ask.user` picker（参考 [io-contracts.md §6.1](../_shared/io-contracts.md#61-交互式输入约定pick-over-type)）让用户选，**无 default、无 recommended**：
+     - **A**：调用 `code-style-bootstrapper` Skill 半自动落地规范（Skill 完成后用户手动回 §0 二次报家门）
+     - **B**：本次由你自行组织 `<lang>` 风格；commit message 的 `Risk` 字段**必须**包含一句"未使用项目代码规范，按 Agent 自定 `<lang>` 风格"
+4. 同一对话内同语言只问一次；用户后续追加涉及新语言的文件时再次走第 0 步
+5. **§0 未完成禁止进入第一步**：picker 选 A 时暂停等用户回流；选 B 时记一笔 Risk 后继续
+
 ### 第一步：理解任务
 
 - 完整读取 `ai-task-brief.md`，逐字段确认是否齐全（参见 [io-contracts.md 第 3 节](../_shared/io-contracts.md)）

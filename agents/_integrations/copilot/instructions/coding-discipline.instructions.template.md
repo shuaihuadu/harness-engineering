@@ -2,9 +2,27 @@
 applyTo: 'src/**'
 ---
 
-# 源码编写规范
+<!--
+重命名提示（v0.0.1+）：本文件早期叫 `coding-style.instructions.template.md`。
+"style" 一词容易让人以为它管缩进/引号/命名等语言风格，实际它管的是
+H5 流程纪律（改动前找任务、跑 Verify、反模式守则）。已重命名为
+`coding-discipline.instructions.template.md`，让 "style" 一词留给项目自己加的
+`<lang>.instructions.md`（C# / TypeScript / Python …）。
+
+如果你在升级 Harness：重装时旧的 `coding-style.instructions.md` 会被识别为
+孤儿文件，按 sync-engine 提示删除即可，再次安装就会落到新名字。
+
+多语言代码风格的分层方法见 `{{VENDOR_DIR}}/docs/instructions-layout.md`，
+半自动落地用 `agents/_skills/code-style-bootstrapper/`。
+-->
+
+# 源码编写规范（流程纪律层）
 
 本规则覆盖 `src/**` 下的全部源码。以下要求与 Harness Engineering 规范第 6 节（H3 详细设计）和 [`stages/h5-coding.md`]({{HARNESS_REPO_REF_FROM_GITHUB}}/docs/stages/h5-coding.md)（H5 编码与自验证）一致，AI 写代码时必须遵守。
+
+> **本文件只覆盖跨语言的"流程纪律"**——改动前先找任务、跑 Verify、避反模式。
+> **语言风格**（命名 / 错误处理 / 测试套路）由项目自加 `.github/instructions/<lang>.instructions.md`，
+> 见 [`{{VENDOR_DIR}}/docs/instructions-layout.md`]({{HARNESS_REPO_REF_FROM_GITHUB}}/docs/instructions-layout.md)。
 
 ## 1. 改动前
 

@@ -55,6 +55,16 @@
             "orphan_check_only_when_all": false
         },
         {
+            "kind": "directory",
+            "source_dir": "../../../templates/instructions-examples",
+            "target_dir": ".github/templates/instructions-examples",
+            "source_glob": "*.example.md",
+            "target_glob": "*.example.md",
+            "selectable": false,
+            "orphan_check": true,
+            "orphan_check_only_when_all": false
+        },
+        {
             "kind": "single",
             "source": "handbook.md",
             "target": "{{VENDOR_DIR}}/HANDBOOK.md"
@@ -88,6 +98,11 @@
             "kind": "single",
             "source": "../../../docs/repo-layout.md",
             "target": "{{VENDOR_DIR}}/docs/repo-layout.md"
+        },
+        {
+            "kind": "single",
+            "source": "../../../docs/instructions-layout.md",
+            "target": "{{VENDOR_DIR}}/docs/instructions-layout.md"
         },
         {
             "kind": "single",

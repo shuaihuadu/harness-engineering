@@ -477,6 +477,10 @@ if [[ $DRY_RUN -eq 1 ]]; then
     echo "DryRun 完成，未写入任何文件 / DryRun done, nothing written."
 else
     echo "完成。下一步建议 / Done. Suggested next steps:"
+    echo "  0. 首次安装必做 / First-time setup (required):"
+    echo "     a. cp .github/templates/AGENTS.md ./AGENTS.md  # 项目根 AGENTS.md，按 §1 注释签字"
+    echo "     b. 多语言项目可选 / Multi-language: 按需从 .github/templates/instructions-examples/ 复制对应语言到 .github/instructions/"
+    echo "        方法论见 / See: ${VENDOR_HARNESS_TO:-.he}/docs/instructions-layout.md"
     echo "  1. cd $TARGET_REPO"
     [[ -n "$VENDOR_HARNESS_TO" ]] && echo "  2. git status $VENDOR_HARNESS_TO"
     echo "  3. git diff 检查修改是否符合预期 / inspect changes"

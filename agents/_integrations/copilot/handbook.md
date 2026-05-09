@@ -32,13 +32,15 @@
 
 依次切 Agent 跑下去，每一步的产出会成为下一步的输入；不要跳级，跳级会让追溯链断在你身上。
 
-> **前置步骤 · 项目身份初始化**：在仓库根创建一份最小 `AGENTS.md`（约 60 行的目录式骨架，最小可工作版本见 [Q8](#q8-我只用-github-copilot仓库根的-agentsmd-还要不要写)）。这是 `H1-RepoImpactMapper` 后续运行的硬性输入（缺它会被报 GAP-001 硬阻塞）。空仓下 H1 走完前不必写满，但“项目身份”那一句必须由项目负责人亲手签下——`AGENTS.md` 是项目对所有 AI 工具的对外声明，AI 代笔 = 闭环漏洞，与 `requirements.md` 的 `status` 签字同源。
+> **前置步骤 · 项目身份初始化**：在仓库根创建一份最小 `AGENTS.md`——直接复制 `.github/templates/AGENTS.md` 到仓库根（约 60 行的目录式骨架，详见模板内 §1 签字位注释；最小可工作版本说明见 [Q8](#q8-我只用-github-copilot仓库根的-agentsmd-还要不要写)）。这是 `H1-RepoImpactMapper` 后续运行的硬性输入（缺它会被报 GAP-001 硬阻塞）。空仓下 H1 走完前不必写满，但"项目身份"那一句必须由项目负责人亲手签下——`AGENTS.md` 是项目对所有 AI 工具的对外声明，AI 代笔 = 闭环漏洞，与 `requirements.md` 的 `status` 签字同源。
 >
 > **完成后下一步**：
 >
-> 1. 第 1 节"项目身份"亲手签字（≤ 2 行讲清目标用户 + 核心价值）；第 4 节"模块边界 / 禁区"在 H1 阶段保留 TODO 即可，H2 完成后回来补。
+> 1. `cp .github/templates/AGENTS.md ./AGENTS.md`，把第 1 节"项目身份"亲手签字（≤ 2 行讲清目标用户 + 核心价值）；第 3 节"模块边界 / 禁区"在 H1 阶段保留 TODO 即可，H2 完成后回来补。
 > 2. 进下一节"1. H1 上半段 · 需求文本"切 `h1-requirements-interviewer`。
 > 3. 在 H1 影响图（第 4 步）跑完后，如果 `repo-impact-map.md` 报了 `GAP-001 仓库根 AGENTS.md 不存在` —— 回到本前置步骤补完，把那条 GAP 标记为 `已关闭`。
+>
+> **多语言项目可选**：若项目同时含 C# / TypeScript / Python / Go / Rust / Java / Shell / JavaScript 任一门主流语言，可从 `.github/templates/instructions-examples/<lang>.instructions.example.md` 复制对应语言到 `.github/instructions/<lang>.instructions.md`（去 `.example` 后缀），按项目栈裁剪。也可直接对 Copilot Chat 说 "给项目加 `<lang>` 代码规范" 触发 `code-style-bootstrapper` Skill 半自动落地。详细方法论见 `{{VENDOR_DIR}}/docs/instructions-layout.md`。
 
 1. **H1 上半段 · 需求文本**：Copilot Chat 输入框下方的 Agent 下拉切到 `h1-requirements-interviewer`，用一段大白话描述目标用户、核心场景、必做与可选——它会反问、追问、把回答落成 `docs/01-requirements/requirements.md` 草稿，分配 `REQ-001`、`REQ-002`…，没答清的进 `open-questions.md`，**不会自动用 `<TBD>` 占位**。
 
@@ -351,7 +353,7 @@
 .github/
 ├── copilot-instructions.md          ← 仓库总指令；何时切哪个 Agent / 用哪个 Prompt
 ├── instructions/                    ← 文件类型相关的"规则集"，按 applyTo 自动加载
-│   ├── coding-style.instructions.md
+│   ├── coding-discipline.instructions.md   ← 流程纪律（找任务 / 跑 Verify / 反模式）
 │   ├── commit-format.instructions.md
 │   └── docs-style.instructions.md
 ├── agents/                          ← 12 个 Custom Agent，下拉菜单可选
