@@ -25,6 +25,7 @@
 | H1 原型评审（PASS/FAIL/UNKNOWN） | `h1-prototype-reviewer`       |
 | H1↔H3 仓库影响面映射             | `h1-repo-impact-mapper`       |
 | H2 架构说明 / 技术选型 / ADR     | `h2-architect-advisor`        |
+| H3 协作起草详细设计（per-module）| `h3-design-author`            |
 | H3 评审详细设计                  | `h3-design-reviewer`          |
 | H4 反推测试用例                  | `h4-test-case-author`         |
 | H5 按任务简报编码 + 自验证       | `h5-coding-executor`          |

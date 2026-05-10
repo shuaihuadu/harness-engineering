@@ -200,16 +200,33 @@
    > 2. **回填根目录 `AGENTS.md` 第 4 节"模块边界 / 禁区"**——把 H2 决定的跨模块允许 / 禁止规则写清楚，这是 H3 / H5 的边界依据。空仓时这一节是 TODO，H2 完成后必须落地。
    > 3. 跑一次 `/run-gate H2` 做机械复核；全 PASS 后挑一个或多个最小 feature 切到 H3 起草详细设计。
 
-6. **H3 详细设计**：人手起草 `docs/04-detailed-design/<feature>/HD-NNN.md`（接口、数据模型、错误码、并发与失败语义）。写完切 `h3-design-reviewer` 让它逐项核对完备性，挡住"设计还没写清"流入下一阶段。
+6. **H3 详细设计**：H3 颗粒度极细（每个程序文件 10 字段 + DB / API / 流程 / 配置 / 日志 / 监控 / 部署 / 性能边界），单次会话装不下。**强制 per-module 切片**——一次起草一个模块，多次拼成完整 H3。两个 Agent 配对走：
 
-   _示例输入_（只评审不修改，给评审口径 + 给期望交付）：
+   - **起草**：切到 `h3-design-author`，给它一个明确的 module 名（必须在 `AGENTS.md` §3.1 拓扑里）。它会读 H1 / H2 / ADR，按 [stages/h3-detailed-design.md §5](../../../docs/stages/h3-detailed-design.md) 的 10 字段模板逐文件写；接口签名 / 错误码 / 日志字段 / 性能数字 / 表结构 等封闭枚举**强制 picker 拍板**，它绝不替你做关键决策。产物落到 `docs/04-detailed-design/<module>/HD-NNN-<module>-<topic>.md`，跨模块章节追加到 `database-design.md` / `api-design.md` / `file-structure.md`。`status` 永远 `draft`，留给人工签字。
 
-   ```text
-   帮我看一下 docs/04-detailed-design/ai-content-factory/HD-001.md。
-   按 stages/h3-detailed-design.md 那份章节列表对——
-   接口、数据模型、错误码、并发与失败语义、可观测性、发布回滚，每一项都看看写没写清。
-   缺啥列出来告诉我下一步该补啥；这轮只评审，别动我的文档。
-   ```
+     _示例输入_（per-module 切片，给目标模块 + 上游凭证）：
+
+     ```text
+     帮我起 H3 第一份：Inkwell.Auth 模块详细设计。
+     上游看 docs/01-requirements/requirements.md 的 REQ-001 / REQ-017 / NFR-003，
+     架构看 docs/03-architecture/architecture.md §3 + ADR-007（Public API Token Auth）。
+     按 stages/h3-detailed-design.md §5 那 10 字段模板逐文件写；
+     接口签名、错误码、日志字段、性能预算这些先用 picker 让我拍板再落到文档。
+     落到 docs/04-detailed-design/auth/，status 保持 draft。
+     ```
+
+   - **评审**：起草完一个模块就立刻切到 `h3-design-reviewer` 跑一次机械化校验。它会按 [stages/h3-detailed-design.md](../../../docs/stages/h3-detailed-design.md) 的章节清单逐项打 `pass` / `partial` / `missing`，给反问清单和阻塞标记。产出 `docs/04-detailed-design/design-review-report.md`。**它不改设计文档，也不替你翻 status**——`blocking` 数为 0 之后由人工把 `HD-NNN.md` 的 `status: draft → reviewed`、`reviewers:` 添一行，然后才进 H4。
+
+     _示例输入_（只评审不修改，给评审口径 + 给期望交付）：
+
+     ```text
+     帮我看一下 docs/04-detailed-design/auth/HD-001-auth-module.md。
+     按 stages/h3-detailed-design.md 那份章节列表对——
+     接口、数据模型、错误码、并发与失败语义、可观测性、发布回滚，每一项都看看写没写清。
+     缺啥列出来告诉我下一步该补啥；这轮只评审，别动我的文档。
+     ```
+
+   > **完成后下一步**：所有目标模块全部走完"author → reviewer → 人工签字"循环，`docs/04-detailed-design/` 下覆盖了 `repo-impact-map.md` 列出的全部 module，跑 `/run-gate H3` 全 PASS 后才进 H4。任何模块 reviewer 报 `blocking` 都不能硬切——回去补对应 module 的 `HD-NNN.md`。
 
    > **完成后下一步**：
    >
@@ -327,6 +344,7 @@
 │  H1 原型实践      → 你自选原型工具              → prototypes/<feature>/      │
 │  H1 影响图        → H1-RepoImpactMapper         → docs/01-requirements/      │
 │  H2 架构 / ADR    → H2-ArchitectAdvisor         → docs/03-architecture/      │
+│  H3 详细设计起草  → H3-DesignAuthor             → docs/04-detailed-design/   │
 │  H3 详细设计评审  → H3-DesignReviewer           → docs/04-detailed-design/   │
 │  H4 测试用例      → H4-TestCaseAuthor           → docs/05-test-design/       │
 │  H5 起任务        → /new-task                   → docs/06-tasks/             │
@@ -363,6 +381,7 @@
 │   ├── h1-prototype-author.agent.md
 │   ├── h1-prototype-reviewer.agent.md
 │   ├── h2-architect-advisor.agent.md
+│   ├── h3-design-author.agent.md
 │   ├── h3-design-reviewer.agent.md
 │   ├── h4-test-case-author.agent.md
 │   ├── h5-coding-executor.agent.md

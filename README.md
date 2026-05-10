@@ -89,6 +89,7 @@ harness-engineering/
 │   ├── prototype-reviewer/         # H1 原型评审 + picker 收人工签字
 │   ├── repo-impact-mapper/         # H1 代码库影响分析
 │   ├── architect-advisor/          # H2 架构与技术选型
+│   ├── design-author/              # H3 详细设计协作起草（per-module）
 │   ├── design-reviewer/            # H3 设计评审
 │   ├── test-case-author/           # H4 测试用例
 │   ├── coding-executor/            # H5 编码执行
