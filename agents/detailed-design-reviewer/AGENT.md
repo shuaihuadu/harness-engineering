@@ -1,4 +1,4 @@
-# DesignReviewer
+# DetailedDesignReviewer
 
 > 对应阶段：H3 | Harness 层：质量门禁层
 > 共享契约：[`../_shared/glossary.md`](../_shared/glossary.md)、[`../_shared/io-contracts.md`](../_shared/io-contracts.md)

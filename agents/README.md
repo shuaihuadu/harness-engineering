@@ -21,8 +21,8 @@
 | [PrototypeReviewer](./prototype-reviewer/AGENT.md)             | H1         | 质量门禁层          | 只读评审：读 UI 文档 + 原型截图，按 phase-gate H1 那 12 条 PASS/FAIL/UNKNOWN，不写文件 |
 | [RepoImpactMapper](./repo-impact-mapper/AGENT.md)              | H1↔H3 之间 | 约束层              | 在做计划前扫描真实代码，产出可审核的"仓库影响地图"，拦截"AI 凭空编 API"的失败模式 |
 | [ArchitectAdvisor](./architect-advisor/AGENT.md)               | H2         | 反馈层 + 约束层     | 反问补齐架构约束、对备选项机械化打分，产出 `architecture.md` / 选型 / 风险 / ADR  |
-| [DesignAuthor](./design-author/AGENT.md)                       | H3         | 协作起草层          | 按模块（per-module）协作起草 H3 详细设计，封闭枚举（接口 / 错误码 / 日志 / 性能 / 表结构）强制 picker 拍板 |
-| [DesignReviewer](./design-reviewer/AGENT.md)                   | H3         | 质量门禁层          | 机械化校验详细设计的完备性与一致性，挡住"设计没写清"流入 H4/H5                    |
+| [DetailedDesignAuthor](./detailed-design-author/AGENT.md)                       | H3         | 协作起草层          | 按模块（per-module）协作起草 H3 详细设计，封闭枚举（接口 / 错误码 / 日志 / 性能 / 表结构）强制 picker 拍板 |
+| [DetailedDesignReviewer](./detailed-design-reviewer/AGENT.md)                   | H3         | 质量门禁层          | 机械化校验详细设计的完备性与一致性，挡住"设计没写清"流入 H4/H5                    |
 | [TestCaseAuthor](./test-case-author/AGENT.md)                  | H4         | 反馈层              | 从需求与设计反推 `TC-NNN`，确保每条 REQ 至少有可机械判断的覆盖                    |
 | [CodingExecutor](./coding-executor/AGENT.md)                   | H5         | 反馈层              | 严格按 `ai-task-brief.md` 完成单个工程单元，同步生成测试与提交元数据              |
 | [CommitAuditor](./commit-auditor/AGENT.md)                     | H5/H6      | 质量门禁层          | 在 PR / 合并前机械化校验提交信息、改动范围、追溯字段                              |
@@ -40,7 +40,7 @@ H1: RequirementsInterviewer ──► UISpecAuthor ──► PrototypeAuthor ─
                                                                                                   │
 H2:                                                                                        ArchitectAdvisor
                                                                                                   │
-H3:                                                                                          DesignReviewer
+H3:                                                                                          DetailedDesignReviewer
                                                                                                   │
 H4:                                                                                          TestCaseAuthor
                                                                                                   │

@@ -6,7 +6,7 @@ title: Harness Engineering 通用 Skills
 
 本目录提供一组**可被任意 Agent 或默认会话复用的操作型 Skill**。它们与 [`../`](../) 下的 Agent 不同：
 
-- **Agent**：一个独立角色，会接管整个会话，按自己的工作流推进任务（比如 `design-reviewer` 会按固定步骤评审 H3 设计）。
+- **Agent**：一个独立角色，会接管整个会话，按自己的工作流推进任务（比如 `detailed-design-reviewer` 会按固定步骤评审 H3 设计）。
 - **Skill**：一个**可重入的 SOP**，描述"遇到 X 任务时按这个步骤来"。模型平时不加载，命中触发条件才查阅。Agent 内部也可以引用 Skill，避免在多个 Agent 的 prompt 里重复同一段操作流程。
 
 边界口诀：**Agent 是「我现在是谁」，Skill 是「我现在要做哪件事的标准做法」。**
@@ -26,7 +26,7 @@ title: Harness Engineering 通用 Skills
 
 | 名称                                                           | 解决的问题                                              | 主要消费者                                          |
 | -------------------------------------------------------------- | ------------------------------------------------------- | --------------------------------------------------- |
-| [traceability-linker](./traceability-linker/SKILL.md)          | 校验并补全 `REQ ↔ HD ↔ TC ↔ Task ↔ Commit` 追溯链       | DesignReviewer / CommitAuditor / RepoImpactMapper   |
+| [traceability-linker](./traceability-linker/SKILL.md)          | 校验并补全 `REQ ↔ HD ↔ TC ↔ Task ↔ Commit` 追溯链       | DetailedDesignReviewer / CommitAuditor / RepoImpactMapper   |
 | [ai-task-brief-writer](./ai-task-brief-writer/SKILL.md)        | 把口头需求/Issue 转成符合 `templates/ai-task-brief.md` 的 H5 任务卡 | 默认会话 / CodingExecutor 启动前        |
 | [commit-message-formatter](./commit-message-formatter/SKILL.md) | 按 io-contracts.md 第 4 节的六字段模板生成或校验提交信息   | 任意阶段                                            |
 | [phase-gate-runner](./phase-gate-runner/SKILL.md)              | 按 `templates/phase-gate-checklist.md` 机械核对阶段门禁 | 阶段切换时                                          |

@@ -1,8 +1,8 @@
-# DesignAuthor
+# DetailedDesignAuthor
 
 > 对应阶段：H3 | Harness 层：协作起草层
 > 共享契约：[`../_shared/glossary.md`](../_shared/glossary.md)、[`../_shared/io-contracts.md`](../_shared/io-contracts.md)
-> 配对 Agent：[`../design-reviewer/AGENT.md`](../design-reviewer/AGENT.md)（先起草后评审）
+> 配对 Agent：[`../detailed-design-reviewer/AGENT.md`](../detailed-design-reviewer/AGENT.md)（先起草后评审）
 
 ## 1. 定位
 
@@ -125,13 +125,13 @@ upstream:
 - 每条字段都能映射到一份输入文档（reviewer 或人工 grep 即可找到证据）
 - `HD-NNN` 编号在全 `docs/04-detailed-design/` 唯一
 - frontmatter `status: draft` / `reviewers: []` 不被错误翻转
-- 切到 `h3-design-reviewer` 评审时 `blocking` 数为 0（`partial` 可有，需后续追加）
+- 切到 `h3-detailed-design-reviewer` 评审时 `blocking` 数为 0（`partial` 可有，需后续追加）
 - 跨模块文件中本模块章节存在且其他模块章节未被改动
 
 ## 8. 与其他 Agent 的协作
 
 - **上游**：H1 / H2 全部产物（`status` ≥ `reviewed`）+ `AGENTS.md` §3 + `repo-impact-map.md`
-- **配对（同阶段）**：[`design-reviewer`](../design-reviewer/AGENT.md)——本 Agent 起草后立刻切到 reviewer 跑机械化校验，挡住"设计没写清"流入 H4
+- **配对（同阶段）**：[`detailed-design-reviewer`](../detailed-design-reviewer/AGENT.md)——本 Agent 起草后立刻切到 reviewer 跑机械化校验，挡住"设计没写清"流入 H4
 - **下游**：
   - `test-case-author`：拿通过 review 的 `HD-NNN` 反推 `TC-NNN`
   - `coding-executor`：H5 任务说明里 `Design:` 字段引用通过审查的设计
@@ -141,6 +141,6 @@ upstream:
 - 不替设计师选接口签名 / 错误码 / SLA 数字（这是人的决策权）——只通过 picker 把候选呈现给人
 - 不预测 v2 需求，只覆盖当前 `REQ-NNN`
 - 跨模块拓扑变更不在范围（要改 `AGENTS.md` §3）
-- 不评估"设计是否优雅"（`design-reviewer` 也不评，那是评审会的事）
+- 不评估"设计是否优雅"（`detailed-design-reviewer` 也不评，那是评审会的事）
 - 不解决"两个 ADR 决策互相冲突"——发现冲突要阻塞返回让人先解决
 - 不替项目挑数据库表的字段类型上限（如 VARCHAR 长度），但必须 picker 让用户在常用候选中选

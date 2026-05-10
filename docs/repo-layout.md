@@ -108,7 +108,7 @@ agents/                    # 配套 Agent 套件（与业务无关，详见第 1
 | UISpecAuthor            | H1     | 反馈层              |
 | PrototypeReviewer       | H1     | 质量门禁层          |
 | RepoImpactMapper        | H1↔H3  | 约束层              |
-| DesignReviewer          | H3     | 质量门禁层          |
+| DetailedDesignReviewer          | H3     | 质量门禁层          |
 | TestCaseAuthor          | H4     | 反馈层              |
 | CodingExecutor          | H5     | 反馈层              |
 | CommitAuditor           | H5/H6  | 质量门禁层          |
@@ -131,7 +131,7 @@ agents/                    # 配套 Agent 套件（与业务无关，详见第 1
 设计取向（与第 10.1 节"AGENTS.md 是目录而非百科全书"一脉相承）：
 
 - **索引优先，不堆百科**：本文件与 `AGENTS.md` 列结构、列职责、列入口路径，**不**复制 `docs/` 下的细节
-- **谁动地貌谁改地图**：模块结构变化、新模块加入、命名约定调整，由当次的 RepoImpactMapper / DesignReviewer / 编码者顺手改掉对应索引行；不允许"漂亮但没人维护"的孤岛文档
+- **谁动地貌谁改地图**：模块结构变化、新模块加入、命名约定调整，由当次的 RepoImpactMapper / DetailedDesignReviewer / 编码者顺手改掉对应索引行；不允许"漂亮但没人维护"的孤岛文档
 - **大仓拆薄册子**：当本文件超过两屏，应按子模块拆出 `src/<area>/AGENTS.md`，按路径层级拼接，避免单文件无限膨胀
 - **细节交给检索与跳转**：具体某个类、某条调用链，交给 IDE 跳转、`#codebase` / `grep` / 向量检索去办；索引层只保证"从哪几扇门进得去"
 

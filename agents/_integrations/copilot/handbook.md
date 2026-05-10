@@ -140,7 +140,7 @@
 
    **它是干啥的**：一份“这次要做的需求，落到这个仓库里会牼动哪些东西”的对账单。它**不**选技术栈、**不**设计 API、**不**写代码，只回答“现在长啥样、谁会被改、谁会被破坏、有没有禁区”。横在 H1 与 H2 之间的一道对账闸门，避免 H2/H3/H5 在沙地上盖楼。
 
-   **不是可选**：`H2-ArchitectAdvisor` 与 `H3-DesignReviewer` 的输入契约都把它列为“必需”（参见 [`agents/architect-advisor/AGENT.md`](../../agents/architect-advisor/AGENT.md) 第 3 节、[`agents/design-reviewer/AGENT.md`](../../agents/design-reviewer/AGENT.md) 第 3 节），缺它两个 Agent 会同时阻塞。区别只在于产出形态不同：
+   **不是可选**：`H2-ArchitectAdvisor` 与 `H3-DetailedDesignReviewer` 的输入契约都把它列为“必需”（参见 [`agents/architect-advisor/AGENT.md`](../../agents/architect-advisor/AGENT.md) 第 3 节、[`agents/detailed-design-reviewer/AGENT.md`](../../agents/detailed-design-reviewer/AGENT.md) 第 3 节），缺它两个 Agent 会同时阻塞。区别只在于产出形态不同：
 
    - **老仓改造**：扫真实代码，列受影响模块 / 文件 / 接口 / 测试，每条给置信度（high / medium / low）。**不在图上的文件，`H5-CodingExecutor` 不会改**——这是约束层的核心机制。
    - **全新空仓**：影响面表的“已存在”列全为“无”是常态，但付要做——它会用占位符（`<frontend>` / `<backend>` / `<dal>`）锁定**功能簇**作为 H2 ADR 的输入信号，并用“缺失发现 GAP-NNN”列出 H2 启动会议必须当面回答的硬依赖（登录方案 / 模型网关 / 第三方服务商等）。
@@ -148,7 +148,7 @@
    **下游怎么用它**：
 
    - H2 `h2-architect-advisor` 读它识别“必须复用”与“可替换”的既有组件
-   - H3 `h3-design-reviewer` 拿设计中引用的路径与它反向交叉验证，疑似凭空编造的全部抦下
+   - H3 `h3-detailed-design-reviewer` 拿设计中引用的路径与它反向交叉验证，疑似凭空编造的全部抦下
    - H5 `/new-task` 起任务卡时，从这里的“已存在”列拽出“允许修改的文件”列表。**AI 改不改一个文件，不取决于它觉得该不该改，取决于这份图列没列**。
 
    _示例输入_（老仓改造场景，强调查不到就标 UNKNOWN，不凭命名臆造）：
@@ -202,7 +202,7 @@
 
 6. **H3 详细设计**：H3 颗粒度极细（每个程序文件 10 字段 + DB / API / 流程 / 配置 / 日志 / 监控 / 部署 / 性能边界），单次会话装不下。**强制 per-module 切片**——一次起草一个模块，多次拼成完整 H3。两个 Agent 配对走：
 
-   - **起草**：切到 `h3-design-author`，给它一个明确的 module 名（必须在 `AGENTS.md` §3.1 拓扑里）。它会读 H1 / H2 / ADR，按 [stages/h3-detailed-design.md §5](../../../docs/stages/h3-detailed-design.md) 的 10 字段模板逐文件写；接口签名 / 错误码 / 日志字段 / 性能数字 / 表结构 等封闭枚举**强制 picker 拍板**，它绝不替你做关键决策。产物落到 `docs/04-detailed-design/<module>/HD-NNN-<module>-<topic>.md`，跨模块章节追加到 `database-design.md` / `api-design.md` / `file-structure.md`。`status` 永远 `draft`，留给人工签字。
+   - **起草**：切到 `h3-detailed-design-author`，给它一个明确的 module 名（必须在 `AGENTS.md` §3.1 拓扑里）。它会读 H1 / H2 / ADR，按 [stages/h3-detailed-design.md §5](../../../docs/stages/h3-detailed-design.md) 的 10 字段模板逐文件写；接口签名 / 错误码 / 日志字段 / 性能数字 / 表结构 等封闭枚举**强制 picker 拍板**，它绝不替你做关键决策。产物落到 `docs/04-detailed-design/<module>/HD-NNN-<module>-<topic>.md`，跨模块章节追加到 `database-design.md` / `api-design.md` / `file-structure.md`。`status` 永远 `draft`，留给人工签字。
 
      _示例输入_（per-module 切片，给目标模块 + 上游凭证）：
 
@@ -215,7 +215,7 @@
      落到 docs/04-detailed-design/auth/，status 保持 draft。
      ```
 
-   - **评审**：起草完一个模块就立刻切到 `h3-design-reviewer` 跑一次机械化校验。它会按 [stages/h3-detailed-design.md](../../../docs/stages/h3-detailed-design.md) 的章节清单逐项打 `pass` / `partial` / `missing`，给反问清单和阻塞标记。产出 `docs/04-detailed-design/design-review-report.md`。**它不改设计文档，也不替你翻 status**——`blocking` 数为 0 之后由人工把 `HD-NNN.md` 的 `status: draft → reviewed`、`reviewers:` 添一行，然后才进 H4。
+   - **评审**：起草完一个模块就立刻切到 `h3-detailed-design-reviewer` 跑一次机械化校验。它会按 [stages/h3-detailed-design.md](../../../docs/stages/h3-detailed-design.md) 的章节清单逐项打 `pass` / `partial` / `missing`，给反问清单和阻塞标记。产出 `docs/04-detailed-design/design-review-report.md`。**它不改设计文档，也不替你翻 status**——`blocking` 数为 0 之后由人工把 `HD-NNN.md` 的 `status: draft → reviewed`、`reviewers:` 添一行，然后才进 H4。
 
      _示例输入_（只评审不修改，给评审口径 + 给期望交付）：
 
@@ -344,8 +344,8 @@
 │  H1 原型实践      → 你自选原型工具              → prototypes/<feature>/      │
 │  H1 影响图        → H1-RepoImpactMapper         → docs/01-requirements/      │
 │  H2 架构 / ADR    → H2-ArchitectAdvisor         → docs/03-architecture/      │
-│  H3 详细设计起草  → H3-DesignAuthor             → docs/04-detailed-design/   │
-│  H3 详细设计评审  → H3-DesignReviewer           → docs/04-detailed-design/   │
+│  H3 详细设计起草  → H3-DetailedDesignAuthor             → docs/04-detailed-design/   │
+│  H3 详细设计评审  → H3-DetailedDesignReviewer           → docs/04-detailed-design/   │
 │  H4 测试用例      → H4-TestCaseAuthor           → docs/05-test-design/       │
 │  H5 起任务        → /new-task                   → docs/06-tasks/             │
 │  H5 编码          → H5-CodingExecutor           → 改源码 + Verify            │
@@ -381,8 +381,8 @@
 │   ├── h1-prototype-author.agent.md
 │   ├── h1-prototype-reviewer.agent.md
 │   ├── h2-architect-advisor.agent.md
-│   ├── h3-design-author.agent.md
-│   ├── h3-design-reviewer.agent.md
+│   ├── h3-detailed-design-author.agent.md
+│   ├── h3-detailed-design-reviewer.agent.md
 │   ├── h4-test-case-author.agent.md
 │   ├── h5-coding-executor.agent.md
 │   ├── h5-commit-auditor.agent.md
@@ -520,7 +520,7 @@ Copy-Item .github\templates\ai-task-brief.md docs\06-tasks\T-001-<slug>.md
 | `H1-PrototypeReviewer`       | H1    | 只读评审：读原型 + UI 文档，按 phase-gate H1 12 条 PASS/FAIL，不写文件                      |
 | `H1-RepoImpactMapper`        | H1↔H3 | 产出“需求 ↔ 真实代码”对账单；H2 / H3 必需输入；H5 阶段用作 AI “允许修改文件”的边界              |
 | `H2-ArchitectAdvisor`        | H2    | 起草架构选型 + ADR，每条选型留六字段                                                        |
-| `H3-DesignReviewer`          | H3    | 评审详细设计是否可进 H4                                                                     |
+| `H3-DetailedDesignReviewer`          | H3    | 评审详细设计是否可进 H4                                                                     |
 | `H4-TestCaseAuthor`          | H4    | 从需求与设计反推测试用例矩阵                                                                |
 | `H5-CodingExecutor`          | H5    | 严格按 ai-task-brief 执行编码 + Verify                                                      |
 | `H5-CommitAuditor`           | H5    | 校验 commit 六字段，不合格拒合并                                                            |
@@ -810,7 +810,7 @@ H2 架构选型完成后由项目负责人补充：
   - 哪些目录禁止 AI 自动修改（须人工评审）
   - 与外部依赖（登录 / 模型网关 / 搜索服务商等）耦合的边界
 
-H1-RepoImpactMapper、H3-DesignReviewer、H5-CodingExecutor 都依赖本节做边界判断。
+H1-RepoImpactMapper、H3-DetailedDesignReviewer、H5-CodingExecutor 都依赖本节做边界判断。
 
 完成本节签字后下一步：
 1. 跑一次 /run-gate H2 做机械复核。
@@ -836,7 +836,7 @@ H1-RepoImpactMapper、H3-DesignReviewer、H5-CodingExecutor 都依赖本节做�
 
 在这份最小版本中，只有第 1 节（项目身份）与第 4 节（模块边界）是你需要亲手签的签字位。其他都是指针，不需要你另外维护。**两个签字位的 HTML 注释里都内嵌了"完成签字后下一步"**——签完不知道接下来做什么时直接回头看注释，不需要再问 Agent。
 
-为什么这里不能让 AI 代笔：这两节付与项目负责人的同一套逻辑——谁都不能替项目说“我是谁”“我该受什么限制”。`H1-RepoImpactMapper` / `H3-DesignReviewer` / `Hx-DocGardener` 都是这两节的下游消费者；AI 代笔 = 让下游评审在架空凭证上跑。
+为什么这里不能让 AI 代笔：这两节付与项目负责人的同一套逻辑——谁都不能替项目说“我是谁”“我该受什么限制”。`H1-RepoImpactMapper` / `H3-DetailedDesignReviewer` / `Hx-DocGardener` 都是这两节的下游消费者；AI 代笔 = 让下游评审在架空凭证上跑。
 ### Q9: Agent 起草的文档里有"待填"位置，我应该在哪里改？怎么改？
 
 简短答：**搜 `[ 待填 ]`**。

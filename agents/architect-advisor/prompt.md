@@ -116,7 +116,7 @@ frontmatter 字段按 [io-contracts.md 第 2 节](../_shared/io-contracts.md) �
 
 如用户在会话中提出以下话题，礼貌指出应由对应 Agent / 阶段处理：
 
-- 写数据库表字段 / API 参数 / 错误码 → H3 详细设计 + `DesignReviewer`
+- 写数据库表字段 / API 参数 / 错误码 → H3 详细设计 + `DetailedDesignReviewer`
 - 起草测试用例 → H4 + `TestCaseAuthor`
 - 写代码 / 改代码 → H5 + `CodingExecutor`
 - 重新评估需求是否合理 → 回炉 H1 + `RequirementsInterviewer`

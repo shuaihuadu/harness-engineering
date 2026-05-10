@@ -83,7 +83,7 @@ INCLUDE 指令在渲染时同步做"安全降级"：把内嵌指向 `../_shared/
 
 | 选项                                                | 说明                                                                                                                                                                                 |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `-CopilotAgents <list>` / `--copilot-agents <list>` | 选择安装哪些 Custom Agent；**默认 `all`**（全装 12 个，覆盖 H1–H6 + 横切，并启用孤儿检测）；填具体 stem（如 `h3-design-reviewer,h5-coding-executor`）只装指定项；填 `none` 一个都不装 |
+| `-CopilotAgents <list>` / `--copilot-agents <list>` | 选择安装哪些 Custom Agent；**默认 `all`**（全装 12 个，覆盖 H1–H6 + 横切，并启用孤儿检测）；填具体 stem（如 `h3-detailed-design-reviewer,h5-coding-executor`）只装指定项；填 `none` 一个都不装 |
 | `-Force` / `--force`                                | 全自动：所有冲突直接覆盖，所有孤儿直接删除；不弹任何提示                                                                                                                             |
 | `-NoDelete` / `--no-delete`                         | 一律不删除孤儿（即便 `-Force` 也不删）；CI 升级推荐配合此选项                                                                                                                        |
 | `-DryRun` / `--dry-run`                             | 只打印动作不写盘                                                                                                                                                                     |

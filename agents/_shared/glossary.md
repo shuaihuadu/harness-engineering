@@ -70,6 +70,6 @@
 
 并列三个**实体概念**：
 
-- **Agent**：本规范定义的 8 个职责单一角色（`requirements-interviewer` / `design-reviewer` / ...），落在 `agents/<name>/AGENT.md` + `prompt.md`。
+- **Agent**：本规范定义的 8 个职责单一角色（`requirements-interviewer` / `detailed-design-reviewer` / ...），落在 `agents/<name>/AGENT.md` + `prompt.md`。
 - **Skill**：跨 Agent 复用的操作型 SOP，落在 `agents/_skills/<name>/SKILL.md`，有标准化 frontmatter 与触发条件。
 - **Custom Agent**：AI 编码工具（Copilot / Cursor / Claude Code 等）侧的"会话级 Agent"装载方式，把上述 Agent 的 prompt 包装成工具自家的配置文件（如 `.github/agents/*.agent.md`）。Agent 是规范概念，Custom Agent 是工具落地形态。

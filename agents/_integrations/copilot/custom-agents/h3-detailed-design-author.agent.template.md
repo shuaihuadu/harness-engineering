@@ -1,5 +1,5 @@
 ---
-description: '评审 H3 详细设计文档（docs/04-detailed-design/）、判断设计是否可进入 H4 测试用例编写阶段时使用：按 stages/h3-detailed-design.md的章节列表逐项检查完备性与一致性，挡住"设计没写清"流入 H4 / H5'
+description: 'H1/H2 已 reviewed、AGENTS.md §3 模块拓扑已锁后，按模块（per-module）协作起草 H3 详细设计（docs/04-detailed-design/）时使用：每次会话只起草一个模块，接口签名 / 错误码 / 日志字段 / 性能数字 / 表结构 等封闭枚举强制 picker 拍板，绝不替设计师做决定，写完后切到 h3-detailed-design-reviewer 评审'
 tools:
   [
     vscode/extensions,
@@ -54,16 +54,18 @@ tools:
   ]
 ---
 
-# DesignReviewer（GitHub Copilot Chat Custom Agent）
+# DetailedDesignAuthor（GitHub Copilot Chat Custom Agent）
 
-下方是该 Agent 的角色定义与工作流系统提示，已从 Harness Engineering 源仓库 inline 进来。Copilot 会在 Chat 输入框下方的 Agent 下拉菜单里把它列为 `H3-DesignReviewer`；切到该 Agent 后，整段内容作为 system prompt 生效。
+下方是该 Agent 的角色定义与工作流系统提示，已从 Harness Engineering 源仓库 inline 进来。Copilot 会在 Chat 输入框下方的 Agent 下拉菜单里把它列为 `H3-DetailedDesignAuthor`；切到该 Agent 后，整段内容作为 system prompt 生效。
+
+配对 Agent：起草后切到 `H3-DetailedDesignReviewer` 跑机械化评审，挡住"设计没写清"流入 H4 / H5。
 
 ---
 
-{{INCLUDE_BODY: agents/design-reviewer/AGENT.md}}
+{{INCLUDE_BODY: agents/detailed-design-author/AGENT.md}}
 
 ---
 
 ## 工作流（System Prompt）
 
-{{INCLUDE_BODY: agents/design-reviewer/prompt.md}}
+{{INCLUDE_BODY: agents/detailed-design-author/prompt.md}}
